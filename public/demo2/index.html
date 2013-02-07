@@ -6,6 +6,7 @@
 	</head>
 
 	<body>
+        <div style="padding-left: 200px; position:absolute" id="count"></div>
 		<div id="container"></div>
 	</body>
 
@@ -269,7 +270,6 @@ float pnoise(vec3 P, vec3 rep)
 
 		// grab the container from the DOM
 		container = document.getElementById( "container" );
-		
 		// create a scene
 		scene = new THREE.Scene();
 
@@ -279,8 +279,8 @@ float pnoise(vec3 P, vec3 rep)
 			fov, 
 			window.innerWidth / window.innerHeight, 
 			1, 
-			10000 );
-		camera.position.z = 100;
+			1000000 );
+		camera.position.z = 10000;
 		camera.target = new THREE.Vector3( 0, 0, 0 );
 
 		scene.add( camera );
@@ -303,12 +303,19 @@ float pnoise(vec3 P, vec3 rep)
 		} );	
 
 		// create a sphere and assign the material
-		mesh = new THREE.Mesh( 
-			new THREE.IcosahedronGeometry( 20, 4 ), 
+		meshl = new THREE.Mesh( 
+			new THREE.SphereGeometry( 2000, 100,100, 0, Math.PI/2, 0, Math.PI/2 ), 
 			material 
 		);
-		scene.add( mesh );
-		
+		meshr = new THREE.Mesh( 
+			new THREE.SphereGeometry( 2000, 10,10, Math.PI/2, Math.PI/2, 0, Math.PI/2 ), 
+			material 
+		);
+		scene.add( meshl );
+		scene.add( meshr );
+	
+        document.getElementById('count').innerHTML = "Left: " + meshl.geometry.vertices.length + " Right: " + meshr.geometry.vertices.length;
+
 		// create the renderer and attach it to the DOM
 		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
@@ -316,6 +323,20 @@ float pnoise(vec3 P, vec3 rep)
 		container.appendChild( renderer.domElement );
 
 		render();
+
+
+        window.addEventListener('keypress', function(e){
+            if(e.keyCode === 37){
+                camera.position.x -= 500;
+            }if(e.keyCode === 39){
+                camera.position.x += 500;
+            }if(e.keyCode === 38){
+                camera.position.y += 500;
+            }if(e.keyCode === 40){
+                camera.position.y -= 500;
+            }
+		    camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        });
 
 	} );
 
