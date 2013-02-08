@@ -12,9 +12,9 @@
 
 	<script src="three.min.js"></script>
 	<script src="stats.min.js"></script>
+    <script src="/js/controls/FlyControls.js"></script>
 	
 <!--	<script type="x-shader/x-vertex" src="classicnoise3d.glsl"></script>-->
-
 	<script type="x-shader/x-vertex" id="vertexShader">
 		// Include the Ashima code here!
 //
@@ -218,7 +218,7 @@ float pnoise(vec3 P, vec3 rep)
 				float b = 5.0 * pnoise( 0.05 * position + vec3( 2.0 * time ), vec3( 100.0 ) );
 				float displacement = - noise + b;
 				 
-				vec3 newPosition = position + normal * displacement;
+				vec3 newPosition = position + normal * displacement ;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 		 
 		}
@@ -254,6 +254,7 @@ float pnoise(vec3 P, vec3 rep)
 		renderer, 
 		scene, 
 		camera, 
+        controls,
 		mesh, 
 		start = Date.now(),
 		fov = 30;
@@ -269,6 +270,7 @@ float pnoise(vec3 P, vec3 rep)
 
 
         var radius = 6378000;
+//        var radius = 8000;
 
 		// grab the container from the DOM
 		container = document.getElementById( "container" );
@@ -282,10 +284,17 @@ float pnoise(vec3 P, vec3 rep)
 			window.innerWidth / window.innerHeight, 
 			1, 
 			10000000000 );
-		camera.position.z = 20000000+radius;
+		camera.position.z = radius*4;
 		camera.target = new THREE.Vector3( 0, 0, 0 );
 
-		scene.add( camera );
+        controls = new THREE.FlyControls( camera );
+        controls.movementSpeed = radius / 2.5;
+        controls.domElement = container;
+        controls.rollSpeed = Math.PI / 24;
+        controls.autoForward = false;
+        controls.dragToLook = false;	
+
+        scene.add( camera );
 
 		// create a wireframe material		
 	  material = new THREE.ShaderMaterial( {
@@ -305,11 +314,11 @@ float pnoise(vec3 P, vec3 rep)
 		} );	
 		// create a sphere and assign the material
 		meshl = new THREE.Mesh( 
-			new THREE.SphereGeometry( radius, 200,200, 0, Math.PI/2, 0, Math.PI/2 ), 
+			new THREE.SphereGeometry( radius, 150,150, 0, Math.PI/2, 0, Math.PI/2 ), 
 			material 
 		);
 		meshr = new THREE.Mesh( 
-			new THREE.SphereGeometry( radius, 30,30, Math.PI/2, Math.PI/2, 0, Math.PI/2 ), 
+			new THREE.SphereGeometry( radius, 50,50, Math.PI/2, Math.PI/2, 0, Math.PI/2 ), 
 			material 
 		);
 		scene.add( meshl );
@@ -325,7 +334,8 @@ float pnoise(vec3 P, vec3 rep)
 
 		render();
 
-        var movement = 1000000;
+        var movement = radius;
+/*
         window.addEventListener('keypress', function(e){
             if(e.keyCode === 37){
                 camera.position.x -= movement;
@@ -338,16 +348,18 @@ float pnoise(vec3 P, vec3 rep)
             }
 		    camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
         });
+*/
 
 	} );
-
+    var clock = new THREE.Clock();
 	function render() {
 		stats.begin();
-		material.uniforms[ 'time' ].value = .0000025 * ( Date.now() - start );
+        var delta = clock.getDelta();
+		material.uniforms[ 'time' ].value = .00000025 * ( Date.now() - start );
 		// let there be light
 		renderer.render( scene, camera );
 		requestAnimationFrame( render );
-		
+        controls.update( delta );
 		stats.end();
 	}
 
