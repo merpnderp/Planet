@@ -7,14 +7,17 @@ var container,
     start = Date.now(),
     fov = 30,
     pause = false,
-    hrez = lrez = 30,
+    hrez = 75,
+    lrez = hrez,
     radius = 20;
+//    radius = 6378000;
     //set up stats
 var stats = new Stats();
 stats.setMode( 1 );
 stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '5px';
     stats.domElement.style.top = '5px';
+    stats.domElement.style.width = '90px';
     document.body.appendChild( stats.domElement );
 
 
@@ -32,7 +35,6 @@ stats.domElement.style.position = 'absolute';
 */
 window.addEventListener( 'load', function() {
 
-//        var radius = 6378000;
 
     // grab the container from the DOM
     container = document.getElementById( "container" );
@@ -46,7 +48,7 @@ window.addEventListener( 'load', function() {
         window.innerWidth / window.innerHeight, 
         1, 
         10000000000 );
-    camera.position.z = radius*4;
+    camera.position.z = radius*5;
     camera.target = new THREE.Vector3( 0, 0, 0 );
 
     controls = new THREE.FlyControls( camera );
@@ -78,7 +80,7 @@ window.addEventListener( 'load', function() {
     // create a sphere and assign the material
 
     planet = new THREE.Object3D();
-    planet.position.x = 10;
+//    planet.position.x = 10;
     createSpheres();
     scene.add( planet );
 
@@ -103,7 +105,7 @@ function render() {
 
     var delta = clock.getDelta();
     material.uniforms[ 'time' ].value = .0000025 * ( Date.now() - start );
-    planet.rotation.y += delta * .01;
+    planet.rotation.y += delta * .03;
     
     // let there be light
     renderer.render( scene, camera );
@@ -113,35 +115,60 @@ function render() {
     controls.update( delta );
 //    createSpheres();
     time += delta;
-    if(time > 1){
-        var angle = getAngle();
+    if(time > .5){
+        var angles = getAngles();
         $('#info').html(
             "Planet rotation: " + 
             planet.rotation.x + "," +
             planet.rotation.y + "," + 
             planet.rotation.z + 
-            "<br/>Left Angle: " + angle
+            "<br/>Horizontal Angle: " + angles[0] + 
+            "<br/>Vertical Angle: " + angles[1]
             );
         time = 0;
     }
 
     stats.update();
 }
-function getAngle(){
-    var direction = new THREE.Vector3(0,0,0).subVectors(planet.position, camera.position);
-    direction.y = 0;
-    direction.normalize();
-    var left = planet.position.clone();
+function getAngles(){
+    var direction = new THREE.Vector3(0,0,0).subVectors(planet.position, camera.position),
+        hdir,
+        vdir,
+        left,
+        up,
+        dot,
+        d,
+        p,
+        hangle,
+        hangle;
+     
+    //Get horizontal angle
+    hdir = direction.clone();
+    hdir.y = 0;
+    hdir.normalize();
+    left = planet.position.clone();
     left.y = 0;
-    left.x - radius;
+    left.x -= radius;
     left.normalize();
-    var dot = direction.dot(left);
-    var d = direction.length();
-    var p = left.length();
+    dot = hdir.dot(left);
+    d = hdir.length();
+    p = left.length();
+    hangle = Math.acos(dot / (d * p));
 
-    var value = dot / (d * p);
+    //Get vertical angle
+    vdir = direction.clone();
+    vdir.x = 0;
+    vdir.normalize();
+    up = planet.position.clone();
+    up.x = 0;
+    up.y += radius;
+    up.normalize();
+    dot = vdir.dot(up);
+    d = vdir.length();
+    p = up.length();
+    vangle = Math.acos(dot / (d * p));
 
-    return Math.acos(value);
+    return [hangle,vangle];
 }
 
 function createSpheres(){
