@@ -6,14 +6,16 @@
 	</head>
 
 	<body>
-        <div style="padding-left: 200px; position:absolute" id="count"></div>
+        <div style="padding-top: 80px; position:absolute" id="info">test</div>
+        <div style="left: 90%; position:absolute" id="paused"></div>
 		<div style="position:absolute" id="container"></div>
 	</body>
 
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="three.min.js"></script>
 	<script src="stats.min.js"></script>
+	<script src="resize.js"></script>
     <script src="/js/controls/FlyControls.js"></script>
-	
 <!--	<script type="x-shader/x-vertex" src="classicnoise3d.glsl"></script>-->
 	<script type="x-shader/x-vertex" id="vertexShader">
 		// Include the Ashima code here!
@@ -255,18 +257,31 @@ float pnoise(vec3 P, vec3 rep)
 		scene, 
 		camera, 
         controls,
-		meshl, 
-		meshr,
+		mesh1, 
         planet
 		start = Date.now(),
-		fov = 30;
+		fov = 30,
+        pause = false;
 		//set up stats
 		var stats = new Stats();
 		stats.setMode( 0 );
 		stats.domElement.style.position = 'absolute';
-		stats.domElement.style.left = '10px';
-		stats.domElement.style.top = '10px';
+		stats.domElement.style.left = '5px';
+		stats.domElement.style.top = '5px';
 		document.body.appendChild( stats.domElement );
+
+
+    window.addEventListener('keypress', function(e){
+        if(e.charCode === 112){
+            pause = ! pause;
+        }
+        if(! pause){
+            render();
+            $('#paused').text('');
+        }else{
+            $('#paused').text('PAUSED');
+        }
+    });
 
 	window.addEventListener( 'load', function() {
 
@@ -318,8 +333,8 @@ float pnoise(vec3 P, vec3 rep)
         // create a sphere and assign the material
         var hrez = lrez = 50;
         var meshes = [];
-        
 		meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, hrez,hrez, 0, Math.PI/2, 0, Math.PI/2 ), material ));
+        mesh1 = meshes[0]; 
 		meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, lrez,lrez, Math.PI/2, Math.PI/2, 0, Math.PI/2 ), material ));
 		meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, lrez,lrez, Math.PI, Math.PI/2, 0, Math.PI/2 ), material ));
 		meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, lrez,lrez, Math.PI * 1.5, Math.PI/2, 0, Math.PI/2 ), material ));
@@ -336,10 +351,9 @@ float pnoise(vec3 P, vec3 rep)
             planet.add(mesh);
         });
 
+    planet.useQuaternion = true;
 		scene.add( planet );
 	
-///        document.getElementById('count').innerHTML = "Left: " + meshl.geometry.vertices.length + " Right: " + meshr.geometry.vertices.length;
-
 		// create the renderer and attach it to the DOM
 		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth-50, window.innerHeight-50 );
@@ -349,33 +363,44 @@ float pnoise(vec3 P, vec3 rep)
 		render();
 
         var movement = radius;
-/*
-        window.addEventListener('keypress', function(e){
-            if(e.keyCode === 37){
-                camera.position.x -= movement;
-            }if(e.keyCode === 39){
-                camera.position.x += movement;
-            }if(e.keyCode === 38){
-                camera.position.y += movement;
-            }if(e.keyCode === 40){
-                camera.position.y -= movement;
-            }
-		    camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
-        });
-*/
 
 	} );
     var clock = new THREE.Clock();
+    var quaternion = new THREE.Quaternion(); 
+
 	function render() {
-		//stats.begin();
+
         var delta = clock.getDelta();
 		material.uniforms[ 'time' ].value = .0000025 * ( Date.now() - start );
-        planet.rotation.y += delta * .1;
+   //     planet.rotation.y += delta * .01;
+        quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), (Math.PI) * delta );
+        planet.quaternion.multiply(quaternion);
+        planet.matrixWorldNeedsUpdate = true;
 
 		// let there be light
-		renderer.render( scene, camera );
-		requestAnimationFrame( render );
+ 		renderer.render( scene, camera );
+        if(! pause){
+    		requestAnimationFrame( render );
+        }
         controls.update( delta );
+
+        var direction = new THREE.Vector3(0,0,0).subVectors(planet.position, camera.position);
+
+        $('#info').html(
+            "Local rotation: " + 
+            mesh1.rotation.x + "," +
+            mesh1.rotation.y + "," + 
+            mesh1.rotation.z + 
+            "<br/>" + 
+            "Planet rotation: " + 
+            planet.rotation.x + "," +
+            planet.rotation.y + "," + 
+            planet.rotation.z + 
+            "<br/>" + 
+            direction.x + "<br/>" + 
+            direction.y + "<br/>" + 
+            direction.z);
+
 		stats.update();
 	}
 
