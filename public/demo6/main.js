@@ -50,10 +50,11 @@ window.addEventListener( 'load', function() {
         window.innerWidth / window.innerHeight, 
         1, 
         10000000000 );
-    camera.position.z = radius*5;
-//    camera.position.y = radius;
+    camera.position.z = radius*2;
+    camera.position.y = radius*5;
     camera.target = new THREE.Vector3( 0, 0, 0 );
     controls = new THREE.FlyControls( camera );
+    camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
     controls.movementSpeed = radius / .5;
     controls.domElement = container;
     controls.rollSpeed = Math.PI / 12;
@@ -82,12 +83,22 @@ window.addEventListener( 'load', function() {
     // create a sphere and assign the material
 
     planet = new THREE.Object3D();
-    planet.position.x = 10;
+    //planet.position.x = 10;
     createSpheres(getAngles());
-    var testSphere = new THREE.Mesh( new THREE.SphereGeometry( 5, hrez,hrez), material );
+    var testSphere = new THREE.Mesh( new THREE.SphereGeometry( 5, hrez,hrez), new THREE.MeshBasicMaterial({color:'#000000'}));
     testSphere.position = new THREE.Vector3(0,0,0);
     scene.add( testSphere );
     scene.add( planet );
+
+    //Add axis markers
+    var xaxis = new THREE.Mesh( new THREE.CylinderGeometry(radius/60, radius/60, radius*100), new THREE.MeshBasicMaterial({color:'#FF0000'}) );
+    xaxis.rotation.z += Math.PI/2;
+    var yaxis = new THREE.Mesh( new THREE.CylinderGeometry(radius/60, radius/60, radius*100), new THREE.MeshBasicMaterial({color:'#FFFF00'}) );
+    var zaxis = new THREE.Mesh( new THREE.CylinderGeometry(radius/60, radius/60, radius*100), new THREE.MeshBasicMaterial({color:'#0000FF'}) );
+    zaxis.rotation.x += Math.PI/2;
+    scene.add(xaxis);
+    scene.add(yaxis);
+    scene.add(zaxis);
 
 //        var directionalLight = new THREE.DirectionalLight( 0xffffff, .5 ); 
 //        directionalLight.position.set( 0, 0, -1 ); 
@@ -125,7 +136,7 @@ function render() {
     time += delta;
     if(time > 1){
         angles = getAngles();
-        createSpheres(angles);
+        createSpheres(angles );
         var d = getPlanetCamera();
         var p = planet.position;
         var c = camera.position;
@@ -162,34 +173,32 @@ function getAngles(){
     left.y = 0;
     left.x -= radius;
     dot = left.dot(hdir);
-    //console.info(direction);
-    //console.info(left);
     d = hdir.length();
     p = left.length();
-   // console.log("dot: " + dot + " d: " + d + " p: " + p);
     hangle = Math.acos(dot / (d * p));
     if(camera.position.z < planet.position.z){
         hangle = Math.PI*2 - hangle;
-    }else{
     }
 
 
     //Get vertical angle
     vdir = direction.clone();
     vdir.x = 0;
-    vdir.normalize();
     up = planet.position.clone();
     up.x = 0;
     up.y += radius;
-    up.normalize();
     dot = vdir.dot(up);
     d = vdir.length();
     p = up.length();
-    //vangle = Math.acos(dot / (d * p));
+    vangle = Math.acos(dot / (d * p));
+    if(camera.position.z < planet.position.z){
+    //    vangle = Math.PI*2 - vangle;
+    }
 
     return [hangle,vangle];
 }
 
+var flip = true;
 function createSpheres(angles){
     var meshes = [];
     planet.children.forEach(function(mesh){
@@ -197,10 +206,14 @@ function createSpheres(angles){
     });
     var hangle = angles[0];
     var vangle = angles[1];
-    var quartPI = Math.PI/4;
-    var halfPI = Math.PI/2;
+    var size = Math.PI/4;
+    var quartPI = size;
+    var halfPI = size*2;
+    flip = ! flip;
+    var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
 //hi-rez slice facing camera;
-    meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, hrez,hrez, hangle - quartPI, halfPI, 0, Math.PI/2 ), material ));
+    //meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, hrez,hrez, hangle - quartPI, halfPI, 0, Math.PI/2 ), material ));
+    meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, hrez,hrez, hangle - quartPI, halfPI, vangle - quartPI, halfPI ), green ));
 //    meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, lrez,lrez, Math.PI/2, Math.PI/2, 0, Math.PI/2 ), material ));
 //    meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, lrez,lrez, Math.PI, Math.PI/2, 0, Math.PI/2 ), material ));
 //    meshes.push(new THREE.Mesh( new THREE.SphereGeometry( radius, lrez,lrez, Math.PI * 1.5, Math.PI/2, 0, Math.PI/2 ), material ));
