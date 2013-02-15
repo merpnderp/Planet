@@ -11,8 +11,8 @@ var container,
     setRez = 30,
 //    radius = 5.913520000 * Math.pow(10,11);//size of sun
 //    radius = 149597870700 * 50000;//Size of solar system
-//    radius = 20;
-    radius = 6378000;
+    radius = 100;
+//    radius = 6378000;
     //set up stats
     
    
@@ -205,23 +205,27 @@ function createSpheres(angles){
         planet.remove(mesh);
     });
 
-
 //    flip = ! flip;
     var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
-//green = material;  
+green = material;  
+
+    var distance = camera.position.distanceTo(planet.position) - radius;
+    var circ = Math.PI/2;
+    if(distance < radius ){
+        circ = THREE.Math.clampBottom(circ * (distance / (radius/2)), circ / 5) ;
+        controls.movementSpeed = THREE.Math.clamp(radius*.5*(distance/radius), radius*.05, radius*.5);
+    }
     var hangle = angles[0];
     var vangle = angles[1];
 
-    var circ = Math.PI/2;
     var mod = 1;
-    var iterations = 5;
+    var iterations = 4;
     var rezMod = iterations * iterations;
-    var rez;
+    var rez = setRez/ iterations;
     var geos = new Array();
     for(var i = 1; i < iterations; i++){
-        rez = setRez / rezMod;
-        rezMod /= 2;
-//        rezMod = --rezMod > 1 ? rezMod : 1;
+//        rez = setRez / rezMod;
+//        rezMod /= 2;
 
         //top 4
         geos.push(new THREE.SphereGeometry( radius, rez,rez, hangle - (circ*mod), circ*mod/2 , vangle - (circ*mod), circ*mod/2 ));
@@ -240,12 +244,12 @@ function createSpheres(angles){
         geos.push( new THREE.SphereGeometry( radius, rez,rez, hangle, circ*mod/2 , vangle + (circ*mod/2), circ*mod/2 ));
         geos.push( new THREE.SphereGeometry( radius, rez,rez, hangle + circ*mod/2, circ*mod/2 , vangle + (circ*mod/2), circ*mod/2 ));
         
-        
+        rez *= 1.2;       
         mod /= 2;         
     }
     //Final Patch
     geos.push( new THREE.SphereGeometry( radius, setRez, setRez, hangle - (circ*mod), circ*mod*2 , vangle - (circ*mod), circ*mod*2 ));
-    
+      
     geos.forEach(function(geo){
         meshes.push( new THREE.Mesh(geo, green));
     });
