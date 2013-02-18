@@ -37,16 +37,16 @@ function start(){
         start = Date.now(),
         fov = 30,
         pause = false,
-        setRez = 20,
+        setRez = 10,
     //    radius = 5.913520000 * Math.pow(10,11);//size of sun
     //    radius = 149597870700 * 50000;//Size of solar system
-        radius = 100;
+        radius = 50;
     //    radius = 6378000;//radius of earth
    
 
 
     var stats = new Stats();
-    stats.setMode( 0 );
+    stats.setMode( 1 );
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '5px';
     stats.domElement.style.top = '5px';
@@ -86,6 +86,10 @@ function start(){
             time: { // float initialized to 0
                 type: "f", 
                 value: 0.0 
+            },
+            rotation: { 
+                type: "v4",
+                value: new THREE.Vector4(0,0,0,0),
             }
         },
         vertexShader: vertexShader,//document.getElementById( 'vertexShader' ).textContent,
@@ -96,7 +100,7 @@ function start(){
     // create a sphere and assign the material
 
     planet = new THREE.Object3D();
-    //planet.position.x = 10;
+//    planet.position.x = .10;
     oldAngles = getAngles();
     createSpheres(oldAngles);
     var testSphere = new THREE.Mesh( new THREE.SphereGeometry( radius/10, setRez,setRez), new THREE.MeshBasicMaterial({color:'#000000'}));
@@ -136,14 +140,29 @@ function start(){
     directionalLight.position.set( 2, 2, 0 ); 
     scene.add( directionalLight );
 
+    var oldD = getPlanetCamera();
     render();
-
+    
+    function getPlanetCamera(){
+        return new THREE.Vector3(0,0,0).subVectors(camera.position, planet.position);
+    }
+    function logVector(s, v){
+        console.log(s + " : " +v.x + ", " + v.y + ", " + v.z);
+    }
+    
     function render() {
         var angles = [];
         delta = clock.getDelta();
 
+        var m = planet.matrix.clone();
+        m.lookAt(camera.position, planet.position, planet.up);
+       // var rr = m.decompose()[ 1 ];
+        var tr = m.decompose()[ 1 ].inverse();
+        
         material.uniforms[ 'time' ].value = .0000025 * ( Date.now() - start );
-    //    planet.rotation.y += delta * .03;
+        material.uniforms[ 'rotation' ].value = tr;
+//        planet.lookAt(camera.position);
+//        planet.rotation.y += delta * .13;
         
         // let there be light
         renderer.render( scene, camera );
@@ -151,39 +170,16 @@ function start(){
             requestAnimationFrame( render );
         }
         controls.update( delta );
-         
-        angles = getAngles();
-        if(angles[0] !== oldAngles[0] || angles[1] !== oldAngles[1]){
-            createSpheres(angles );
-            oldAngles = angles;
-        }
-        
+
+//        var d = getPlanetCamera().normalize();
+       
+//        planet.lookAt(camera.position);
+
         time += delta;
-        if(time > .5){
-            var d = getPlanetCamera();
-            var p = planet.position;
-            var c = camera.position;
-            $('#info').html(
-                "Planet rotation: " + 
-                planet.rotation.x + "," +
-                planet.rotation.y + "," + 
-                planet.rotation.z + 
-                "<br/>Horizontal Angle: " + angles[0] + 
-                "<br/>Vertical Angle: " + angles[1] + 
-                "<br/>Planet->Camera: " + sign(d.x) + " : " + sign(d.y) + " : " + sign(d.z) + 
-                "<br/>Planet: " + p.x + " : " + p.y + " : " + p.z + 
-                "<br/>Camera: " + c.x + " : " + c.y + " : " + c.z
-                );
-            time = 0;
-        }
         stats.update();
     }
     function sign(number){
         return number?number<0?-1:1:0;
-    }
-    function getPlanetCamera(){
-        //return new THREE.Vector3(0,0,0).subVectors(planet.position, camera.position);
-        return new THREE.Vector3(0,0,0).subVectors(camera.position, planet.position);
     }
     function getAngles(){
         var direction = getPlanetCamera(), hdir, vdir, left, up, dot, d, p, hangle, vangle,
@@ -204,7 +200,7 @@ function start(){
         //Get vertical angle
         vdir = direction.clone();
         up = planet.position.clone();
-        up.y += radius;
+//        up.y += radius;
         dot = vdir.dot(up);
         d = vdir.length();
         p = up.length();
@@ -221,17 +217,17 @@ function start(){
             planet.remove(mesh);
         });
         planet.updateMatrix();
-
-        flip = ! flip;
-        //var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
-        var wireFrame = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, wireframe: true } );
-        var green = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
+        
         if(flip){
             green = wireFrame;
         }
-//        var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
-    //    green = new THREE.MeshPhongMaterial();
-//    green = material;  
+
+        //flip = ! flip;
+        //var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
+        var wireFrame = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors, wireframe: true } );
+        var green = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
+        green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: true});
+    green = material;  
 
         var distance = camera.position.distanceTo(planet.position) - radius;
         var circ = Math.PI/2;
@@ -241,7 +237,8 @@ function start(){
         }
         var hangle = angles[0];
         var vangle = angles[1];
-
+hangle = Math.PI/2;
+vangle = Math.PI/2;
         var mod = 1;
         var iterations = 4;
         var rezMod = iterations * iterations;

@@ -373,7 +373,7 @@ float pnoise(vec3 P, vec3 rep)
         var delta = clock.getDelta();
 		material.uniforms[ 'time' ].value = .0000025 * ( Date.now() - start );
    //     planet.rotation.y += delta * .01;
-        quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), (Math.PI) * delta );
+        quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), (Math.PI/16) * delta );
         planet.quaternion.multiply(quaternion);
         planet.matrixWorldNeedsUpdate = true;
 

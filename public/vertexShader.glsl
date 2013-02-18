@@ -174,11 +174,19 @@ float pnoise(vec3 P, vec3 rep)
   float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
   return 2.2 * n_xyz;
 }
-		
+
+//Rotate a vector by a quaternion
+vec3 rotateVector( vec4 quat, vec3 vec ){
+    return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
+}
+
 varying vec2 vUv;
 varying float noise;
+varying float displacement;
+varying vec3 norm;
 uniform float time;
- 
+uniform vec4 rotation;
+
 float turbulence( vec3 p ) {
         float w = 100.0;
         float t = -.5;
@@ -188,17 +196,21 @@ float turbulence( vec3 p ) {
         }
         return t;
 }
-		 
-void main() {
- 
-        vUv = uv;
- 
+vec3 updatePosition(vec3 position){
         // add time to the noise parameters so it's animated
         noise = 10.0 *  -.10 * turbulence( .5 * normal + time );
         float b = 5.0 * pnoise( 0.05 * position + vec3( 2.0 * time ), vec3( 100.0 ) );
-        float displacement = - noise + b;
+        //float displacement = - noise + b;
+        displacement = - noise + b;
          
-        vec3 newPosition = position + normal * displacement ;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+        return (position + normal * displacement);
+}
+void main() {
  
+        vUv = uv;
+        vec3 newPosition = position;
+        newPosition = rotateVector(rotation, position);
+        newPosition = updatePosition(newPosition);
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }
