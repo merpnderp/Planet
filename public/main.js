@@ -37,7 +37,7 @@ function start(){
         start = Date.now(),
         fov = 30,
         pause = false,
-        setRez = 10,
+        setRez = 20,
     //    radius = 5.913520000 * Math.pow(10,11);//size of sun
     //    radius = 149597870700 * 50000;//Size of solar system
         radius = 50;
@@ -62,19 +62,33 @@ function start(){
         window.innerWidth / window.innerHeight, 
         1, 
         10000000000 );
-    camera.position.z = radius*4;
-//    camera.position.y = radius*2;
-//    camera.position.x = radius;
-//    camera.target = new THREE.Vector3( 0, 0, 0 );
-    controls = new THREE.FlyControls( camera );
+    camera.position.z = radius*9;
+    
+    scene.add( camera );
+    //controls = new THREE.FlyControls( camera );
     camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
-    controls.movementSpeed = radius / .5;
+    controls = new THREE.TrackballControls(camera);
+        controls.rotateSpeed = 1.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+
+        controls.noZoom = false;
+        controls.noPan = false;
+
+        controls.staticMoving = true;
+        controls.dynamicDampingFactor = 0.3;
+
+        controls.keys = [ 65, 83, 68 ];
+
+        //controls.addEventListener( 'change', render );
+
+/*   old fly controls controls.movementSpeed = radius / .5;
     controls.domElement = container;
     controls.rollSpeed = Math.PI / 12;
     controls.autoForward = false;
     controls.dragToLook = false;	
+    */
 
-    scene.add( camera );
 
     // create a wireframe material		
   material = new THREE.ShaderMaterial( {
@@ -159,7 +173,7 @@ function start(){
        // var rr = m.decompose()[ 1 ];
         var tr = m.decompose()[ 1 ].inverse();
         
-        material.uniforms[ 'time' ].value = .0000025 * ( Date.now() - start );
+        material.uniforms[ 'time' ].value = .00005 * ( Date.now() - start );
         material.uniforms[ 'rotation' ].value = tr;
 //        planet.lookAt(camera.position);
 //        planet.rotation.y += delta * .13;
@@ -169,7 +183,8 @@ function start(){
         if(! pause){
             requestAnimationFrame( render );
         }
-        controls.update( delta );
+    //    controls.update( delta );
+        controls.update( );
 
 //        var d = getPlanetCamera().normalize();
        
@@ -233,7 +248,7 @@ function start(){
         var circ = Math.PI/2;
         if(distance < radius ){
             circ = THREE.Math.clampBottom(circ * (distance / (radius/2)), circ / 5) ;
-            controls.movementSpeed = THREE.Math.clamp(radius*.5*(distance/radius), radius*.05, radius*.5);
+//            controls.movementSpeed = THREE.Math.clamp(radius*.5*(distance/radius), radius*.05, radius*.5);
         }
         var hangle = angles[0];
         var vangle = angles[1];
