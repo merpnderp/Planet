@@ -237,6 +237,7 @@ function start(){
         //var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
         var green = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
         green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: true});
+        var red = new THREE.MeshBasicMaterial({color:'#FF0000', wireframe: true});
 //    green = material;  
 
         var distance = camera.position.distanceTo(planet.position) - radius;
@@ -244,28 +245,34 @@ function start(){
 
         var axis;
         var forward;
-        var left;
+        var orig;
         var swizle;
         var angle;
         var front = new THREE.Vector3(0,0,radius);
-
+        var dot;
         ico.vertices.forEach(function(vert){
-            axis = vert.cross(front);
-            angle = Math.acos(front.dot(vert)/(front.length()*vert.length()));
-//            forward = new THREE.Quaternion().setFromAxisAngle(axis, angle);
-//            left = new THREE.Quaternion().setFromAxisAngle(axis, 0);
-            left = new THREE.Quaternion().setFromEuler(vert);
-            forward = new THREE.Quaternion().setFromEuler(front);
-            swizle = new THREE.Quaternion();
-            THREE.Quaternion.slerp(left, forward, swizle, .1);
-//            console.info(swizle);
-            swizle = new THREE.Quaternion().setFromAxisAngle(axis,-Math.PI/16);
-            vert.applyQuaternion(swizle);
+            axis = new THREE.Vector3();
+            
+            (axis.crossVectors(front, vert)).normalize();
+
+            dot = vert.clone();
+            /*
+            console.log("front: " + front.x + ", " + front.y + ", " + front.z);
+            console.log("vert: " + vert.x + ", " + vert.y + ", " + vert.z);
+            console.log("axis: " + axis.x + ", " + axis.y + ", " + axis.z);
+            */ 
+            angle = Math.acos( dot.dot(front) / ( front.length() *  vert.length() ));
+            var move = ((1.57 - angle)/1.57)*angle;
+            move = Math.pow(move, 1.1);
+//            console.log("move: " + move + " angle: " + angle); 
+            vert.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(axis, -move));
             
         });
 
 
         planet.add(new THREE.Mesh(ico, green));
+//        var ico2 = new THREE.IcosahedronGeometry(radius, 5);
+//        planet.add(new THREE.Mesh(ico2, red));
         console.log(planet.children[0].geometry.vertices.length);
         console.log(planet.children[0].geometry.faces.length);
     }
@@ -275,45 +282,45 @@ $(init);
 Icosahedron = function ( radius, detail ) {
 
   var t = ( 1 + Math.sqrt( 5 ) ) / 2;
-
-  var vertices = [
-    [ -1,  t,  0 ], 
-    [  1, t, 0 ], 
-    [ -1, -t,  0 ], 
-    [  1, -t,  0 ],
-    [  0, -1,  t ], 
-    [  0, 1, t ], 
-//    [  0, -1, -t ],//6 
-//    [  0,  1, -t ],//7
-//    [  t,  0, -1 ],//8
-    [  t, 0, 1 ],//9->6 
-//    [ -t,  0, -1 ],//10
-    [ -t,  0,  1 ]//11->7
+  
+    var vertices = [
+    [ -1,  t,  0 ],//0
+	[  1, t, 0 ],  //1
+	[ -1, -t,  0 ],//2
+	[  1, -t,  0 ],//3
+    [  0, -1,  t ],//4
+	[  0, 1, t ],  //5
+//	[  0, -1, -t ],//6
+//	[  0,  1, -t ],//7
+    [  t,  0, -1 ],//8->6
+	[  t, 0, 1 ],  //9->7
+	[ -t,  0, -1 ],//10->8
+	[ -t,  0,  1 ] //11->9
   ];
 
   var faces = [
-    [ 0, 7,  5 ],
+    [ 0, 9,  5 ],
 	[ 0,  5,  1 ],
-	//[  0,  1,  7 ],
-	//[  0,  7, 10 ],
-	//[  0, 10, 11 ],
-    [ 1,  5,  6 ],
-	[ 5, 7,  4 ],
-	//[ 11, 10,  2 ],
-	//[ 10,  7,  6 ],
-	//[  7,  1,  8 ],
-    [ 3,  6,  4 ],
+//	[  0,  1,  7 ],
+//	[  0,  7, 8 ],
+	[  0, 8, 9 ],
+    [ 1,  5,  7 ],
+	[ 5, 9,  4 ],
+	[ 9, 8,  2 ],
+//	[ 8,  7,  6 ],
+//	[  7,  1,  6 ],
+    [ 3,  7,  4 ],
 	[ 3,  4,  2 ],
-	//[  3,  2,  6 ],
-	//[  3,  6,  8 ],
-	//[  3,  8,  9 ],
-    [ 4,  6,  5 ],
-	[ 2,  4, 7 ],
-	//[  6,  2, 10 ],
-	//[  8,  6,  7 ],
-	//[  9,  8,  1 ]
+	[  3,  2,  6 ],
+//	[  3,  6,  6 ],
+	[  3,  6,  7 ],
+    [ 4,  7,  5 ],
+	[ 2,  4, 9 ],
+//	[  6,  2, 8 ],
+//	[  6,  6,  7 ],
+	[  7,  6,  1 ]
   ];
-
+ 
   THREE.PolyhedronGeometry.call( this, vertices, faces, radius, detail );
 
 };

@@ -1,8 +1,10 @@
 
 function start(){    
 
-    var stats = new Stats();
-    stats.setMode( 1 );
+    var radius = 30,
+    stats = new Stats();
+
+    stats.setMode( 0 );
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '5px';
     stats.domElement.style.top = '5px';
@@ -16,10 +18,10 @@ function start(){
     var camera = new THREE.PerspectiveCamera( 
         30, 
         window.innerWidth / window.innerHeight, 
-        1, 
-        1000000);
+        .1, 
+        1000000000);
 
-    camera.position.z = 1000;
+    camera.position.z = radius * 8;
 //    camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
     
     scene.add( camera );
@@ -44,11 +46,16 @@ function start(){
 
         controls.keys = [ 65, 83, 68 ];
         
-    var planeGeo = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
+//    var planeGeo = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
     //var planeGeo = new THREE.SphereGeometry( 10, 10, 50, 50);
-    var plane = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } )); 
-    plane.position = new THREE.Vector3(0,0,0);
-    scene.add(plane);
+//    var plane = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } )); 
+//    plane.position = new THREE.Vector3(0,0,0);
+//    scene.add(plane);
+    //var circleGeo = new THREE.CircleGeometry(10, 5, Math.PI, Math.PI);
+    var circleGeo = new THREE.RingGeometry(5, 10, 10, 5, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
+    var circle = new THREE.Mesh(circleGeo, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5, wireframe: true } )); 
+    console.dir(circleGeo);
+    scene.add(circle);
 
     var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 ); 
     directionalLight.position.set( 1, 1, 1 ); 
@@ -66,4 +73,5 @@ function start(){
 
     }
 };
+
 $(start);
