@@ -21,13 +21,13 @@ function start(){
         .1, 
         1000000000);
 
-    camera.position.z = radius * 8;
+    camera.position.z = radius * 2;
 //    camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
     
     scene.add( camera );
 
     var renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth-10, window.innerHeight-10);
     renderer.domElement.style.position = "absolute";
     renderer.domElement.style.top = 1 + "px";
     renderer.domElement.style.left = "0px";
@@ -52,19 +52,22 @@ function start(){
 //    plane.position = new THREE.Vector3(0,0,0);
 //    scene.add(plane);
     //var circleGeo = new THREE.CircleGeometry(10, 5, Math.PI, Math.PI);
-    var thetas = 30, phis = 5, wf = true;
-    
-    var cgeo = new THREE.RingGeometry(5, 10, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
-    var c= new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial( { color: 0xFFFF00, specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
-    scene.add(c);
-    var cGeo2 = new THREE.RingGeometry(10, 15, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
-    var c2 = new THREE.Mesh(cGeo2, new THREE.MeshPhongMaterial( { color: 0xFF0000, specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
-    scene.add(c2);
-    var cGeo3 = new THREE.RingGeometry(1, 5, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
-    var c3 = new THREE.Mesh(cGeo3, new THREE.MeshPhongMaterial( { color: 0x00FF00, specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
-    scene.add(c3);
-
-
+    var thetas = 50, phis = 2, 
+    wf = false, 
+    step = 10, count = 0;
+    var mod = Math.random();
+    var start = 0;
+    var end = step;
+    var colors = [0xFF0000, 0x0000FF, 0x00FF00];
+    for(var i = 0; i <= 20; i++){
+        var cgeo = new THREE.RingGeometry(start, end, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
+        var c= new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
+        scene.add(c);
+        count += cgeo.vertices.length;
+        start = start + step;
+        end = end + step;
+    }
+console.log(count);
     var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ); 
     directionalLight.position.set( 1, 1, 1 ); 
     scene.add( directionalLight );
