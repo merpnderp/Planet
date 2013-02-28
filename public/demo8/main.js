@@ -95,7 +95,7 @@ function start(){
         uniforms: { 
             tExplosion: { // texture in slot 0, loaded with ImageUtils
                 type: "t", 
-                value: THREE.ImageUtils.loadTexture( 'explosion.png' )
+                value: THREE.ImageUtils.loadTexture( '../explosion.png' )
             },
             time: { // float initialized to 0
                 type: "f", 
@@ -167,10 +167,8 @@ function start(){
     function render() {
         var angles = [];
         delta = clock.getDelta();
-
         var m = planet.matrix.clone();
         m.lookAt(camera.position, planet.position, planet.up);
-       // var rr = m.decompose()[ 1 ];
         var tr = m.decompose()[ 1 ].inverse();
 
         material.uniforms[ 'time' ].value = .00005 * ( Date.now() - start );
@@ -244,7 +242,7 @@ function start(){
         green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: true});
         var terrain = THREE.ShaderTerrain['terrain'];
     green = material;  
-    green = terrain;
+//    green = terrain;
 
         var distance = camera.position.distanceTo(planet.position) - radius;
         var circ = Math.PI/2;

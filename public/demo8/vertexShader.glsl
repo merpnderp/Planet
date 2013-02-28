@@ -175,10 +175,6 @@ float pnoise(vec3 P, vec3 rep)
   return 2.2 * n_xyz;
 }
 
-//Rotate a vector by a quaternion
-vec3 rotateVector( vec4 quat, vec3 vec ){
-    return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
-}
 
 varying vec2 vUv;
 varying float noise;
@@ -186,6 +182,11 @@ varying float displacement;
 varying vec3 norm;
 uniform float time;
 uniform vec4 rotation;
+
+//Rotate a vector by a quaternion
+vec3 rotateVector( vec4 quat, vec3 vec ){
+    return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
+}
 
 float turbulence( vec3 p ) {
         float w = 100.0;
