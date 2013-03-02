@@ -1,7 +1,11 @@
 
-function start(){    
 
-    var radius = 30,
+var so = so || {};
+
+function start(){   
+var b = new so.Planet();
+//    var radius = 100,
+    var radius = 6353000,
     stats = new Stats();
 
     stats.setMode( 0 );
@@ -21,7 +25,7 @@ function start(){
         .1, 
         1000000000);
 
-    camera.position.z = radius * 2;
+    camera.position.z = radius * 7;
 //    camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
     
     scene.add( camera );
@@ -46,15 +50,9 @@ function start(){
 
         controls.keys = [ 65, 83, 68 ];
         
-//    var planeGeo = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
-    //var planeGeo = new THREE.SphereGeometry( 10, 10, 50, 50);
-//    var plane = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } )); 
-//    plane.position = new THREE.Vector3(0,0,0);
-//    scene.add(plane);
-    //var circleGeo = new THREE.CircleGeometry(10, 5, Math.PI, Math.PI);
-    var thetas = 512, phis = 20, 
-    wf = false, 
-    step = 10, count = 0;
+    var thetas = 20, phis = 20, 
+    wf = true, 
+    step = 1, count = 0;
     var mod = Math.random();
     var start = 0;
     var end = step;
@@ -65,13 +63,18 @@ function start(){
         var cgeo = new THREE.RingGeometry(iradius, oradius, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
 		count += cgeo.vertices.length
         var c= new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
-        scene.add(c);
+//        scene.add(c);
     }
-$('#info').append(count);
-$('#info').append('<br/>hi');
+//$('#info').append(count);
+//$('#info').append('<br/>hi');
     var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ); 
-    directionalLight.position.set( 1, 1, 1 ); 
+    directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
+
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 40);
+var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .5));
+scene.add(center);
+	scene.add(planet.obj);
 
     render();
 
@@ -82,6 +85,8 @@ $('#info').append('<br/>hi');
         
         controls.update();
         stats.update();
+
+		planet.update();
 
     }
 };
