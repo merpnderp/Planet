@@ -180,11 +180,27 @@ vec3 rotateVector( vec4 quat, vec3 vec ){
     return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
 }
 
+vec4 createQuaterionFromAxisAngle( vec3 axis, float angle ) {
+	
+	vec4 quat;
+
+	float halfAngle = angle / 2,
+	float s = Math.sin( halfAngle );
+	
+	quat.x = axis.x * s;
+	quat.y = axis.y * s;
+	quat.z = axis.z * s;
+	quat.w = cos( halfAngle );
+	
+	return quat;
+
+}
+
 varying vec2 vUv;
 varying float noise;
 varying float displacement;
 varying vec3 norm;
-uniform float time;
+uniform float scale;
 uniform vec4 rotation;
 
 float turbulence( vec3 p ) {
@@ -210,7 +226,7 @@ void main() {
         vUv = uv;
         vec3 newPosition = position;
         newPosition = rotateVector(rotation, position);
-        newPosition = updatePosition(newPosition);
+//        newPosition = updatePosition(newPosition);
 
         gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

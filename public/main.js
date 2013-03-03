@@ -4,8 +4,8 @@ var so = so || {};
 
 function start(){   
 	
-	var radius = 200,
-//	var radius = 6353000,
+//	var radius = 200,
+	var radius = 6353000,
 	fov = 30,
     stats = new Stats();
 
@@ -73,7 +73,7 @@ function start(){
     directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
 
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 40, fov, window.innerWidth);
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 40, fov, window.innerWidth, 15);
 var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .95));
 center.position.x = radius * 2; center.position.z = radius;
 //scene.add(center);
@@ -92,6 +92,13 @@ controls.target =  planet.obj.position;
         stats.update();
 
 		planet.update();
+		$('#render').html(renderer.info.memory.programs);
+		$('#render').append(' : ' +  renderer.info.memory.geometries);
+		$('#render').append(' : ' +  renderer.info.memory.textures);
+		$('#render').append(' : ' +  renderer.info.render.calls);
+		$('#render').append(' : ' +  renderer.info.render.vertices);
+		$('#render').append(' : ' +  renderer.info.render.faces);
+		$('#render').append(' : ' +  renderer.info.render.points);
 
     }
 };

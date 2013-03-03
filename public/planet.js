@@ -14,7 +14,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	var clipMapCount = _clipMapCount || 10;
 
 	var fov = _fov || 30;
-	fov = fov * .0174532925;
+	fov = fov * .0174532925;//Convert to radians
 
 	var screenWidth = _screenWidth || 768;
 
@@ -23,20 +23,22 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 	var fragmentShader;
 	var vertexShader;
+	
+	var halfPI = Math.PI/2;
+	var quarterPI = Math.PI/4;
+	var tau = Math.PI * 2;
 
 	//Create two reused geos
-	var minTheta = getMinTheta(radius, 2);
-	var smallestCirc = Math.PI * radius * 2 * ( minTheta / (Math.PI / 2) );
-	
-	var circleGeo = new THREE.RingGeometry(.00001, smallestCirc, segments, segments, 0, Math.PI * 2);
-	var ringGeo = new THREE.RingGeometry(smallestCirc, smallestCirc * 2, segments, segments, 0, Math.PI * 2);
+	var smallestTheta = getMinTheta(radius, 2);
+	var smallestCirc = Math.PI * radius * 2 * ( smallestTheta / halfPI );//circumference divided by the percentage of 90 degrees this theta represents
+	var circleGeo = new THREE.RingGeometry(.00001, smallestCirc, segments, segments, 0, tau);
+//	var ringGeo = new THREE.RingGeometry(smallestCirc, smallestCirc * 2, segments, segments, 0, Math.PI * 2);
 	//Project geos to a sphere
-	[circleGeo, ringGeo].forEach( function(g) {
-		g.vertices.forEach( function(v) {
-			v.z = radius;
-			v.setLength(radius);
-			v.z -= radius;
-		});
+	//[circleGeo, ringGeo].forEach( function(g) {
+	circleGeo.vertices.forEach( function(v) {
+		v.z = radius;
+		v.setLength(radius);
+		v.z -= radius;
 	});
 
 
@@ -54,17 +56,15 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		fragmentShader = files['fragmentShader.glsl'];
 		vertexShader = files['vertexShader.glsl'];
 		inited = true;
+		initClipMaps();
 
 	}
-	
-	var colors = [0xFF0000, 0x0000FF, 0x00FF00];
-	var wireframe = true;
-	var c = new THREE.Mesh(circleGeo);//, new THREE.MeshPhongMaterial( { color: colors[ 0 % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
-	c.translateZ(radius);
-	var r = new THREE.Mesh(ringGeo, new THREE.MeshPhongMaterial( { color: colors[ 0 % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
-	r.translateZ(radius);
-	me.obj.add(c);
-	me.obj.add(r);
+
+/*
+ *
+ * Update loop
+ *
+ */
 
 	var clock = new THREE.Clock(), localCam, cameraDistance, delta, theta, phi;
 	me.update = function( ) {
@@ -89,25 +89,79 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		getPhi(localCam.x, localCam.z);
 		log("phi", phi);
 
+		log("smallest theta possible", getMinTheta(radius, 2));
 
 		updateClipMaps(cameraDistance - radius);
 
-		log("smallest theta possible", getMinTheta(radius, 2));
-
 		$('#info').html(logText);
 	}
+	
+/*
+ *
+ * Update Clipmaps
+ *
+ */
+	var s, maxTheta, clipMaps = [], i;
+	var colors = [0xFF0000, 0x0000FF, 0x00FF00];
+	var wireframe = true;
+	
+	function initClipMaps( ) {
 
-	var s, maxTheta, clipMaps;
+		clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime
+		
+		for( i = 0; i < clipMapCount; i++ ) {
+			clipMaps[i] = {};
+			clipMaps[i].material = new THREE.ShaderMaterial( {
+				uniforms: { 
+					tHeightmap: { // texture in slot 0, loaded with ImageUtils
+						type: "t", 
+						value: THREE.ImageUtils.loadTexture( '../explosion.png' )
+					},  
+					scale: {
+						type: 'f',
+						value: 0.0
+					},
+					rotation: { 
+						type: "v4",
+						value: new THREE.Vector4(0,0,0,0),
+					}   
+				},  
+				vertexShader: vertexShader,
+				fragmentShader: fragmentShader
 
+			} );	
+
+			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);//, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
+			clipMaps[i].mesh.translateZ(radius);
+			me.obj.add(clipMaps[i].mesh);
+		}
+	}
+
+	var thetaStep = 0;
+	var thetaMult = 1;
 	function updateClipMaps( height ) {
 		log('radius', radius);
 		log('height', height);
-		//max theta
-		maxTheta = getMaxTheta( radius, height );
-		log('maxTheta',maxTheta);
+		
 		//min theta planet pixel size / radius i minimum theta
 		minTheta =  getMinTheta( radius, height );
 		log('minTheta', minTheta);
+		//max theta
+		maxTheta = getMaxTheta( radius, height );
+		log('maxTheta',maxTheta);
+
+		thetaStep = ( maxTheta - minTheta ) / clipMapCount;	
+
+
+		for( i = 0; i < clipMapCount; i++ ) {
+			if( i === 0 ) {
+				//inner cirlce case
+				clipMaps[i].material.scale = minTheta - smallestTheta;	
+			} else {
+				clipMaps[i].material.scale = ( thetaStep * ( i+1 ) ) - smallestTheta;
+			}
+log('scale ' + i + ': ', clipMaps[i].material.scale);
+		}
 	}
 
 
@@ -116,12 +170,14 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
  * Helper functions
  * 
  */
-
 	function getMaxTheta( radius, height ) {
-		return Math.acos( radius / (radius + height ) );	
+		var mt = Math.acos( radius / (radius + height ) );	
+		return mt < halfPI ? mt : halfPI;
 	}
+
 	function getMinTheta( radius, height ) {
-		return (height * vs) / radius;
+		var lt = (height * vs) / radius;
+		return lt < quarterPI ? lt : quarterPI;
 	}
 
 	function getTheta( x, y, z) {

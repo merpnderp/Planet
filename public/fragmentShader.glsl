@@ -9,7 +9,7 @@ varying vec2 vUv;
 varying float noise;
 varying float displacement;
 varying vec3 norm;
-uniform sampler2D tExplosion;
+uniform sampler2D tHeightmap;
 uniform vec4 rotation; 
 
 
