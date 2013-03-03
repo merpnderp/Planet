@@ -211,7 +211,7 @@ function createSpheres(angles){
 //    flip = ! flip;
     var green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: flip});
 //    green = new THREE.MeshPhongMaterial();
-//green = material;  
+green = material;  
 
     var distance = camera.position.distanceTo(planet.position) - radius;
     var circ = Math.PI/2;

@@ -242,7 +242,7 @@ function start(){
         green = new THREE.MeshBasicMaterial({color:'#008000', wireframe: true});
         var terrain = THREE.ShaderTerrain['terrain'];
     green = material;  
-//    green = terrain;
+    green = terrain;
 
         var distance = camera.position.distanceTo(planet.position) - radius;
         var circ = Math.PI/2;
