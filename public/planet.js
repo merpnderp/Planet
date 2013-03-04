@@ -30,15 +30,16 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 	//Create two reused geos
 	var smallestTheta = getMinTheta(radius, 2);
-	var smallestCirc = Math.PI * radius * 2 * ( smallestTheta / halfPI );//circumference divided by the percentage of 90 degrees this theta represents
+//	var smallestCirc = Math.PI * radius * 2 * ( smallestTheta / halfPI );//circumference divided by the percentage of 90 degrees this theta represents
+var smallestCirc = 1;
 	var circleGeo = new THREE.RingGeometry(.00001, smallestCirc, segments, segments, 0, tau);
 //	var ringGeo = new THREE.RingGeometry(smallestCirc, smallestCirc * 2, segments, segments, 0, Math.PI * 2);
 	//Project geos to a sphere
 	//[circleGeo, ringGeo].forEach( function(g) {
 	circleGeo.vertices.forEach( function(v) {
-		v.z = radius;
+		v.z = radius/2;
 		v.setLength(radius);
-		v.z -= radius;
+//		v.z -= radius;
 	});
 
 
@@ -89,7 +90,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		getPhi(localCam.x, localCam.z);
 		log("phi", phi);
 
-		log("smallest theta possible", getMinTheta(radius, 2));
+//		log("smallest theta possible", getMinTheta(radius, 2));
 
 		updateClipMaps(cameraDistance - radius);
 
@@ -102,7 +103,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
  *
  */
 	var s, maxTheta, clipMaps = [], i;
-	var colors = [0xFF0000, 0x0000FF, 0x00FF00];
+	var colors = [0xFF0000, 0x0000FF, 0x00FF00];//red, blue, green
 	var wireframe = true;
 	
 	function initClipMaps( ) {
@@ -115,7 +116,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 				uniforms: { 
 					tHeightmap: { // texture in slot 0, loaded with ImageUtils
 						type: "t", 
-						value: THREE.ImageUtils.loadTexture( '../explosion.png' )
+						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
 					},  
 					scale: {
 						type: 'f',
@@ -124,21 +125,25 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 					rotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
-					}   
+					},
+					icolor: {
+						type: "c",
+						value: new THREE.Color(colors[i % 3]),
+					},
 				},  
 				vertexShader: vertexShader,
 				fragmentShader: fragmentShader
 
 			} );	
 
-			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);//, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
+			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
+//			clipMaps[i].mesh = new THREE.Mesh(circleGeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
 			clipMaps[i].mesh.translateZ(radius);
 			me.obj.add(clipMaps[i].mesh);
 		}
 	}
 
 	var thetaStep = 0;
-	var thetaMult = 1;
 	function updateClipMaps( height ) {
 		log('radius', radius);
 		log('height', height);
@@ -150,17 +155,19 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		maxTheta = getMaxTheta( radius, height );
 		log('maxTheta',maxTheta);
 
-		thetaStep = ( maxTheta - minTheta ) / clipMapCount;	
+		thetaStep = ( maxTheta - smallestTheta ) / clipMapCount;	
 
+//		log('thetaStep', thetaStep);
 
 		for( i = 0; i < clipMapCount; i++ ) {
 			if( i === 0 ) {
 				//inner cirlce case
-				clipMaps[i].material.scale = minTheta - smallestTheta;	
+				clipMaps[i].material.uniforms.scale.value = minTheta - smallestTheta;	
 			} else {
-				clipMaps[i].material.scale = ( thetaStep * ( i+1 ) ) - smallestTheta;
+//				clipMaps[i].material.uniforms.scale.value = 15*minTheta - smallestTheta;	
+				clipMaps[i].material.uniforms.scale.value = ( ( thetaStep * ( i+1 ) ) - smallestTheta );
 			}
-log('scale ' + i + ': ', clipMaps[i].material.scale);
+log('scale ' + i + ': ', clipMaps[i].material.uniforms.scale.value );
 		}
 	}
 
@@ -174,7 +181,7 @@ log('scale ' + i + ': ', clipMaps[i].material.scale);
 		var mt = Math.acos( radius / (radius + height ) );	
 		return mt < halfPI ? mt : halfPI;
 	}
-
+	
 	function getMinTheta( radius, height ) {
 		var lt = (height * vs) / radius;
 		return lt < quarterPI ? lt : quarterPI;

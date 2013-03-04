@@ -4,8 +4,8 @@ var so = so || {};
 
 function start(){   
 	
-//	var radius = 200,
-	var radius = 6353000,
+	var radius = 200,
+//	var radius = 6353000,
 	fov = 30,
     stats = new Stats();
 
@@ -26,8 +26,8 @@ function start(){
         .1, 
         1000000000);
 
-    camera.position.z = radius * 2.1;
-    camera.position.x = radius * 2;
+    camera.position.z = radius * 6.1;
+//    camera.position.x = radius * 2;
 //	camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
     
     scene.add( camera );
@@ -73,12 +73,15 @@ function start(){
     directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
 
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 40, fov, window.innerWidth, 15);
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 40, fov, window.innerWidth, 10);
 var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .95));
-center.position.x = radius * 2; center.position.z = radius;
-//scene.add(center);
-planet.obj.position.x = radius * 2; planet.obj.position.z = radius;
-controls.target =  planet.obj.position;
+//center.position.x = radius * 2; 
+//center.position.z = radius;
+scene.add(center);
+//planet.obj.position.x = radius * 2; 
+planet.obj.position.z = 0;
+center.position.z = planet.obj.position.z;
+//controls.target =  planet.obj.position;
 	scene.add(planet.obj);
 
     render();

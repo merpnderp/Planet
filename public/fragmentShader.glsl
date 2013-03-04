@@ -6,9 +6,10 @@ vec3 rotateVector( vec4 quat, vec3 vec ){
 
 
 varying vec2 vUv;
-varying float noise;
-varying float displacement;
-varying vec3 norm;
+//varying float noise;
+//varying float displacement;
+//varying vec3 norm;
+uniform vec3 icolor;
 uniform sampler2D tHeightmap;
 uniform vec4 rotation; 
 
@@ -29,10 +30,12 @@ void main() {
         //vec2 tPos = vec2( 0, 1.0 - 2.3 * noise + r );
 //        vec2 tPos = vec2( 0, 1.0 - 2.3 * noise + displacement * .3 );
         //vec2 tPos = vec2( 0, (displacement+2.5)*2.02);
-        vec2 tPos = vec2( 0, (displacement+5.0)*.1);
+//        vec2 tPos = vec2( 0, (displacement+5.0)*.1);
         
-        vec4 color = texture2D( tExplosion, tPos );
+       // vec4 color = texture2D( tHeightmap, tPos );
+        vec4 color = texture2D( tHeightmap, vec2(5,5) );
  
-        gl_FragColor = vec4( color.rgb, 1.0 );
+        //gl_FragColor = vec4( color.rgb, 1.0 );
+        gl_FragColor = vec4( icolor, 1.0 );
  
 }
