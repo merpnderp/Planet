@@ -29,19 +29,23 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	var tau = Math.PI * 2;
 
 	//Create two reused geos
-	var smallestTheta = getMinTheta(radius, 2);
+//	var smallestTheta = getMinTheta(radius, 2);
 //	var smallestCirc = Math.PI * radius * 2 * ( smallestTheta / halfPI );//circumference divided by the percentage of 90 degrees this theta represents
-var smallestCirc = 1;
-	var circleGeo = new THREE.RingGeometry(.00001, smallestCirc, segments, segments, 0, tau);
+//var smallestCirc = 1;
+	var circleGeo = new THREE.RingGeometry( 0, radius,  segments, segments, 0, tau );
 //	var ringGeo = new THREE.RingGeometry(smallestCirc, smallestCirc * 2, segments, segments, 0, Math.PI * 2);
 	//Project geos to a sphere
 	//[circleGeo, ringGeo].forEach( function(g) {
 	circleGeo.vertices.forEach( function(v) {
-		v.z = radius/2;
-		v.setLength(radius);
+			//if(Math.abs(v.y) < 1) v.y = 0.000000000000000;
+			//if(Math.abs(v.x) < 1) v.x = 0.000000000000000;
+			if(Math.abs(v.y) < 1) v.y = 0;
+			if(Math.abs(v.x) < 1) v.x = 0;
+			v.z = 0;
+//		v.z = radius;
+//		v.setLength(radius);
 //		v.z -= radius;
 	});
-
 
 	//Don't resond to update unless init has completed
 	var inited = false;
@@ -118,7 +122,15 @@ var smallestCirc = 1;
 						type: "t", 
 						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
 					},  
-					scale: {
+					radius: {
+						type: 'f',
+						value: radius 
+					},
+					minTheta: {
+						type: 'f',
+						value: 0.0
+					},
+					maxTheta: {
 						type: 'f',
 						value: 0.0
 					},
@@ -138,12 +150,12 @@ var smallestCirc = 1;
 
 			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
 //			clipMaps[i].mesh = new THREE.Mesh(circleGeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
-			clipMaps[i].mesh.translateZ(radius);
+//			clipMaps[i].mesh.translateZ(radius);
 			me.obj.add(clipMaps[i].mesh);
 		}
 	}
 
-	var thetaStep = 0;
+	var thetaStep = 0, currentTheta = 0;
 	function updateClipMaps( height ) {
 		log('radius', radius);
 		log('height', height);
@@ -155,19 +167,15 @@ var smallestCirc = 1;
 		maxTheta = getMaxTheta( radius, height );
 		log('maxTheta',maxTheta);
 
-		thetaStep = ( maxTheta - smallestTheta ) / clipMapCount;	
-
-//		log('thetaStep', thetaStep);
+		thetaStep = ( maxTheta - minTheta ) / clipMapCount;	
+		currentTheta = 0;
 
 		for( i = 0; i < clipMapCount; i++ ) {
-			if( i === 0 ) {
-				//inner cirlce case
-				clipMaps[i].material.uniforms.scale.value = minTheta - smallestTheta;	
-			} else {
-//				clipMaps[i].material.uniforms.scale.value = 15*minTheta - smallestTheta;	
-				clipMaps[i].material.uniforms.scale.value = ( ( thetaStep * ( i+1 ) ) - smallestTheta );
-			}
-log('scale ' + i + ': ', clipMaps[i].material.uniforms.scale.value );
+			clipMaps[i].material.uniforms.minTheta.value =  currentTheta ;
+			currentTheta += thetaStep;
+			clipMaps[i].material.uniforms.maxTheta.value =  currentTheta ;
+log('minTheta #  ' + (i+1), clipMaps[i].material.uniforms.minTheta.value);
+log('maxTheta #' + (i+1), clipMaps[i].material.uniforms.maxTheta.value);
 		}
 	}
 

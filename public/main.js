@@ -27,6 +27,8 @@ function start(){
         1000000000);
 
     camera.position.z = radius * 6.1;
+    camera.position.y = radius * 2.1;
+    camera.position.x = radius * 2.1;
 //    camera.position.x = radius * 2;
 //	camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
     
@@ -64,7 +66,7 @@ function start(){
         var iradius = start + i * step;
         var cgeo = new THREE.RingGeometry(iradius, oradius, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
 		count += cgeo.vertices.length
-        var c= new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
+        var c = new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
 //        scene.add(c);
     }
 //$('#info').append(count);
@@ -73,8 +75,8 @@ function start(){
     directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
 
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 40, fov, window.innerWidth, 10);
-var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .95));
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth, 15);
+var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1));
 //center.position.x = radius * 2; 
 //center.position.z = radius;
 scene.add(center);
@@ -83,6 +85,8 @@ planet.obj.position.z = 0;
 center.position.z = planet.obj.position.z;
 //controls.target =  planet.obj.position;
 	scene.add(planet.obj);
+
+	scene.add(new THREE.AxisHelper(radius * 10));
 
     render();
 

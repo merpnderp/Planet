@@ -22,7 +22,9 @@ function start(){
         .1, 
         1000000000);
 
-    camera.position.z = radius;
+    camera.position.z = radius * 2;
+    camera.position.y = radius * 1;
+    camera.position.x = radius * 1;
 
  	var controls = new THREE.TrackballControls(camera);
         controls.rotateSpeed = 1.0;
@@ -45,6 +47,9 @@ function start(){
     renderer.domElement.style.top = 0 + "px";
     renderer.domElement.style.left = "0px";
     container.appendChild( renderer.domElement );
+
+
+	scene.add(new THREE.AxisHelper(100));
 	
 
 	var sunGeo = new THREE.SphereGeometry(radius/10);
@@ -54,16 +59,20 @@ function start(){
 	var moonGeo = new THREE.SphereGeometry(radius/80);
 	var moon = new THREE.Mesh(moonGeo, new THREE.MeshPhongMaterial( { color: 0x808080, specular: 0xffaa00, shininess: 5 } ) );
 
-	var poleGeo = new THREE.CylinderGeometry(.1,.1,30);
+/*	var poleGeo = new THREE.CylinderGeometry(.1,.1,30);
 	var sunPole = new THREE.Mesh(poleGeo);
 	var earthPole = new THREE.Mesh(poleGeo);
 	var moonPole = new THREE.Mesh(poleGeo);
 	sun.add(sunPole);
 	earth.add(earthPole);
-	moon.add(moonPole);
+	moon.add(moonPole);*/
 	
-	earth.position.x += radius/2;
-	moon.position.x += radius/12;
+	sun.position.x += radius/5;
+	sun.add(new THREE.AxisHelper(radius/3));
+	earth.position.x += radius/1.5;
+	earth.add(new THREE.AxisHelper(radius/10));
+	moon.position.x += radius/1.3;
+	moon.add(new THREE.AxisHelper(radius/10));
 /*	
 	earth.rotation.x += .5;
 */
@@ -79,21 +88,24 @@ function start(){
 		
 
 	scene.add(sun);
-	sun.add(earth);
-	earth.add(moon);
+	scene.add(earth);
+	scene.add(moon);
+//	sun.add(earth);
+//	earth.add(moon);
 
 
 	var clock = new THREE.Clock(), delta;
+	var x = 1;
 	function render(){
 		delta = clock.getDelta();
 	
 		logText = '';
-		log('sun position', sun.position);
-		log('sun rotation', sun.rotation);
-		log('earth position', earth.position);
-		log('earth rotation', earth.rotation);
-		log('moon position', moon.position);
-		log('moon rotation', moon.rotation);
+		log('sun initial position', sun.position);
+//		log('sun rotation', sun.rotation);
+		log('earth initial position', earth.position);
+//		log('earth rotation', earth.rotation);
+		log('moon initial position', moon.position);
+//		log('moon rotation', moon.rotation);
 /*
 
 		sun.rotation.y += delta * .2;
@@ -102,12 +114,30 @@ function start(){
 */
 		var sunEq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI / 4 * delta);
 		sun.quaternion.multiply(sunEq);
+
+
+//		var earthEq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI / 2 * delta);
+//		earth.quaternion.multiply(earthEq);
 		
-		var earthEq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI / 4 * delta);
-		earth.quaternion.multiply(earthEq);
-		
-		var moonEq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI / 4 * delta);
+		var moonEq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI / 8 * delta);
 		moon.quaternion.multiply(moonEq);
+		
+		earthEq = getRotateAround( earth, sun, new THREE.Vector3(0,0,1), Math.PI / 3 * delta );			
+		sun.worldToLocal(earth.position);
+		sun.localToWorld(earth.position.applyQuaternion(earthEq));
+
+		var tMoon = getRotateAround( moon, sun, new THREE.Vector3(0,0,1), Math.PI / 3 * delta );			
+		sun.worldToLocal(moon.position);
+		sun.localToWorld(moon.position.applyQuaternion(tMoon));
+		
+		var fMoon = getRotateAround( moon, earth, new THREE.Vector3(0,0,1), Math.PI / 3 * delta );			
+		earth.worldToLocal(moon.position);
+		earth.localToWorld(moon.position.applyQuaternion(fMoon));
+
+//		earth.quaternion.multiply(earthEq);
+		
+//		var moonEq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI / 4 * delta);
+//		moon.quaternion.multiply(moonEq);
 
 
 		renderer.render( scene, camera );
@@ -119,10 +149,23 @@ function start(){
 		$('#info').html(logText);
 	}
 
+
 	render();
 			
 
 };
+
+
+function getRotateAround( a, b, axis, angle) {
+	var ap = a.position.clone();
+	b.worldToLocal(ap);
+
+	axis.cross(ap).normalize();
+	var negation = axis.x + axis.y + axis.z;
+	return new THREE.Quaternion().setFromAxisAngle(axis, (negation * angle));
+
+	return a;
+}
 
 
 //Simple log function

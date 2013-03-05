@@ -33,7 +33,7 @@ void main() {
 //        vec2 tPos = vec2( 0, (displacement+5.0)*.1);
         
        // vec4 color = texture2D( tHeightmap, tPos );
-        vec4 color = texture2D( tHeightmap, vec2(5,5) );
+//        vec4 color = texture2D( tHeightmap, vec2(5,5) );
  
         //gl_FragColor = vec4( color.rgb, 1.0 );
         gl_FragColor = vec4( icolor, 1.0 );
