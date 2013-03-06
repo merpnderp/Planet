@@ -26,11 +26,19 @@ function start(){
         .1, 
         1000000000);
 
-    camera.position.z = radius * 6.1;
-    camera.position.y = radius * 2.1;
-    camera.position.x = radius * 2.1;
+    camera.position.z = radius * .5;
+    camera.position.y = radius * .5;
+    camera.position.x = radius * .75;
+
 //    camera.position.x = radius * 2;
 //	camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
+	var controls = new THREE.FlyControls( camera );
+        controls.movementSpeed = radius / 69.5;
+//        controls.domElement = container;
+        controls.domElement = document;
+        controls.rollSpeed = Math.PI / 24; 
+        controls.autoForward = false;
+        controls.dragToLook = false; 
     
     scene.add( camera );
 
@@ -40,7 +48,7 @@ function start(){
     renderer.domElement.style.top = 0 + "px";
     renderer.domElement.style.left = "0px";
     container.appendChild( renderer.domElement );
-
+/*
     var controls = new THREE.TrackballControls(camera);
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
@@ -53,7 +61,8 @@ function start(){
         controls.dynamicDampingFactor = 0.3;
 
         controls.keys = [ 65, 83, 68 ];
-        
+*/ 
+
     var thetas = 20, phis = 20, 
     wf = true, 
     step = 1, count = 0;
@@ -75,7 +84,7 @@ function start(){
     directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
 
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth, 3);
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth);
 var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00));
 //center.position.x = radius * 2; 
 //center.position.z = radius;
@@ -88,15 +97,11 @@ center.position.z = planet.obj.position.z;
 
 	scene.add(new THREE.AxisHelper(radius * 10));
 
-    render();
+	var clock = new THREE.Clock();
+	var delta;
 
     function render(){
-
-        renderer.render( scene, camera );
-        requestAnimationFrame( render );
-        
-        controls.update();
-        stats.update();
+		delta = clock.getDelta();
 
 		planet.update();
 		var r = 
@@ -106,11 +111,21 @@ center.position.z = planet.obj.position.z;
 			"<br />calls: " + renderer.info.render.calls + 
 			"<br />vertices: " + renderer.info.render.vertices + 
 			"<br />faces: " + renderer.info.render.faces + 
-			"<br />points: " + renderer.info.render.points + "<br />"; 
+			"<br />points: " + renderer.info.render.points + 
+			"<br />camera: " + camera.position.x + 
+			"<br />camera: " + camera.position.y + 
+			"<br />camera: " + camera.position.z + 
+			"<br />"; 
 
 		$('#render').html(r);
+        
+		controls.update( delta );
+        renderer.render( scene, camera );
+        requestAnimationFrame( render );
+        stats.update();
 
     }
+    render();
 };
 
 $(start);

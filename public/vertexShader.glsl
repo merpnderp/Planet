@@ -2,8 +2,6 @@
 varying vec2 vUv;
 uniform vec4 rotation;
 uniform float radius;
-uniform float minTheta;
-uniform float maxTheta;
 uniform float scale;
 uniform int last;
 
