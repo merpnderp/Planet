@@ -32,16 +32,16 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 //	var smallestTheta = getMinTheta(radius, 2);
 //	var smallestCirc = Math.PI * radius * 2 * ( smallestTheta / halfPI );//circumference divided by the percentage of 90 degrees this theta represents
 //var smallestCirc = 1;
-	var circleGeo = new THREE.RingGeometry( 0, radius,  segments, segments, 0, tau );
+	var circleGeo = new THREE.RingGeometry( .00000001, radius,  segments, segments, 0, tau );
 //	var ringGeo = new THREE.RingGeometry(smallestCirc, smallestCirc * 2, segments, segments, 0, Math.PI * 2);
 	//Project geos to a sphere
 	//[circleGeo, ringGeo].forEach( function(g) {
 	circleGeo.vertices.forEach( function(v) {
 			//if(Math.abs(v.y) < 1) v.y = 0.000000000000000;
 			//if(Math.abs(v.x) < 1) v.x = 0.000000000000000;
-			if(Math.abs(v.y) < 1) v.y = 0;
-			if(Math.abs(v.x) < 1) v.x = 0;
 			v.z = 0;
+//			v.x += .5;
+//			v.y += .5;
 //		v.z = radius;
 //		v.setLength(radius);
 //		v.z -= radius;
@@ -95,10 +95,13 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		log("phi", phi);
 
 //		log("smallest theta possible", getMinTheta(radius, 2));
+		var m = me.obj.matrix.clone();
+		m.lookAt(camera.position, me.obj.position, me.obj.up);
+		var tr = m.decompose()[ 1 ].inverse();
 
-		updateClipMaps(cameraDistance - radius);
+		updateClipMaps(cameraDistance - radius,tr);
 
-		$('#info').html(logText);
+//		$('#info').html(logText);
 	}
 	
 /*
@@ -134,9 +137,17 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 						type: 'f',
 						value: 0.0
 					},
+					scale: {
+						type: 'f',
+						value: 1.0
+					},
 					rotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
+					},
+					last: { 
+						type: "i",
+						value: 0,
 					},
 					icolor: {
 						type: "c",
@@ -156,7 +167,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	}
 
 	var thetaStep = 0, currentTheta = 0;
-	function updateClipMaps( height ) {
+	function updateClipMaps( height, rotate ) {
 		log('radius', radius);
 		log('height', height);
 		
@@ -169,11 +180,16 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 		thetaStep = ( maxTheta - minTheta ) / clipMapCount;	
 		currentTheta = 0;
-
 		for( i = 0; i < clipMapCount; i++ ) {
-			clipMaps[i].material.uniforms.minTheta.value =  currentTheta ;
-			currentTheta += thetaStep;
-			clipMaps[i].material.uniforms.maxTheta.value =  currentTheta ;
+			clipMaps[i].material.uniforms.rotation.value =  rotate ;
+			clipMaps[i].material.uniforms.scale.value =  i+1 ;
+			if(i+1 === clipMapCount){
+				clipMaps[i].material.uniforms.scale.value =  i ;
+				clipMaps[i].material.uniforms.last.value =  1;
+			}else{
+				clipMaps[i].material.uniforms.last.value =  0;
+			}
+				
 log('minTheta #  ' + (i+1), clipMaps[i].material.uniforms.minTheta.value);
 log('maxTheta #' + (i+1), clipMaps[i].material.uniforms.maxTheta.value);
 		}

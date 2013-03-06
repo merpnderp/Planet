@@ -75,8 +75,8 @@ function start(){
     directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
 
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth, 15);
-var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1));
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth, 3);
+var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00));
 //center.position.x = radius * 2; 
 //center.position.z = radius;
 scene.add(center);
@@ -99,13 +99,16 @@ center.position.z = planet.obj.position.z;
         stats.update();
 
 		planet.update();
-		$('#render').html(renderer.info.memory.programs);
-		$('#render').append(' : ' +  renderer.info.memory.geometries);
-		$('#render').append(' : ' +  renderer.info.memory.textures);
-		$('#render').append(' : ' +  renderer.info.render.calls);
-		$('#render').append(' : ' +  renderer.info.render.vertices);
-		$('#render').append(' : ' +  renderer.info.render.faces);
-		$('#render').append(' : ' +  renderer.info.render.points);
+		var r = 
+			"programs: " + renderer.info.memory.programs + 
+			"<br />geometries: " + renderer.info.memory.geometries + 
+			"<br />textures: " + renderer.info.memory.textures + 
+			"<br />calls: " + renderer.info.render.calls + 
+			"<br />vertices: " + renderer.info.render.vertices + 
+			"<br />faces: " + renderer.info.render.faces + 
+			"<br />points: " + renderer.info.render.points + "<br />"; 
+
+		$('#render').html(r);
 
     }
 };
