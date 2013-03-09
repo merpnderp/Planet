@@ -8,6 +8,9 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 	var me = this;
 	
+	var fragmentShader;
+	var vertexShader;
+	
 	me.obj = new THREE.Object3D();
 	me.obj.position = _position || new THREE.Vector3();
 
@@ -34,18 +37,29 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	}
 	
 	var clipMapCount = findClipMapCount();
-
-
-	var fragmentShader;
-	var vertexShader;
 	
+	var circleGeos = [];
+	
+	for( var i = 0; i < clipMapCount; i++ ) {
 
-	var circleGeo = new THREE.RingGeometry( .00000001, radius,  segments, segments, 0, tau );
-	circleGeo.vertices.forEach( function(v) {
-			//if(Math.abs(v.y) < 1) v.y = 0.000000000000000;
-			//if(Math.abs(v.x) < 1) v.x = 0.000000000000000;
-			v.z = 0;
-	});
+		var geo = new THREE.RingGeometry( .00000001, radius,  segments, segments, 0, tau ); 
+		var scale = ( 1 / Math.pow( 2, i+1 ) ) ;
+		var scaledPI = Math.PI /  2 * scale ;
+		geo.vertices.forEach( function(v) {
+			var rotation = ( ( v.length() / radius ) * scaledPI ) + scaledPI;
+			var front = new THREE.Vector3(0,0,1);
+			front.cross(v);
+			var quat = new THREE.Quaternion().setFromAxisAngle( front.normalize(), rotation );
+			v.x = 0;
+			v.y = 0;
+			v.z = radius;
+			v = v.applyQuaternion(quat);
+
+		});
+
+		circleGeos[i] = geo;
+	}
+
 
 	//Don't resond to update unless init has completed
 	var inited = false;
@@ -99,7 +113,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		m.lookAt(camera.position, me.obj.position, me.obj.up);
 		var tr = m.decompose()[ 1 ].inverse();
 
-		updateClipMaps(cameraDistance - radius,tr);
+		updateClipMaps(cameraDistance - radius, tr);
 
 		$('#info').html(logText);
 	}
@@ -127,21 +141,9 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 						type: "t", 
 						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
 					},  
-					radius: {
-						type: 'f',
-						value: radius 
-					},
-					scale: {
-						type: 'f',
-						value: 1.0
-					},
 					rotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
-					},
-					last: { 
-						type: "i",
-						value: 0,
 					},
 					icolor: {
 						type: "c",
@@ -153,9 +155,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 			} );	
 			clipMaps[i].theta = t;
-			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
-			clipMaps[i].added = false;
-//			clipMaps[i].mesh = new THREE.Mesh(circleGeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wireframe } ));
+			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], clipMaps[i].material);
+			clipMaps[i].visible = false;
 //			clipMaps[i].mesh.translateZ(radius);
 
 			t /= 2;//Each successive clipMap covers half as much theta
@@ -172,24 +173,33 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		//max theta
 		var maxTheta = getMaxTheta( radius, height );
 		log('maxTheta',maxTheta);
-
+		log('clipMapCount', clipMapCount+1);
+log('rotate', rotate.x);
+log('rotate', rotate.y);
+log('rotate', rotate.z);
+log('rotate', rotate.w);
 		for( var i = 0; i < clipMapCount; i++ ) {
-			if(clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta){
-				me.obj.add(clipMaps[i].mesh);
-				clipMaps[i].added = true;
-			}else if(clipMaps[i].added === true && ( clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta ) ){
-				me.obj.remove(clipMaps[i].mesh);
-				clipMaps[i].added = false;
+			if( clipMaps[i].visible === false ) {
+				if( clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta ) {
+					me.obj.add(clipMaps[i].mesh);
+					clipMaps[i].visible = true;
+				}
+			} else {
+				if( clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta ) {
+					me.obj.remove(clipMaps[i].mesh);
+					clipMaps[i].visible = false;
+					continue;
+				}
 			}
-			if(clipMaps[i].added === true) {
+			if(clipMaps[i].visible) {
 				log('level: ' + i , ' theta:' + clipMaps[i].theta);
-				clipMaps[i].material.uniforms.rotation.value =  rotate ;
-				clipMaps[i].material.uniforms.scale.value =  i+1 ;
-				if(i+1 === clipMapCount){
-					clipMaps[i].material.uniforms.scale.value =  i ;
-					clipMaps[i].material.uniforms.last.value =  1;
+				clipMaps[i].material.uniforms.rotation.value = rotate ;
+		//		clipMaps[i].material.uniforms.scale.value =  calcScale(i+1) ;
+				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
+		//			clipMaps[i].material.uniforms.scale.value =  calcScale(i) ;
+		//			clipMaps[i].material.uniforms.last.value =  1;
 				}else{
-					clipMaps[i].material.uniforms.last.value =  0;
+		//			clipMaps[i].material.uniforms.last.value =  0;
 				}
 			}
 		}
@@ -207,7 +217,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	}
 	
 	function getMinTheta( radius, height ) {
-		var lt = (height * vs) / radius;
+		var lt = ( (height * vs) / radius ) * segments;//multiply by segments because this is theta per triangle
 		return lt < quarterPI ? lt : quarterPI;
 	}
 

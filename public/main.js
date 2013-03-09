@@ -4,8 +4,9 @@ var so = so || {};
 
 function start(){   
 	
-	var radius = 200,
-//	var radius = 6353000,
+//	var radius = 200,
+	var radius = 6353000,
+//	var radius = 10000,
 	fov = 30,
     stats = new Stats();
 
@@ -26,21 +27,23 @@ function start(){
         .1, 
         1000000000);
 
-    camera.position.z = radius * .5;
-    camera.position.y = radius * .5;
-    camera.position.x = radius * .75;
+   camera.position.z = radius +2;//* 4;
 
 //    camera.position.x = radius * 2;
 //	camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
+//    var controls = new THREE.FirstPersonControls(camera);
+
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 69.5;
+        controls.movementSpeed = radius / 200.5;
 //        controls.domElement = container;
         controls.domElement = document;
         controls.rollSpeed = Math.PI / 24; 
         controls.autoForward = false;
         controls.dragToLook = false; 
-    
+		
     scene.add( camera );
+
+	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth-9, window.innerHeight-9);
@@ -90,7 +93,7 @@ var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00));
 //center.position.z = radius;
 scene.add(center);
 //planet.obj.position.x = radius * 2; 
-planet.obj.position.z = 0;
+//planet.obj.position.z = radius * -1;//0;
 center.position.z = planet.obj.position.z;
 //controls.target =  planet.obj.position;
 	scene.add(planet.obj);
@@ -112,9 +115,9 @@ center.position.z = planet.obj.position.z;
 			"<br />vertices: " + renderer.info.render.vertices + 
 			"<br />faces: " + renderer.info.render.faces + 
 			"<br />points: " + renderer.info.render.points + 
-			"<br />camera: " + camera.position.x + 
-			"<br />camera: " + camera.position.y + 
-			"<br />camera: " + camera.position.z + 
+			"<br />camera x: " + camera.position.x + 
+			"<br />camera y: " + camera.position.y + 
+			"<br />camera z: " + camera.position.z + 
 			"<br />"; 
 
 		$('#render').html(r);
