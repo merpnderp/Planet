@@ -33,7 +33,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			i++;
 			theta = (1 / Math.pow(2,i) ) * Math.PI;
 		}
-		return i;
+		var min = 21;
+		return i < min ? i : min;
 	}
 	
 	var clipMapCount = findClipMapCount();
@@ -53,7 +54,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			v.x = 0;
 			v.y = 0;
 			v.z = radius;
-			v = v.applyQuaternion(quat);
+			v = v.applyQuaternion(quat.inverse());
+			v.z = -radius;
 
 		});
 
@@ -67,12 +69,13 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 	//load shaders before init
 	var fileGetter = new so.FileLoader();
-	fileGetter.getFiles(['fragmentShader.glsl', 'vertexShader.glsl'], init);
+	fileGetter.getFiles(['fragmentShader.glsl', 'vertexShader.glsl', 'wireframeFragmentShader.glsl'], init);
 
 	
 	function init( files ) {
 
 		fragmentShader = files['fragmentShader.glsl'];
+//		fragmentShader = files['wireframeFragmentShader.glsl'];
 		vertexShader = files['vertexShader.glsl'];
 		inited = true;
 		initClipMaps();
@@ -113,7 +116,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		m.lookAt(camera.position, me.obj.position, me.obj.up);
 		var tr = m.decompose()[ 1 ].inverse();
 
-		updateClipMaps(cameraDistance - radius, tr);
+		updateClipMaps(cameraDistance, tr);
 
 		$('#info').html(logText);
 	}
@@ -174,10 +177,6 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		var maxTheta = getMaxTheta( radius, height );
 		log('maxTheta',maxTheta);
 		log('clipMapCount', clipMapCount+1);
-log('rotate', rotate.x);
-log('rotate', rotate.y);
-log('rotate', rotate.z);
-log('rotate', rotate.w);
 		for( var i = 0; i < clipMapCount; i++ ) {
 			if( clipMaps[i].visible === false ) {
 				if( clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta ) {

@@ -27,7 +27,7 @@ function start(){
         .1, 
         1000000000);
 
-   camera.position.z = radius +2;//* 4;
+   camera.position.z = 200;
 
 //    camera.position.x = radius * 2;
 //	camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
@@ -37,13 +37,14 @@ function start(){
         controls.movementSpeed = radius / 200.5;
 //        controls.domElement = container;
         controls.domElement = document;
-        controls.rollSpeed = Math.PI / 24; 
+//        controls.rollSpeed = Math.PI / 24; 
+        controls.rollSpeed = Math.PI / 4; 
         controls.autoForward = false;
         controls.dragToLook = false; 
 		
     scene.add( camera );
 
-	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
+//	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth-9, window.innerHeight-9);
@@ -91,10 +92,10 @@ function start(){
 var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00));
 //center.position.x = radius * 2; 
 //center.position.z = radius;
-scene.add(center);
+//scene.add(center);
 //planet.obj.position.x = radius * 2; 
 //planet.obj.position.z = radius * -1;//0;
-center.position.z = planet.obj.position.z;
+//center.position.z = planet.obj.position.z;
 //controls.target =  planet.obj.position;
 	scene.add(planet.obj);
 
@@ -120,7 +121,7 @@ center.position.z = planet.obj.position.z;
 			"<br />camera z: " + camera.position.z + 
 			"<br />"; 
 
-		$('#render').html(r);
+//		$('#render').html(r);
         
 		controls.update( delta );
         renderer.render( scene, camera );
