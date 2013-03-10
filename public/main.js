@@ -25,16 +25,17 @@ function start(){
         fov, 
         window.innerWidth / window.innerHeight, 
         .1, 
-        1000000000);
+        10000000000);
 
-   camera.position.z = 200;
+   camera.position.x = 0;
+   camera.position.y = 0;
+//   camera.position.z = radius + 2;
+   camera.position.z = 2;
 
-//    camera.position.x = radius * 2;
-//	camera.lookAt( new THREE.Vector3( 0, 0, 0 ));
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 200.5;
+        controls.movementSpeed = radius / 2.5;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
@@ -43,6 +44,7 @@ function start(){
         controls.dragToLook = false; 
 		
     scene.add( camera );
+camera.lookAt( new THREE.Vector3( 0,0,0));
 
 //	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
 
@@ -89,24 +91,24 @@ function start(){
     scene.add( directionalLight );
 
 	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth);
-var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00));
-//center.position.x = radius * 2; 
+//var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00, 100, 100));
 //center.position.z = radius;
+//planet.obj.position.z = -radius;
 //scene.add(center);
-//planet.obj.position.x = radius * 2; 
-//planet.obj.position.z = radius * -1;//0;
+//var ring = new THREE.Mesh(new THREE.RingGeometry(0,radius));
+//scene.add(ring);
+
 //center.position.z = planet.obj.position.z;
 //controls.target =  planet.obj.position;
 	scene.add(planet.obj);
 
-	scene.add(new THREE.AxisHelper(radius * 10));
+	scene.add(new THREE.AxisHelper(radius * 100));
 
 	var clock = new THREE.Clock();
 	var delta;
 
     function render(){
 		delta = clock.getDelta();
-
 		planet.update();
 		var r = 
 			"programs: " + renderer.info.memory.programs + 
@@ -121,7 +123,7 @@ var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00));
 			"<br />camera z: " + camera.position.z + 
 			"<br />"; 
 
-//		$('#render').html(r);
+		$('#render').html(r);
         
 		controls.update( delta );
         renderer.render( scene, camera );

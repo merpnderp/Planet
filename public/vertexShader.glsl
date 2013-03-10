@@ -1,7 +1,5 @@
 precision highp float;
 
-varying vec2 vUv;
-uniform vec4 rotation;
 
 vec3 rotateVector( vec4 quat, vec3 vec ){
 	return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
@@ -213,12 +211,18 @@ float turbulence( vec3 p ) {
 	return t;
 }
 		 
+uniform vec4 rotation;
+uniform float radius;
 varying float noise;		 
+varying vec2 vUv;
+
 void main() {
  
 	vUv = uv;
-
-	vec3 newPosition = rotateVector( rotation, position);
+	vec3 newPosition = position;
+//	newPosition.z += radius;
+	newPosition = rotateVector( rotation, newPosition);
+//	newPoision.z -= radius;
 /*
 	// add time to the noise parameters so it's animated
 	noise = 10.0 *  -.10 * turbulence( .5 * normal );

@@ -10,7 +10,9 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	
 	var fragmentShader;
 	var vertexShader;
-	
+
+	var position = new THREE.Vector3(0,0,0);
+
 	me.obj = new THREE.Object3D();
 	me.obj.position = _position || new THREE.Vector3();
 
@@ -40,12 +42,13 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	var clipMapCount = findClipMapCount();
 	
 	var circleGeos = [];
-	
+clipMapCount = 25;	
 	for( var i = 0; i < clipMapCount; i++ ) {
 
-		var geo = new THREE.RingGeometry( .00000001, radius,  segments, segments, 0, tau ); 
+		var geo = new THREE.RingGeometry( 1, radius,  segments, segments, 0, tau ); 
 		var scale = ( 1 / Math.pow( 2, i+1 ) ) ;
 		var scaledPI = Math.PI /  2 * scale ;
+	
 		geo.vertices.forEach( function(v) {
 			var rotation = ( ( v.length() / radius ) * scaledPI ) + scaledPI;
 			var front = new THREE.Vector3(0,0,1);
@@ -54,11 +57,9 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			v.x = 0;
 			v.y = 0;
 			v.z = radius;
-			v = v.applyQuaternion(quat.inverse());
-			v.z = -radius;
-
+			v.applyQuaternion(quat);
+			v.z -= radius;
 		});
-
 		circleGeos[i] = geo;
 	}
 
@@ -140,10 +141,10 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			clipMaps[i] = {};
 			clipMaps[i].material = new THREE.ShaderMaterial( {
 				uniforms: { 
-					tHeightmap: { // texture in slot 0, loaded with ImageUtils
-						type: "t", 
-						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
-					},  
+//					tHeightmap: { // texture in slot 0, loaded with ImageUtils
+//						type: "t", 
+//						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
+//					},  
 					rotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
@@ -152,14 +153,21 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 						type: "c",
 						value: new THREE.Color(colors[i % 3]),
 					},
-				},  
+					radius: {
+						type: "f",
+						value: radius
+					},
+				},
+
 				vertexShader: vertexShader,
 				fragmentShader: fragmentShader
 
 			} );	
 			clipMaps[i].theta = t;
 			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], clipMaps[i].material);
+//			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], new THREE.MeshBasicMaterial({color:'#FF0000'}));
 			clipMaps[i].visible = false;
+			me.obj.add(clipMaps[i].mesh);
 //			clipMaps[i].mesh.translateZ(radius);
 
 			t /= 2;//Each successive clipMap covers half as much theta
@@ -180,12 +188,12 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		for( var i = 0; i < clipMapCount; i++ ) {
 			if( clipMaps[i].visible === false ) {
 				if( clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta ) {
-					me.obj.add(clipMaps[i].mesh);
+		//			me.obj.add(clipMaps[i].mesh);
 					clipMaps[i].visible = true;
 				}
 			} else {
 				if( clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta ) {
-					me.obj.remove(clipMaps[i].mesh);
+		//			me.obj.remove(clipMaps[i].mesh);
 					clipMaps[i].visible = false;
 					continue;
 				}
