@@ -213,6 +213,7 @@ float turbulence( vec3 p ) {
 		 
 uniform vec4 rotation;
 uniform float radius;
+uniform sampler2D tHeightmap;
 varying float noise;		 
 varying vec2 vUv;
 
@@ -231,5 +232,8 @@ void main() {
 	 
 	newPosition = newPosition + normal * displacement;
 */
+	vec2 p = vec2(newPosition.x, newPosition.y);	
+	vec4 displacement = texture2D(tHeightmap, p);
+	newPosition = newPosition + normal * displacement.x * .9;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

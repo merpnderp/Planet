@@ -29,17 +29,16 @@ function start(){
 
    camera.position.x = 0;
    camera.position.y = 0;
-//   camera.position.z = radius + 2;
    camera.position.z = 2;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 2.5;
+        controls.movementSpeed = radius / .5;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
-        controls.rollSpeed = Math.PI / 4; 
+        controls.rollSpeed = Math.PI / 2; 
         controls.autoForward = false;
         controls.dragToLook = false; 
 		
@@ -91,10 +90,10 @@ camera.lookAt( new THREE.Vector3( 0,0,0));
     scene.add( directionalLight );
 
 	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth);
-//var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.00, 100, 100));
-//center.position.z = radius;
+var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1, 100, 100));
+center.position.z = -radius;
 //planet.obj.position.z = -radius;
-//scene.add(center);
+scene.add(center);
 //var ring = new THREE.Mesh(new THREE.RingGeometry(0,radius));
 //scene.add(ring);
 
@@ -109,7 +108,9 @@ camera.lookAt( new THREE.Vector3( 0,0,0));
 
     function render(){
 		delta = clock.getDelta();
-		planet.update();
+		controls.update( delta );
+
+
 		var r = 
 			"programs: " + renderer.info.memory.programs + 
 			"<br />geometries: " + renderer.info.memory.geometries + 
@@ -123,12 +124,22 @@ camera.lookAt( new THREE.Vector3( 0,0,0));
 			"<br />camera z: " + camera.position.z + 
 			"<br />"; 
 
-		$('#render').html(r);
+//		$('#render').html(r);
         
-		controls.update( delta );
         renderer.render( scene, camera );
         requestAnimationFrame( render );
         stats.update();
+		if(camera.position.length() > 100){
+			var t = new THREE.Vector3(0,0,0);
+			t.subVectors(camera.position, t);
+			planet.obj.position.sub(t);
+			center.position.sub(t);
+			camera.position.x = 0;
+			camera.position.y = 0;
+			camera.position.z = 0;
+		}
+
+		planet.update();
 
     }
     render();

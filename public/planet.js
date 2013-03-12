@@ -98,18 +98,23 @@ clipMapCount = 25;
 		delta = clock.getDelta();
 		
 		log("planetpos",me.obj.position);
+		var tMesh = me.obj.clone();
+		tMesh.position.z -= radius;
+		tMesh.updateMatrixWorld(false);
+		log("adjusted planetpos",tMesh.position);
+
 
 		localCam = camera.position.clone();
 		log("actualcam",localCam);
-		me.obj.worldToLocal(localCam);
+		tMesh.worldToLocal(localCam);
 		log("localcam",localCam);
-		cameraDistance = camera.position.distanceTo(me.obj.position);
+		cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
 		log('camera distance', cameraDistance);	
 
 
-		getTheta(localCam.x, localCam.y, localCam.z);
+		getTheta(localCam.x, localCam.y, localCam.z );
 		log("theta", theta);
-		getPhi(localCam.x, localCam.z);
+		getPhi(localCam.x, localCam.z );
 		log("phi", phi);
 
 //		log("smallest theta possible", getMinTheta(radius, 2));
@@ -141,10 +146,10 @@ clipMapCount = 25;
 			clipMaps[i] = {};
 			clipMaps[i].material = new THREE.ShaderMaterial( {
 				uniforms: { 
-//					tHeightmap: { // texture in slot 0, loaded with ImageUtils
-//						type: "t", 
-//						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
-//					},  
+					tHeightmap: { // texture in slot 0, loaded with ImageUtils
+						type: "t", 
+						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
+					},  
 					rotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
@@ -167,7 +172,7 @@ clipMapCount = 25;
 			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], clipMaps[i].material);
 //			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], new THREE.MeshBasicMaterial({color:'#FF0000'}));
 			clipMaps[i].visible = false;
-			me.obj.add(clipMaps[i].mesh);
+	//		me.obj.add(clipMaps[i].mesh);
 //			clipMaps[i].mesh.translateZ(radius);
 
 			t /= 2;//Each successive clipMap covers half as much theta
@@ -188,12 +193,12 @@ clipMapCount = 25;
 		for( var i = 0; i < clipMapCount; i++ ) {
 			if( clipMaps[i].visible === false ) {
 				if( clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta ) {
-		//			me.obj.add(clipMaps[i].mesh);
+					me.obj.add(clipMaps[i].mesh);
 					clipMaps[i].visible = true;
 				}
 			} else {
 				if( clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta ) {
-		//			me.obj.remove(clipMaps[i].mesh);
+					me.obj.remove(clipMaps[i].mesh);
 					clipMaps[i].visible = false;
 					continue;
 				}
