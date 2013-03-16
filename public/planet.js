@@ -38,31 +38,6 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		var min = 21;
 		return i < min ? i : min;
 	}
-	
-	var clipMapCount = findClipMapCount();
-	
-	var circleGeos = [];
-clipMapCount = 25;	
-	for( var i = 0; i < clipMapCount; i++ ) {
-
-		var geo = new THREE.RingGeometry( 1, radius,  segments, segments, 0, tau ); 
-		var scale = ( 1 / Math.pow( 2, i+1 ) ) ;
-		var scaledPI = Math.PI /  2 * scale ;
-	
-		geo.vertices.forEach( function(v) {
-			var rotation = ( ( v.length() / radius ) * scaledPI ) + scaledPI;
-			var front = new THREE.Vector3(0,0,1);
-			front.cross(v);
-			var quat = new THREE.Quaternion().setFromAxisAngle( front.normalize(), rotation );
-			v.x = 0;
-			v.y = 0;
-			v.z = radius;
-			v.applyQuaternion(quat);
-			v.z -= radius;
-		});
-		circleGeos[i] = geo;
-	}
-
 
 	//Don't resond to update unless init has completed
 	var inited = false;
@@ -82,6 +57,13 @@ clipMapCount = 25;
 		initClipMaps();
 
 	}
+	
+	var clipMapCount = findClipMapCount();
+	
+	clipMapCount = 20;	
+	
+	var circleGeo = new THREE.RingGeometry( .000001, radius,  segments, segments, 0, tau ); 
+
 
 /*
  *
@@ -90,6 +72,7 @@ clipMapCount = 25;
  */
 
 	var clock = new THREE.Clock(), localCam, cameraDistance, delta, theta, phi;
+var logLimiter = 0;
 	me.update = function( ) {
 		logText = '';
 
@@ -123,8 +106,11 @@ clipMapCount = 25;
 		var tr = m.decompose()[ 1 ].inverse();
 
 		updateClipMaps(cameraDistance, tr);
-
-		$('#info').html(logText);
+		logLimiter++;
+		if( logLimiter % 30 == 0 ) {
+			$('#info').html(logText);
+			logLimiter = 0;
+		}
 	}
 	
 /*
@@ -143,14 +129,18 @@ clipMapCount = 25;
 		var t = quarterPI;
 
 		for( i = 0; i < clipMapCount; i++ ) {
+			var scale = ( 1 / Math.pow( 2, i+1 ) ) ;
+			var scaledPI = Math.PI /  2 * scale ;
 			clipMaps[i] = {};
 			clipMaps[i].material = new THREE.ShaderMaterial( {
 				uniforms: { 
+/*
 					tHeightmap: { // texture in slot 0, loaded with ImageUtils
 						type: "t", 
 						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
 					},  
-					rotation: { 
+*/
+					meshRotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
 					},
@@ -158,9 +148,17 @@ clipMapCount = 25;
 						type: "c",
 						value: new THREE.Color(colors[i % 3]),
 					},
+					scaledPI: {
+						type: "f",
+						value: scaledPI 
+					},
 					radius: {
 						type: "f",
-						value: radius
+						value: radius 
+					},
+					last: {
+						type: "i",
+						value: 0 
 					},
 				},
 
@@ -169,7 +167,7 @@ clipMapCount = 25;
 
 			} );	
 			clipMaps[i].theta = t;
-			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], clipMaps[i].material);
+			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
 //			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], new THREE.MeshBasicMaterial({color:'#FF0000'}));
 			clipMaps[i].visible = false;
 	//		me.obj.add(clipMaps[i].mesh);
@@ -205,13 +203,11 @@ clipMapCount = 25;
 			}
 			if(clipMaps[i].visible) {
 				log('level: ' + i , ' theta:' + clipMaps[i].theta);
-				clipMaps[i].material.uniforms.rotation.value = rotate ;
-		//		clipMaps[i].material.uniforms.scale.value =  calcScale(i+1) ;
+				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
 				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
-		//			clipMaps[i].material.uniforms.scale.value =  calcScale(i) ;
-		//			clipMaps[i].material.uniforms.last.value =  1;
+					clipMaps[i].material.uniforms.last.value =  1;
 				}else{
-		//			clipMaps[i].material.uniforms.last.value =  0;
+					clipMaps[i].material.uniforms.last.value =  0;
 				}
 			}
 		}

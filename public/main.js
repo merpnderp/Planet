@@ -24,8 +24,8 @@ function start(){
     var camera = new THREE.PerspectiveCamera( 
         fov, 
         window.innerWidth / window.innerHeight, 
-        .1, 
-        10000000000);
+        .01, 
+        1000000000);
 
    camera.position.x = 0;
    camera.position.y = 0;
@@ -34,11 +34,11 @@ function start(){
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / .5;
+        controls.movementSpeed = radius / 5;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
-        controls.rollSpeed = Math.PI / 2; 
+        controls.rollSpeed = Math.PI / 8; 
         controls.autoForward = false;
         controls.dragToLook = false; 
 		
@@ -105,31 +105,31 @@ scene.add(center);
 
 	var clock = new THREE.Clock();
 	var delta;
-
+var logLimiter = 0;
     function render(){
 		delta = clock.getDelta();
 		controls.update( delta );
 
+		if( logLimiter++ % 60 == 0 ) {
+			var r = 
+				"programs: " + renderer.info.memory.programs + 
+				"<br />geometries: " + renderer.info.memory.geometries + 
+				"<br />textures: " + renderer.info.memory.textures + 
+				"<br />calls: " + renderer.info.render.calls + 
+				"<br />vertices: " + renderer.info.render.vertices + 
+				"<br />faces: " + renderer.info.render.faces + 
+				"<br />points: " + renderer.info.render.points + 
+				"<br />camera x: " + camera.position.x + 
+				"<br />camera y: " + camera.position.y + 
+				"<br />camera z: " + camera.position.z + 
+				"<br />"; 
 
-		var r = 
-			"programs: " + renderer.info.memory.programs + 
-			"<br />geometries: " + renderer.info.memory.geometries + 
-			"<br />textures: " + renderer.info.memory.textures + 
-			"<br />calls: " + renderer.info.render.calls + 
-			"<br />vertices: " + renderer.info.render.vertices + 
-			"<br />faces: " + renderer.info.render.faces + 
-			"<br />points: " + renderer.info.render.points + 
-			"<br />camera x: " + camera.position.x + 
-			"<br />camera y: " + camera.position.y + 
-			"<br />camera z: " + camera.position.z + 
-			"<br />"; 
-
-//		$('#render').html(r);
-        
+			$('#render').html(r);
+		} 
         renderer.render( scene, camera );
         requestAnimationFrame( render );
         stats.update();
-		if(camera.position.length() > 100){
+/*		if(camera.position.length() > 100){
 			var t = new THREE.Vector3(0,0,0);
 			t.subVectors(camera.position, t);
 			planet.obj.position.sub(t);
@@ -138,7 +138,7 @@ scene.add(center);
 			camera.position.y = 0;
 			camera.position.z = 0;
 		}
-
+*/
 		planet.update();
 
     }
