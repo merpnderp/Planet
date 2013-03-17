@@ -29,21 +29,23 @@ function start(){
 
    camera.position.x = 0;
    camera.position.y = 0;
-   camera.position.z = 2;
+   camera.position.z = 2;//radius;
+camera.position.z = -radius ;
+camera.position.x = radius;
+camera.position.y = radius;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 5;
+        controls.movementSpeed = radius / 1;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
-        controls.rollSpeed = Math.PI / 8; 
+        controls.rollSpeed = Math.PI / 3; 
         controls.autoForward = false;
         controls.dragToLook = false; 
 		
     scene.add( camera );
-camera.lookAt( new THREE.Vector3( 0,0,0));
 
 //	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
 
@@ -90,10 +92,15 @@ camera.lookAt( new THREE.Vector3( 0,0,0));
     scene.add( directionalLight );
 
 	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth);
-var center = new THREE.Mesh(new THREE.SphereGeometry(radius * 1, 100, 100));
+var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .9, 100, 100));
 center.position.z = -radius;
-//planet.obj.position.z = -radius;
-scene.add(center);
+planet.obj.position.z = -radius * 2;
+planet.obj.position.x = radius;
+planet.obj.position.y = radius;
+
+camera.lookAt( planet.obj.position );
+
+//scene.add(center);
 //var ring = new THREE.Mesh(new THREE.RingGeometry(0,radius));
 //scene.add(ring);
 
@@ -101,11 +108,13 @@ scene.add(center);
 //controls.target =  planet.obj.position;
 	scene.add(planet.obj);
 
-	scene.add(new THREE.AxisHelper(radius * 100));
+	var axis = new THREE.AxisHelper( radius * 100 );
+	axis.position = planet.obj.position;
+	scene.add(axis);
 
 	var clock = new THREE.Clock();
-	var delta;
-var logLimiter = 0;
+	var delta, logLimiter = 0;
+
     function render(){
 		delta = clock.getDelta();
 		controls.update( delta );

@@ -88,6 +88,7 @@ var logLimiter = 0;
 
 
 		localCam = camera.position.clone();
+		localCam.z -= radius;
 		log("actualcam",localCam);
 		tMesh.worldToLocal(localCam);
 		log("localcam",localCam);
@@ -100,12 +101,34 @@ var logLimiter = 0;
 		getPhi(localCam.x, localCam.z );
 		log("phi", phi);
 
-//		log("smallest theta possible", getMinTheta(radius, 2));
+		//Get -radius localToWorld and that's the point to rotate the mesh around
+
+//		var center = planet.obj.localToWorld( new THREE.Vector3(0,0,-radius) );
+/*
 		var m = me.obj.matrix.clone();
-		m.lookAt(camera.position, me.obj.position, me.obj.up);
+		var p = new THREE.Vector3().getPositionFromMatrix(m);
+		p.z -= radius;
+		m.setPosition(p);
+
+//		m.lookAt(camera.position, me.obj.position, me.obj.up);
+		m.lookAt(localCam, p, me.obj.up);
 		var tr = m.decompose()[ 1 ].inverse();
 
+		//updateClipMaps(cameraDistance, tr);
 		updateClipMaps(cameraDistance, tr);
+*/
+		var forward = new THREE.Vector3(0,1,0);
+		forward.cross(localCam).normalize();
+		var tr = new THREE.Quaternion().setFromAxisAngle(forward, theta);
+		
+		var up = new THREE.Vector3(1,0,1);
+		up.cross(localCam).normalize();
+		var pr = new THREE.Quaternion().setFromAxisAngle(up, phi);
+
+		var mr = pr.multiplyQuaternions(tr, pr);
+
+		updateClipMaps(cameraDistance, pr);
+		
 		logLimiter++;
 		if( logLimiter % 30 == 0 ) {
 			$('#info').html(logText);

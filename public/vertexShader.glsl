@@ -37,21 +37,30 @@ void main() {
 	
 	float pointRotation;
 
+	//Test if this clipmap is a ring or a circle (is it the bottom level)
 	if( last == 1 ) {
 		pointRotation = ( length(newPosition) / radius ) * ( scaledPI * 2.0 );
 	} else {
 		pointRotation = ( length(newPosition) / radius ) * scaledPI + scaledPI;
 	}
 
+	//Find the normal for the front of the sphere and this point
 	vec3 axis = normalize(cross(front, newPosition));
 
 	vec4 quat = createQuaternionFromAxisAngle( axis, pointRotation );
 
+	//Create a brand new vertex at the prime meridian on the equator and rotate it to its correct position
 	newPosition = rotateVector( quat, vec3( 0, 0, radius ) );
 
-	newPosition.z -= radius;
-
+	//Now rotate this point to face the camera (broken portion)
 	newPosition = rotateVector(meshRotation, newPosition );
+
+	newPosition.z -= radius;
 	
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }
+
+
+
+
+
