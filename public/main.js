@@ -30,9 +30,6 @@ function start(){
    camera.position.x = 0;
    camera.position.y = 0;
    camera.position.z = 2;//radius;
-camera.position.z = -radius ;
-camera.position.x = radius;
-camera.position.y = radius;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
@@ -94,9 +91,7 @@ camera.position.y = radius;
 	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth);
 var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .9, 100, 100));
 center.position.z = -radius;
-planet.obj.position.z = -radius * 2;
-planet.obj.position.x = radius;
-planet.obj.position.y = radius;
+//planet.obj.position.z = -radius * 2;
 
 camera.lookAt( planet.obj.position );
 
@@ -138,7 +133,7 @@ camera.lookAt( planet.obj.position );
         renderer.render( scene, camera );
         requestAnimationFrame( render );
         stats.update();
-/*		if(camera.position.length() > 100){
+		if(camera.position.length() > 100){
 			var t = new THREE.Vector3(0,0,0);
 			t.subVectors(camera.position, t);
 			planet.obj.position.sub(t);
@@ -147,7 +142,7 @@ camera.lookAt( planet.obj.position );
 			camera.position.y = 0;
 			camera.position.z = 0;
 		}
-*/
+
 		planet.update();
 
     }

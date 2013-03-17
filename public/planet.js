@@ -88,7 +88,7 @@ var logLimiter = 0;
 
 
 		localCam = camera.position.clone();
-		localCam.z -= radius;
+//		localCam.z -= radius;
 		log("actualcam",localCam);
 		tMesh.worldToLocal(localCam);
 		log("localcam",localCam);
@@ -104,22 +104,25 @@ var logLimiter = 0;
 		//Get -radius localToWorld and that's the point to rotate the mesh around
 
 //		var center = planet.obj.localToWorld( new THREE.Vector3(0,0,-radius) );
-/*
-		var m = me.obj.matrix.clone();
-		var p = new THREE.Vector3().getPositionFromMatrix(m);
-		p.z -= radius;
-		m.setPosition(p);
 
+		//var m = me.obj.matrix.clone();
+		var m = new THREE.Matrix4();
+		var p = new THREE.Vector3();
+		//var p = new THREE.Vector3().getPositionFromMatrix(m);
+		//p.z -= radius;
+		//m.setPosition(p);
+		
 //		m.lookAt(camera.position, me.obj.position, me.obj.up);
-		m.lookAt(localCam, p, me.obj.up);
+		m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
 		var tr = m.decompose()[ 1 ].inverse();
 
 		//updateClipMaps(cameraDistance, tr);
 		updateClipMaps(cameraDistance, tr);
-*/
+
+		/*
 		var forward = new THREE.Vector3(0,1,0);
 		forward.cross(localCam).normalize();
-		var tr = new THREE.Quaternion().setFromAxisAngle(forward, theta);
+		var tr = new THREE.Quaternion().setFromAxisAngle(forward, halfPI - theta);
 		
 		var up = new THREE.Vector3(1,0,1);
 		up.cross(localCam).normalize();
@@ -127,8 +130,9 @@ var logLimiter = 0;
 
 		var mr = pr.multiplyQuaternions(tr, pr);
 
-		updateClipMaps(cameraDistance, pr);
-		
+		updateClipMaps(cameraDistance, mr);
+		*/	
+
 		logLimiter++;
 		if( logLimiter % 30 == 0 ) {
 			$('#info').html(logText);
