@@ -1,5 +1,6 @@
 precision highp float;
 
+uniform sampler2D texture;
 uniform float scaledPI;
 uniform float radius;
 uniform vec4 meshRotation;
@@ -52,9 +53,10 @@ void main() {
 	//Create a brand new vertex at the prime meridian on the equator and rotate it to its correct position
 	newPosition = rotateVector( quat, vec3( 0, 0, radius ) );
 
-	//Now rotate this point to face the camera (broken portion)
+	//Now rotate this point to face the camera
 	newPosition = rotateVector(meshRotation, newPosition );
 
+	//Move point back to its relative position to the mesh
 	newPosition.z -= radius;
 	
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );

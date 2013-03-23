@@ -1,20 +1,29 @@
+'use strict'
+
 var so = so || {};
 
+var halfPI = Math.PI/2;
+var quarterPI = Math.PI/4;
+var tau = Math.PI * 2;
 
-so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth ) {
-	var halfPI = Math.PI/2;
-	var quarterPI = Math.PI/4;
-	var tau = Math.PI * 2;
+so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth, renderer ) {
 
 	var me = this;
 	
 	var fragmentShader;
 	var vertexShader;
 
+	renderer = renderer ? renderer : new THREE.WebGLRenderer();
+
 	var position = new THREE.Vector3(0,0,0);
 
 	me.obj = new THREE.Object3D();
 	me.obj.position = _position || new THREE.Vector3();
+
+	//trying to solve clipping issue.
+//	var placeHolder = new THREE.Mesh( new THREE.SphereGeometry( radius * 1.3 ) );
+//	placeHolder.position.z -= radius;
+//	me.obj.add( placeHolder );
 
 	var camera = _camera;
 	var radius = _radius || 6353000;
@@ -22,6 +31,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	
 	var fov = _fov || 30;
 	fov = fov * .0174532925;//Convert to radians
+
+	var textureProvider = new so.TextureProvider( renderer, radius, 42 );
 
 	var screenWidth = _screenWidth || 768;
 	//tan of fov/screenWidth is first half of pixel size on planet calc
@@ -71,72 +82,84 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
  *
  */
 
-	var clock = new THREE.Clock(), localCam, cameraDistance, delta, theta, phi;
-var logLimiter = 0;
+	var clock = new THREE.Clock(), localCam, cameraDistance, delta = 0, theta, phi, maxTheta, minTheta;
+	var lockHeight = 2;
+	
 	me.update = function( ) {
 		logText = '';
 
 		if(! inited){ return; }
 		
-		delta = clock.getDelta();
-		
-		log("planetpos",me.obj.position);
-		var tMesh = me.obj.clone();
-		tMesh.position.z -= radius;
-		tMesh.updateMatrixWorld(false);
-		log("adjusted planetpos",tMesh.position);
+		delta += clock.getDelta();
+	
+		if(delta >= 1){
+
+			var tMesh = me.obj.clone();
+			tMesh.position = tMesh.localToWorld(tMesh.position);
+			tMesh.position.z -= radius;
+			tMesh.updateMatrixWorld(false);
+
+			localCam = camera.position.clone();
+			tMesh.worldToLocal(localCam);
+			cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
 
 
-		localCam = camera.position.clone();
-//		localCam.z -= radius;
-		log("actualcam",localCam);
-		tMesh.worldToLocal(localCam);
-		log("localcam",localCam);
-		cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
-		log('camera distance', cameraDistance);	
+			getTheta(localCam.x, localCam.y, localCam.z );
+			getPhi(localCam.x, localCam.z );
+			minTheta =  getMinTheta( radius, cameraDistance );
+			maxTheta = getMaxTheta( radius, cameraDistance );
 
+			getLockHeight( cameraDistance );	
 
-		getTheta(localCam.x, localCam.y, localCam.z );
-		log("theta", theta);
-		getPhi(localCam.x, localCam.z );
-		log("phi", phi);
+			//Determine if we need to update clipmaps and to which phi, theta
 
-		//Get -radius localToWorld and that's the point to rotate the mesh around
+			var m = new THREE.Matrix4();
+			var p = new THREE.Vector3();
+			
+			m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
+			var tr = m.decompose()[ 1 ].inverse();
 
-//		var center = planet.obj.localToWorld( new THREE.Vector3(0,0,-radius) );
+			updateClipMaps(lockHeight, tr, phi, theta);
 
-		//var m = me.obj.matrix.clone();
-		var m = new THREE.Matrix4();
-		var p = new THREE.Vector3();
-		//var p = new THREE.Vector3().getPositionFromMatrix(m);
-		//p.z -= radius;
-		//m.setPosition(p);
-		
-//		m.lookAt(camera.position, me.obj.position, me.obj.up);
-		m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
-		var tr = m.decompose()[ 1 ].inverse();
-
-		//updateClipMaps(cameraDistance, tr);
-		updateClipMaps(cameraDistance, tr);
-
-		/*
-		var forward = new THREE.Vector3(0,1,0);
-		forward.cross(localCam).normalize();
-		var tr = new THREE.Quaternion().setFromAxisAngle(forward, halfPI - theta);
-		
-		var up = new THREE.Vector3(1,0,1);
-		up.cross(localCam).normalize();
-		var pr = new THREE.Quaternion().setFromAxisAngle(up, phi);
-
-		var mr = pr.multiplyQuaternions(tr, pr);
-
-		updateClipMaps(cameraDistance, mr);
-		*/	
-
-		logLimiter++;
-		if( logLimiter % 30 == 0 ) {
+			log('lockHeight', lockHeight);
+			log("planetpos",me.obj.position);
+			log("adjusted planetpos",tMesh.position);
+			log('radius', radius);
+			log('height', cameraDistance);
+			log("actualcam",camera.position);
+			log("localcam",localCam);
+			log("theta", theta);
+			log("phi", phi);
+			log('minTheta', minTheta);
+			log('maxTheta',maxTheta);
+			log('clipMapCount', clipMapCount+1);
 			$('#info').html(logText);
-			logLimiter = 0;
+			delta = 0;
+		}
+	}
+	
+	function getLockHeight( height ) {
+		var max = 30, min = 1, midpoint = Math.floor( max / 2), step = midpoint;
+
+		while( 1 ) {
+			step = Math.round( step / 2 );
+			step = step == 0 ? 1 : step;
+			lockHeight = Math.pow(2,midpoint);
+
+			if( height < 2 ) {//If we have a negative height, whups
+				lockHeight = 2;
+				break;
+			}
+
+			if ( height >= lockHeight ) {
+				if( midpoint >= max || height < Math.pow(2, midpoint+1) ) {
+					break;
+				} else {
+					midpoint += step ;
+				}
+			} else {
+					midpoint -= step ;
+			}
 		}
 	}
 	
@@ -145,28 +168,57 @@ var logLimiter = 0;
  * Update Clipmaps
  *
  */
-	var s, maxTheta, clipMaps = [], i;
+	var clipMaps = [], i;
 	var colors = [0xFF0000, 0x0000FF, 0x00FF00];//red, blue, green
-	var wireframe = true;
+	function updateClipMaps( height, rotate ) {
+		
+		//min theta planet pixel size / radius i minimum theta
+		//max theta
+		for( var i = 0; i < clipMapCount; i++ ) {
+			if( clipMaps[i].visible === false ) {
+				if( clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta ) {
+					me.obj.add(clipMaps[i].mesh);
+					clipMaps[i].visible = true;
+				}
+			} else {
+				if( clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta ) {
+					me.obj.remove(clipMaps[i].mesh);
+					clipMaps[i].visible = false;
+					continue;
+				}
+			}
+			if(clipMaps[i].visible) {
+				log('level: ' + i , ' theta:' + clipMaps[i].theta);
+				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
+				//clipMaps[i].material.uniforms.texture = textureProvider.getTexture( i, phi, theta ); 
+				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
+					clipMaps[i].material.uniforms.last.value =  1;
+				}else{
+					clipMaps[i].material.uniforms.last.value =  0;
+				}
+			}
+		}
+	}
+
 	
 	function initClipMaps( ) {
 
 		clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime
 	
 		var t = quarterPI;
-
+		var scale, scaledPI;
 		for( i = 0; i < clipMapCount; i++ ) {
-			var scale = ( 1 / Math.pow( 2, i+1 ) ) ;
-			var scaledPI = Math.PI /  2 * scale ;
+
+			scale = ( 1 / Math.pow( 2, i+1 ) ) ;
+			scaledPI = Math.PI /  2 * scale ;
 			clipMaps[i] = {};
+
 			clipMaps[i].material = new THREE.ShaderMaterial( {
 				uniforms: { 
-/*
-					tHeightmap: { // texture in slot 0, loaded with ImageUtils
+					texture: { // texture in slot 0, loaded with ImageUtils
 						type: "t", 
-						value: THREE.ImageUtils.loadTexture( 'explosion.png' )
+						value: undefined
 					},  
-*/
 					meshRotation: { 
 						type: "v4",
 						value: new THREE.Vector4(0,0,0,0),
@@ -193,52 +245,15 @@ var logLimiter = 0;
 				fragmentShader: fragmentShader
 
 			} );	
+
 			clipMaps[i].theta = t;
 			clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
-//			clipMaps[i].mesh = new THREE.Mesh(circleGeos[i], new THREE.MeshBasicMaterial({color:'#FF0000'}));
 			clipMaps[i].visible = false;
-	//		me.obj.add(clipMaps[i].mesh);
-//			clipMaps[i].mesh.translateZ(radius);
 
 			t /= 2;//Each successive clipMap covers half as much theta
 		}
 	}
 
-	function updateClipMaps( height, rotate ) {
-		log('radius', radius);
-		log('height', height);
-		
-		//min theta planet pixel size / radius i minimum theta
-		var minTheta =  getMinTheta( radius, height );
-		log('minTheta', minTheta);
-		//max theta
-		var maxTheta = getMaxTheta( radius, height );
-		log('maxTheta',maxTheta);
-		log('clipMapCount', clipMapCount+1);
-		for( var i = 0; i < clipMapCount; i++ ) {
-			if( clipMaps[i].visible === false ) {
-				if( clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta ) {
-					me.obj.add(clipMaps[i].mesh);
-					clipMaps[i].visible = true;
-				}
-			} else {
-				if( clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta ) {
-					me.obj.remove(clipMaps[i].mesh);
-					clipMaps[i].visible = false;
-					continue;
-				}
-			}
-			if(clipMaps[i].visible) {
-				log('level: ' + i , ' theta:' + clipMaps[i].theta);
-				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
-				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
-					clipMaps[i].material.uniforms.last.value =  1;
-				}else{
-					clipMaps[i].material.uniforms.last.value =  0;
-				}
-			}
-		}
-	}
 
 
 /*

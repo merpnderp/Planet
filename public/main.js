@@ -27,9 +27,9 @@ function start(){
         .01, 
         1000000000);
 
-   camera.position.x = 0;
-   camera.position.y = 0;
-   camera.position.z = 2;//radius;
+   camera.position.x = radius;
+   camera.position.y = radius;
+   camera.position.z = radius;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
@@ -88,33 +88,37 @@ function start(){
     directionalLight.position.set( 2, 2, 10 ); 
     scene.add( directionalLight );
 
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth);
-var center = new THREE.Mesh(new THREE.SphereGeometry(radius * .9, 100, 100));
-center.position.z = -radius;
-//planet.obj.position.z = -radius * 2;
+	var solarSystem = new THREE.Object3D();
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth, renderer);
 
-camera.lookAt( planet.obj.position );
+	camera.lookAt( planet.obj.position );
 
-//scene.add(center);
-//var ring = new THREE.Mesh(new THREE.RingGeometry(0,radius));
-//scene.add(ring);
-
-//center.position.z = planet.obj.position.z;
-//controls.target =  planet.obj.position;
-	scene.add(planet.obj);
+	solarSystem.add(planet.obj);
 
 	var axis = new THREE.AxisHelper( radius * 100 );
 	axis.position = planet.obj.position;
-	scene.add(axis);
-
+	solarSystem.add(axis);
+	var pipe = radius / 50;
+	var Y = new THREE.Mesh( new THREE.CylinderGeometry (pipe, pipe, radius * 100) );
+	var X = new THREE.Mesh( new THREE.CylinderGeometry (pipe, pipe, radius * 100) );
+	var Z = new THREE.Mesh( new THREE.CylinderGeometry (pipe, pipe, radius * 100) );
+	X.rotation.z += Math.PI/2;
+	Z.rotation.x += Math.PI/2;
+	Y.position.z -= radius;
+	X.position.z -= radius;
+	Z.position.z -= radius;
+	solarSystem.add(Y);
+	solarSystem.add(X);
+	solarSystem.add(Z);
+	scene.add(solarSystem);
 	var clock = new THREE.Clock();
 	var delta, logLimiter = 0;
 
     function render(){
 		delta = clock.getDelta();
 		controls.update( delta );
-
-		if( logLimiter++ % 60 == 0 ) {
+		logLimiter++;
+		if( logLimiter % 180 == 0 ) {
 			var r = 
 				"programs: " + renderer.info.memory.programs + 
 				"<br />geometries: " + renderer.info.memory.geometries + 
@@ -129,6 +133,7 @@ camera.lookAt( planet.obj.position );
 				"<br />"; 
 
 			$('#render').html(r);
+			logLimiter = 0;
 		} 
         renderer.render( scene, camera );
         requestAnimationFrame( render );
@@ -136,8 +141,7 @@ camera.lookAt( planet.obj.position );
 		if(camera.position.length() > 100){
 			var t = new THREE.Vector3(0,0,0);
 			t.subVectors(camera.position, t);
-			planet.obj.position.sub(t);
-			center.position.sub(t);
+			solarSystem.position.sub(t);
 			camera.position.x = 0;
 			camera.position.y = 0;
 			camera.position.z = 0;

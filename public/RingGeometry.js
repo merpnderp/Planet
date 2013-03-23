@@ -1,10 +1,6 @@
-/*
- *
- * Author: Kaleb Murphy
- *
+/**
+ * @author Kaleb Murphy
  */
-
-
 
 THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
@@ -18,55 +14,59 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 
 	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
 	phiSegments = phiSegments !== undefined ? Math.max( 3, phiSegments ) : 8;
-	
-	var i, o, uvs = [], radius = innerRadius, radiusStep = ( ( outerRadius - innerRadius ) / phiSegments);
-	 
-	for( i = 0; i <= phiSegments; i++) {//concentric circles inside ring
 
-		for( o = 0; o <= thetaSegments; o++) {//number of segments per circle
+	var i, o, uvs = [], radius = innerRadius, radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+
+	for ( i = 0; i <= phiSegments; i ++ ) { // concentric circles inside ring
+
+		for ( o = 0; o <= thetaSegments; o ++ ) { // number of segments per circle
 
 			var vertex = new THREE.Vector3();
-			
-			vertex.x = radius * Math.cos( thetaStart + o / thetaSegments * thetaLength );
-			vertex.y = radius * Math.sin( thetaStart + o / thetaSegments * thetaLength );
-			
+			var segment = thetaStart + o / thetaSegments * thetaLength;
+
+			vertex.x = radius * Math.cos( segment );
+			vertex.y = radius * Math.sin( segment );
+
 			this.vertices.push( vertex );
-			uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
+			//uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
+			uvs.push( new THREE.Vector2( i / phiSegments, o / thetaSegments ) );
 		}
-	
+
 		radius += radiusStep;
 
 	}
 
 	var n = new THREE.Vector3( 0, 0, 1 );
-	
-	for( i = 0; i < phiSegments; i++) {//concentric circles inside ring
 
-		for( o = 0; o <= thetaSegments; o++) {//number of segments per circle
-			
-			var v1, v2, v3;
+	for ( i = 0; i < phiSegments; i ++ ) { // concentric circles inside ring
 
-			v1 = o + (thetaSegments * i) + i;
-			v2 = o + (thetaSegments * i) + thetaSegments + i;
-			v3 = o + (thetaSegments * i) + thetaSegments + 1 + i;
-			
+		var thetaSegment = i * thetaSegments;
+
+		for ( o = 0; o <= thetaSegments; o ++ ) { // number of segments per circle
+
+			var segment = o + thetaSegment;
+
+			var v1 = segment + i;
+			var v2 = segment + thetaSegments + i;
+			var v3 = segment + thetaSegments + 1 + i;
+
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
-			
-			v1 = o + (thetaSegments * i) + i;
-			v2 = o + (thetaSegments * i) + thetaSegments + 1 + i;
-			v3 = o + (thetaSegments * i) + 1 + i;
-			
+
+			v1 = segment + i;
+			v2 = segment + thetaSegments + 1 + i;
+			v3 = segment + 1 + i;
+
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
 
 		}
 	}
-	
+
 	this.computeCentroids();
 	this.computeFaceNormals();
 
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius ); 
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 

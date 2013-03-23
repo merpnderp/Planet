@@ -10,7 +10,7 @@ varying vec2 vUv;
 //varying float displacement;
 //varying vec3 norm;
 uniform vec3 icolor;
-uniform sampler2D tHeightmap;
+uniform sampler2D texture;
 uniform vec4 rotation; 
 
 
