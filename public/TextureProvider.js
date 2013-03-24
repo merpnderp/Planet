@@ -39,13 +39,27 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 				type: "f",
 				value: radius
 			},
-
+			phi: {
+				type: "f",
+				value: 0
+			},
+			theta: {
+				type: "f",
+				value: 0
+			},
+			level: {
+				type: "f",
+				value: 0
+			},
+			seed: {
+				type: "f",
+				value: seed 
+			},
 		},
 		vertexShader: vertexShader,
-		fragmentShader, fragmentShader
+		fragmentShader: fragmentShader
 	} );
 
-	//var geo = new so.RingGeometry( .000001, radius, rx, ry, 0, Math.PI * 2 );
 	var geo = new THREE.PlaneGeometry( rx, ry );
 
 	var quadTarget = new THREE.Mesh( geo, material );
@@ -53,34 +67,22 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 
 	sceneRenderTarget.add( quadTarget );
 
-
 	seed = seed ? seed : Math.floor( Math.random() * 10000000000 + 1 );
 
 	var textureHash = {};
 	var textureArray = [];
 
 	this.getTexture = function( level, phi, theta )  {
+
 		if( ! inited ) return;		
-	
-		// At level 0 phi = 0 and theta = 1.57 we want back a texture spanning from -PI, 0 to PI, PI.
-		// At level 1 phi = 0 and theta = 1.57 we want back a texture spanning from -1.57, 0 to 1.57, PI.
-		// At level 2 phi = 0 and theta = 1.57 we want back a texture spanning from -.79, .79 to .79, 2.36.
+		
+		quadTarget.material.uniforms.level = level;
+		quadTarget.material.uniforms.phi = phi;
+		quadTarget.material.uniforms.theta = theta;
 
-		var step = Math.PI / ( level + 1 );
-		//solve for phi which goes form -PI to PI
-		var mapPhi = 0, mapTheta = 0;
-		while(1) {
-			if ( phi - step >= mapPhi && phi + step < mapPhi ) {
-				mapTheta = 0;
-			} else if (phi < mapPhi ){
-		//		mapPhi
-			}
-			break;
-		}
+		renderer.render( sceneRenderTarget, cameraOrtho, heightMap, true );
 
-		for( var i = 0; i < Math.PI; i+= step ) {
-		}
-
+		return heightMap;
 
 	};
 };
