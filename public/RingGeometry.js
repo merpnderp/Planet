@@ -2,7 +2,7 @@
  * @author Kaleb Murphy
  */
 
-THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+so.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
 
@@ -70,4 +70,4 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 
 };
 
-THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
+so.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );

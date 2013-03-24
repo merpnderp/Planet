@@ -37,12 +37,13 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	var screenWidth = _screenWidth || 768;
 	//tan of fov/screenWidth is first half of pixel size on planet calc
 	var vs = Math.tan(fov/screenWidth);
-	
+
+	var smallestTheta;
 	function findClipMapCount(){
-		var minTheta = getMinTheta(radius, 2);//smallest theta is 2 units of height
+		smallestTheta = getMinTheta(radius, 2);//smallest theta is 2 units of height
 		var i = 0;
 		var theta = 100;
-		while( theta > minTheta){
+		while( theta > smallestTheta){
 			i++;
 			theta = (1 / Math.pow(2,i) ) * Math.PI;
 		}
@@ -73,7 +74,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	
 	clipMapCount = 20;	
 	
-	var circleGeo = new THREE.RingGeometry( .000001, radius,  segments, segments, 0, tau ); 
+	var circleGeo = new so.RingGeometry( .000001, radius,  segments, segments, 0, tau ); 
 
 
 /*
@@ -83,7 +84,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
  */
 
 	var clock = new THREE.Clock(), localCam, cameraDistance, delta = 0, theta, phi, maxTheta, minTheta;
-	var lockHeight = 2;
+	var heightLock = 2, thetaLock = 0, phiLock = 0;//These are the discrete values we're locking to for the cameras phi/theta to the planet
+	var oldHeightLock = 0, oldThetaLock = 0, oldPhiLock = 0;
 	
 	me.update = function( ) {
 		logText = '';
@@ -92,7 +94,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		
 		delta += clock.getDelta();
 	
-		if(delta >= 1){
+		if(delta >= .1){
 
 			var tMesh = me.obj.clone();
 			tMesh.position = tMesh.localToWorld(tMesh.position);
@@ -103,55 +105,110 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			tMesh.worldToLocal(localCam);
 			cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
 
-
 			getTheta(localCam.x, localCam.y, localCam.z );
 			getPhi(localCam.x, localCam.z );
-			minTheta =  getMinTheta( radius, cameraDistance );
-			maxTheta = getMaxTheta( radius, cameraDistance );
 
-			getLockHeight( cameraDistance );	
+			getHeightLock( cameraDistance );
+			minTheta =  getMinTheta( radius, heightLock );
+			maxTheta = getMaxTheta( radius, heightLock );
+			getPhiLock( );
+			getThetaLock( );
 
-			//Determine if we need to update clipmaps and to which phi, theta
+			if( oldHeightLock != heightLock || oldPhiLock != phiLock || oldThetaLock != thetaLock ) {
+				oldHeightLock = heightLock;	
+				oldPhiLock = phiLock;	
+				oldThetaLock = thetaLock;	
 
-			var m = new THREE.Matrix4();
-			var p = new THREE.Vector3();
-			
-			m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
-			var tr = m.decompose()[ 1 ].inverse();
+				var pq = new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), -phiLock );
+				var tq = new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), (Math.PI / 2 ) - thetaLock);
+				tq.multiply(pq);
+				updateClipMaps(heightLock, tq, phi, theta);
+	/*
+				var m = new THREE.Matrix4();
+				var p = new THREE.Vector3();
+				m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
+				var tr = m.decompose()[ 1 ].inverse();
+				updateClipMaps(heightLock, tr, phi, theta);
+	*/
+				log('height', cameraDistance);
+				log('heightLock', heightLock);
+				log('phiSteps', Math.PI * 2 / minTheta);
+				log('phiLock', phiLock);
+				log("phi", phi);
+				log('thetaSteps', Math.PI / minTheta);
+				log('thetaLock', thetaLock);
+				log("theta", theta);
+				log("planetpos",me.obj.position);
+				log("adjusted planetpos",tMesh.position);
+				log('radius', radius);
+				log("actualcam",camera.position);
+				log("localcam",localCam);
+				log('minTheta', minTheta);
+				log('maxTheta',maxTheta);
+				log('clipMapCount', clipMapCount+1);
+				$('#info').html(logText);
+				delta = 0;
+			}
+		}
+	}
 
-			updateClipMaps(lockHeight, tr, phi, theta);
+	function getPhiLock( ) {
+		var max = Math.PI * 2 / minTheta, min = 0, midpoint = max / 2, step = midpoint, tphi = phi + Math.PI;
+		var count = 0;
+		while( 1 ) {
+			step = step / 2;
+			step = step == 0 ? 1 : step;
 
-			log('lockHeight', lockHeight);
-			log("planetpos",me.obj.position);
-			log("adjusted planetpos",tMesh.position);
-			log('radius', radius);
-			log('height', cameraDistance);
-			log("actualcam",camera.position);
-			log("localcam",localCam);
-			log("theta", theta);
-			log("phi", phi);
-			log('minTheta', minTheta);
-			log('maxTheta',maxTheta);
-			log('clipMapCount', clipMapCount+1);
-			$('#info').html(logText);
-			delta = 0;
+			phiLock = minTheta * midpoint;
+		
+			if( tphi >= phiLock ) {
+				if( tphi < minTheta * (midpoint + 1 ) ) {
+					break;
+				} else {
+					midpoint += step;
+				}
+			} else {
+				midpoint -= step;
+			}
+		}
+		phiLock -= Math.PI;
+	}
+
+	function getThetaLock( ) {
+		var max = Math.PI / minTheta, min = 0, midpoint = max / 2, step = midpoint;
+		var count = 0;
+		while( 1 ) {
+			step = step / 2;
+			step = step == 0 ? 1 : step;
+
+			thetaLock = minTheta * midpoint;
+		
+			if( theta >= thetaLock ) {
+				if( theta < minTheta * (midpoint + 1 ) ) {
+					break;
+				} else {
+					midpoint += step;
+				}
+			} else {
+				midpoint -= step;
+			}
 		}
 	}
 	
-	function getLockHeight( height ) {
-		var max = 30, min = 1, midpoint = Math.floor( max / 2), step = midpoint;
+	function getHeightLock( height ) {
+		var max = 30, min = 1, midpoint = Math.round( max / 2), step = midpoint;
 
 		while( 1 ) {
 			step = Math.round( step / 2 );
 			step = step == 0 ? 1 : step;
-			lockHeight = Math.pow(2,midpoint);
+			heightLock = Math.pow(2,midpoint);
 
 			if( height < 2 ) {//If we have a negative height, whups
-				lockHeight = 2;
+				heightLock = 2;
 				break;
 			}
 
-			if ( height >= lockHeight ) {
+			if ( height >= heightLock ) {
 				if( midpoint >= max || height < Math.pow(2, midpoint+1) ) {
 					break;
 				} else {
@@ -190,7 +247,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			if(clipMaps[i].visible) {
 				log('level: ' + i , ' theta:' + clipMaps[i].theta);
 				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
-				//clipMaps[i].material.uniforms.texture = textureProvider.getTexture( i, phi, theta ); 
+//				clipMaps[i].material.uniforms.texture = textureProvider.getTexture( i, phiLock, thetaLock ); 
 				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
 					clipMaps[i].material.uniforms.last.value =  1;
 				}else{
@@ -268,7 +325,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	
 	function getMinTheta( radius, height ) {
 		var lt = ( (height * vs) / radius ) * segments;//multiply by segments because this is theta per triangle
-		return lt < quarterPI ? lt : quarterPI;
+		lt = lt < quarterPI ? lt : quarterPI;
+		return lt < 0 ? smallestTheta : lt;
 	}
 
 	function getTheta( x, y, z) {

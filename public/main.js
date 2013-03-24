@@ -27,14 +27,14 @@ function start(){
         .01, 
         1000000000);
 
-   camera.position.x = radius;
-   camera.position.y = radius;
+//   camera.position.x = radius;
+ //  camera.position.y = radius;
    camera.position.z = radius;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 1;
+        controls.movementSpeed = radius / .1;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
