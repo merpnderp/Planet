@@ -27,7 +27,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 	var camera = _camera;
 	var radius = _radius || 6353000;
-	var segments = _segments || 20;
+	var segments = _segments || 52;
 	
 	var fov = _fov || 30;
 	fov = fov * .0174532925;//Convert to radians

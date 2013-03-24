@@ -16,8 +16,8 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 		inited = true;
 	}
 
-	rx = rx ? rx : 50;
-	ry = ry ? ry : 50;
+	rx = rx ? rx : 52;
+	ry = ry ? ry : 52;
 
 	var textures;
 
@@ -27,7 +27,7 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 
 	sceneRenderTarget.add( cameraOrtho );
 
-	var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+	var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat };
 	var heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 	var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 

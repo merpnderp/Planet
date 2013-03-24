@@ -89,7 +89,7 @@ function start(){
     scene.add( directionalLight );
 
 	var solarSystem = new THREE.Object3D();
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 50, fov, window.innerWidth, renderer);
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 52, fov, window.innerWidth, renderer);
 
 	camera.lookAt( planet.obj.position );
 
