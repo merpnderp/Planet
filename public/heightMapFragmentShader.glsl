@@ -1,5 +1,5 @@
 
-/
+//
 // GLSL textureless classic 3D noise "cnoise",
 // with an RSL-style periodic variant "pnoise".
 // Author:  Stefan Gustavson (stefan.gustavson@liu.se)
@@ -188,16 +188,24 @@ float turbulence( vec3 p ) {
 
 }
 
-varying vec2 vUv
-         
+varying vec2 vUv;
+varying vec3 pos;
+uniform float phi;
+uniform float theta;
+uniform float radius;
+uniform float seed;
+uniform int level;
+uniform int x;
+uniform int y;
+
 void main() {
 	
 	float noise = 10.0 *  -.10 * turbulence( .5 * normal + time ); 
 	float b = 5.0 * pnoise( 0.05 * position + vec3( 2.0 * time ), vec3( 100.0 ) );
 	float displacement = - noise + b;
 
-
-
+	//From the x,y and position we know which vertex on the plane we are and can map that to the vertex on the ring projected onto the sphere that we represent.
+	
 
 	gl_FragColor = vec4( color.rgb, 1.0 );
  

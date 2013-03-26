@@ -48,12 +48,20 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 				value: 0
 			},
 			level: {
-				type: "f",
+				type: "i",
 				value: 0
 			},
 			seed: {
 				type: "f",
 				value: seed 
+			},
+			x: {
+				type: "i",
+				value: rx 
+			},
+			y: {
+				type: "y",
+				value: ry 
 			},
 		},
 		vertexShader: vertexShader,
