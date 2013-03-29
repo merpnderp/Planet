@@ -27,7 +27,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 
 	var camera = _camera;
 	var radius = _radius || 6353000;
-	var segments = _segments || 52;
+	var segments = _segments || 64;
 	
 	var fov = _fov || 30;
 	fov = fov * .0174532925;//Convert to radians
@@ -74,7 +74,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	
 	clipMapCount = 20;	
 	
-	var circleGeo = new so.RingGeometry( .000001, radius,  segments, segments, 0, tau ); 
+	var circleGeo = new THREE.RingGeometry( .000001, radius,  segments, segments, 0, tau ); 
 
 
 /*
@@ -227,6 +227,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
  */
 	var clipMaps = [], i;
 	var colors = [0xFF0000, 0x0000FF, 0x00FF00];//red, blue, green
+	var scaledPI = [];
 	function updateClipMaps( height, rotate ) {
 		
 		//min theta planet pixel size / radius i minimum theta
@@ -247,7 +248,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			if(clipMaps[i].visible) {
 				log('level: ' + i , ' theta:' + clipMaps[i].theta);
 				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
-//				clipMaps[i].material.uniforms.texture = textureProvider.getTexture( i, phiLock, thetaLock ); 
+//				clipMaps[i].material.uniforms.texture = textureProvider.getTexture( i, phiLock, thetaLock, rotate, scaledPI[i] ); 
 				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
 					clipMaps[i].material.uniforms.last.value =  1;
 				}else{
@@ -263,11 +264,11 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime
 	
 		var t = quarterPI;
-		var scale, scaledPI;
+		var scale;
 		for( i = 0; i < clipMapCount; i++ ) {
 
 			scale = ( 1 / Math.pow( 2, i+1 ) ) ;
-			scaledPI = Math.PI /  2 * scale ;
+			scaledPI[i] = Math.PI /  2 * scale ;
 			clipMaps[i] = {};
 
 			clipMaps[i].material = new THREE.ShaderMaterial( {
@@ -286,7 +287,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 					},
 					scaledPI: {
 						type: "f",
-						value: scaledPI 
+						value: scaledPI[i]
 					},
 					radius: {
 						type: "f",

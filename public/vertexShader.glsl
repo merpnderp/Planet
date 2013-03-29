@@ -46,7 +46,7 @@ void main() {
 	}
 
 	//Find the normal for the front of the sphere and this point
-	vec3 axis = normalize(cross(front, newPosition));
+	vec3 axis = normalize( cross( front, newPosition ) );
 
 	vec4 quat = createQuaternionFromAxisAngle( axis, pointRotation );
 

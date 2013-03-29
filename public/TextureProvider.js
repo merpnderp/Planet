@@ -16,8 +16,10 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 		inited = true;
 	}
 
-	rx = rx ? rx : 52;
-	ry = ry ? ry : 52;
+	rx = rx ? rx : 128;
+	ry = ry ? ry : 64;
+
+	seed = seed ? seed : Math.floor( Math.random() * 10000000000 + 1 );
 
 	var textures;
 
@@ -39,27 +41,23 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 				type: "f",
 				value: radius
 			},
-			phi: {
+			scaledPI: {
 				type: "f",
 				value: 0
 			},
-			theta: {
-				type: "f",
-				value: 0
-			},
-			level: {
-				type: "i",
-				value: 0
+			meshRotation: {
+				type: "v4",
+				value: new THREE.Vector4(0,0,0,0),
 			},
 			seed: {
 				type: "f",
 				value: seed 
 			},
-			x: {
+			rx: {
 				type: "i",
 				value: rx 
 			},
-			y: {
+			ry: {
 				type: "y",
 				value: ry 
 			},
@@ -69,24 +67,22 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 	} );
 
 	var geo = new THREE.PlaneGeometry( rx, ry );
+	//var geo = new THREE.RingGeometry( .000001, radius,  rx, ry, 0, Math.PI * 2 );
 
 	var quadTarget = new THREE.Mesh( geo, material );
 	quadTarget.position.z = -500;
 
 	sceneRenderTarget.add( quadTarget );
 
-	seed = seed ? seed : Math.floor( Math.random() * 10000000000 + 1 );
-
 	var textureHash = {};
 	var textureArray = [];
 
-	this.getTexture = function( level, phi, theta )  {
+	this.getTexture = function( rotate, scaledPI )  {
 
 		if( ! inited ) return;		
-		
-		quadTarget.material.uniforms.level = level;
-		quadTarget.material.uniforms.phi = phi;
-		quadTarget.material.uniforms.theta = theta;
+	
+		quadTarget.matherial.uniforms.meshRotation.value = rotate;
+		quadTarget.matherial.uniforms.scaledPI.value = scaledPI;
 
 		renderer.render( sceneRenderTarget, cameraOrtho, heightMap, true );
 

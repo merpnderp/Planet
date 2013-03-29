@@ -10,7 +10,7 @@ function start(){
 	fov = 30,
     stats = new Stats();
 
-    stats.setMode( 0 );
+    stats.setMode( 1 );
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '5px';
     stats.domElement.style.top = '5px';
@@ -89,11 +89,14 @@ function start(){
     scene.add( directionalLight );
 
 	var solarSystem = new THREE.Object3D();
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 52, fov, window.innerWidth, renderer);
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer);
 
 	camera.lookAt( planet.obj.position );
 
 	solarSystem.add(planet.obj);
+
+	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius*2, radius*2, 100, 100 ));
+	solarSystem.add(plane);
 
 	var axis = new THREE.AxisHelper( radius * 100 );
 	axis.position = planet.obj.position;
