@@ -211,7 +211,6 @@ vec4 qmul(vec4 a, vec4 b) {
 	return vec4(cross(a.xyz,b.xyz) + a.xyz*b.w + b.xyz*a.w, a.w*b.w - dot(a.xyz,b.xyz));
 }
 
-varying vec2 vUv;
 varying vec3 pos;
 uniform float scaledPI;
 uniform vec4 rotate;
@@ -224,30 +223,27 @@ vec3 front = vec3(0,0,1);
 vec3 up = vec3(0,1,0);
 
 void main() {
-	pos.z = radius;
-	float length = length(pos);
-	float ratio = radius / length;
-
+	
 	//First we need to find the proected point of the plane onto the sphere.
 	//We'll do this as two separate rotations, once for phi and once for theata, since phi will be twice the rotation of theta (as it covers twice the distance).
 	float xRotationAmount = pos.x * 2.0 / rx * scaledPI;
 	float yRotationAmount = pos.y / ry * scaledPI;
 
-	vec3 axis = normalize( cross( front, new vec3( pos.x, 0, 0 ) );
+	vec3 fAxis = normalize( cross( front, new vec3( pos.x, 0, 0 ) );
 
-	vec4 rotation = createQuaternionFromAxisAngle( axis, xRotationAmount );
+	vec4 rotation = createQuaternionFromAxisAngle( fAxis, xRotationAmount );
 	
-	axis = normalize( cross( up, new vec3( 0, pos.y, 0 ) );
+	vec3 uAxis = normalize( cross( up, new vec3( 0, pos.y, 0 ) );
 	
-	rotation = qmul( rotation, createQuaternionFromAxisAngle( axis, yRotationAmount ) );
+	rotation = qmul( rotation, createQuaternionFromAxisAngle( uAxis, yRotationAmount ) );
 	
 	vec3 tempPos = rotateVector( rotation, new vec3( 0, 0, radius ) );	
+
+	tempPos = rotateVector( rotate, tempPos );
 
 	float noise = 10.0 * -.10 * turbulence( .5 * normal + seed); 
 	float b = 5.0 * pnoise( 0.05 * tempPos + vec3( 2.0 * seed ), vec3( 100.0 ) );
 	float displacement = - noise + b;
-
-	//From the x,y and position we know which vertex on the plane we are and can map that to the vertex on the ring projected onto the sphere that we represent.
 
 	gl_FragColor = vec4( color.rgb, 1.0 );
  

@@ -66,7 +66,7 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 		fragmentShader: fragmentShader
 	} );
 
-	var geo = new THREE.PlaneGeometry( rx, ry );
+	var geo = new THREE.PlaneGeometry( rx, ry, rx, ry );
 	//var geo = new THREE.RingGeometry( .000001, radius,  rx, ry, 0, Math.PI * 2 );
 
 	var quadTarget = new THREE.Mesh( geo, material );
@@ -81,9 +81,9 @@ so.TextureProvider = function( renderer, radius, rx, ry, seed ) {
 
 		if( ! inited ) return;		
 	
-		quadTarget.matherial.uniforms.meshRotation.value = rotate;
-		quadTarget.matherial.uniforms.scaledPI.value = scaledPI;
-
+		quadTarget.material.uniforms.meshRotation.value = rotate;
+		quadTarget.material.uniforms.scaledPI.value = scaledPI;
+		
 		renderer.render( sceneRenderTarget, cameraOrtho, heightMap, true );
 
 		return heightMap;

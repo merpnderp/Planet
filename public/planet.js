@@ -32,7 +32,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	var fov = _fov || 30;
 	fov = fov * .0174532925;//Convert to radians
 
-	var textureProvider = new so.TextureProvider( renderer, radius, 42 );
+	var textureProvider = new so.TextureProvider( renderer, radius, 128, 64, 42 );
 
 	var screenWidth = _screenWidth || 768;
 	//tan of fov/screenWidth is first half of pixel size on planet calc
@@ -248,7 +248,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			if(clipMaps[i].visible) {
 				log('level: ' + i , ' theta:' + clipMaps[i].theta);
 				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
-//				clipMaps[i].material.uniforms.texture = textureProvider.getTexture( i, phiLock, thetaLock, rotate, scaledPI[i] ); 
+				clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] ); 
 				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
 					clipMaps[i].material.uniforms.last.value =  1;
 				}else{
