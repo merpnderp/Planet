@@ -29,12 +29,12 @@ function start(){
 
 //   camera.position.x = radius;
  //  camera.position.y = radius;
-   camera.position.z = 2;
+   camera.position.z = radius;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 1;
+        controls.movementSpeed = radius / 10;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
@@ -89,14 +89,29 @@ function start(){
     scene.add( directionalLight );
 
 	var solarSystem = new THREE.Object3D();
-	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer);
+	
+	var pmat = new THREE.MeshBasicMaterial( );
+	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius, radius, 128, 64 ), pmat);
+	var tl = new THREE.TextureLoader();
+	tl.addEventListener("load", function(data){
+		pmat = new THREE.MeshBasicMaterial( { map: data.content });
+		plane = new THREE.Mesh( new THREE.PlaneGeometry(radius, radius, 128, 64 ), pmat);
+		plane.position.z += radius / 2;
+		solarSystem.add(plane);
+	});
+	function updatePlane(p){
+		solarSystem.remove(plane);
+		plane = p;
+		solarSystem.add(plane);
+		plane.needsUpdate = true;
+	}
+	tl.load("explosion.png");
+	var planet = new so.Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer, updatePlane);
 
 	camera.lookAt( planet.obj.position );
 
 	solarSystem.add(planet.obj);
-
-	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius*2, radius*2, 100, 100 ));
-	solarSystem.add(plane);
+//	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius*2, radius*2, 128, 64 ));
 
 	var axis = new THREE.AxisHelper( radius * 100 );
 	axis.position = planet.obj.position;

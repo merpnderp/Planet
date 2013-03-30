@@ -6,7 +6,7 @@ var halfPI = Math.PI/2;
 var quarterPI = Math.PI/4;
 var tau = Math.PI * 2;
 
-so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth, renderer ) {
+so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth, renderer, updatePlane ) {
 
 	var me = this;
 	
@@ -248,7 +248,13 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 			if(clipMaps[i].visible) {
 				log('level: ' + i , ' theta:' + clipMaps[i].theta);
 				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
-				clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] ); 
+				//clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] ); 
+				if(i === 0){
+					clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] ); 
+					var text = textureProvider.getTexture( rotate, scaledPI[i] ); 
+					var pmat = new THREE.MeshBasicMaterial( { map: text } );
+					updatePlane(new THREE.Mesh( new THREE.PlaneGeometry(radius/2, radius/2, 128, 64 ), pmat));
+				}
 				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
 					clipMaps[i].material.uniforms.last.value =  1;
 				}else{

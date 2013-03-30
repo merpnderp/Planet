@@ -1,11 +1,10 @@
-precision highp float;
+varying vec3 pos;
+varying vec3 norm;
 
-varying vec3 pos
-
-void main( void ) {
+void main(){
 
 	pos = position;
-
+	norm = normal;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 }

@@ -58,6 +58,11 @@ void main() {
 
 	//Move point back to its relative position to the mesh
 	newPosition.z -= radius;
+
+	float xoffset = newPosition.x / radius * 128.0;
+	float yoffset = newPosition.y / radius * 128.0;
+	vec4 color = texture2D(texture, vec2(xoffset, yoffset));
+	newPosition = newPosition + normal * color.r;
 	
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

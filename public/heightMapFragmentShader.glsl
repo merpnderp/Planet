@@ -212,39 +212,42 @@ vec4 qmul(vec4 a, vec4 b) {
 }
 
 varying vec3 pos;
+varying vec3 norm;
 uniform float scaledPI;
 uniform vec4 rotate;
 uniform float radius;
 uniform float seed;
-uniform int rx;
-uniform int ry;
+uniform float rx;
+uniform float ry;
 
-vec3 front = vec3(0,0,1);
-vec3 up = vec3(0,1,0);
 
 void main() {
-	
+
+	vec3 front = vec3(0,0,1);
+	vec3 up = vec3(0,1,0);
+
 	//First we need to find the proected point of the plane onto the sphere.
 	//We'll do this as two separate rotations, once for phi and once for theata, since phi will be twice the rotation of theta (as it covers twice the distance).
 	float xRotationAmount = pos.x * 2.0 / rx * scaledPI;
 	float yRotationAmount = pos.y / ry * scaledPI;
 
-	vec3 fAxis = normalize( cross( front, new vec3( pos.x, 0, 0 ) );
+	vec3 fAxis = normalize( cross( front, vec3( pos.x, 0, 0 ) ) );
 
 	vec4 rotation = createQuaternionFromAxisAngle( fAxis, xRotationAmount );
 	
-	vec3 uAxis = normalize( cross( up, new vec3( 0, pos.y, 0 ) );
+	vec3 uAxis = normalize( cross( up, vec3( 0, pos.y, 0 ) ) );
 	
 	rotation = qmul( rotation, createQuaternionFromAxisAngle( uAxis, yRotationAmount ) );
 	
-	vec3 tempPos = rotateVector( rotation, new vec3( 0, 0, radius ) );	
+	vec3 tempPos = rotateVector( rotation, vec3( 0, 0, radius ) );	
 
 	tempPos = rotateVector( rotate, tempPos );
 
-	float noise = 10.0 * -.10 * turbulence( .5 * normal + seed); 
+	float noise = 10.0 * -.10 * turbulence( .5 * norm + seed); 
 	float b = 5.0 * pnoise( 0.05 * tempPos + vec3( 2.0 * seed ), vec3( 100.0 ) );
 	float displacement = - noise + b;
+	vec4 color = vec4( clamp( displacement, 0.0, 255.0 ), 0, 0, 0 );
+	//vec4 color = vec4( 255, 0, 0, 0 );
 
 	gl_FragColor = vec4( color.rgb, 1.0 );
- 
 } 
