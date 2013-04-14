@@ -1,11 +1,5 @@
 precision highp float;
 
-uniform sampler2D texture;
-uniform float scaledPI;
-uniform float radius;
-uniform vec4 meshRotation;
-uniform int last;
-varying vec2 vUv;
 
 vec3 rotateVector( vec4 quat, vec3 vec ){
 	return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
@@ -28,6 +22,13 @@ vec4 createQuaternionFromAxisAngle( vec3 axis, float angle ) {
 }
 
 
+uniform sampler2D texture;
+uniform float scaledPI;
+uniform float radius;
+uniform vec4 meshRotation;
+uniform int last;
+varying vec2 vUv;
+varying vec4 color;
 vec3 front = vec3(0,0,1);
 
 void main() {
@@ -56,18 +57,30 @@ void main() {
 	//Now rotate this point to face the camera
 	newPosition = rotateVector(meshRotation, newPosition );
 
+
+	vec3 newNormal = rotateVector(meshRotation, normal);
+
 	//Move point back to its relative position to the mesh
 	newPosition.z -= radius;
 
-	float xoffset = newPosition.x / radius * 128.0;
-	float yoffset = newPosition.y / radius * 128.0;
-	vec4 color = texture2D(texture, vec2(xoffset, yoffset));
-	newPosition = newPosition + normal * color.r;
+//	float phi = atan( newPosition.z / newPosition.x ); 
+	//float theta = acos( newPosition.y );
+//	float theta = atan ( sqrt ( newPosition.y / ( newPosition.x * newPosition.x + newPosition.z + newPosition.z) ) );
+
+//	phi += 3.14;
+//	phi = phi / 6.28;
+
+//	theta /= 3.14;
+
+//	float xoffset = phi;
+//	float yoffset = theta;
+
+	float xoffset = position.x / radius;
+	float yoffset = position.y / radius;
+
+	color = texture2D(texture, vec2(xoffset, yoffset));
+
+	newPosition = newPosition + normal * color.r ;
 	
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }
-
-
-
-
-

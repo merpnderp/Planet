@@ -10,7 +10,7 @@ function start(){
 	fov = 30,
     stats = new Stats();
 
-    stats.setMode( 1 );
+    stats.setMode( 0 );
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '5px';
     stats.domElement.style.top = '5px';
@@ -29,12 +29,13 @@ function start(){
 
 //   camera.position.x = radius;
  //  camera.position.y = radius;
-   camera.position.z = radius;
+   camera.position.z = radius * 3;
+//   camera.position.x = radius * 2.5;
 
 //    var controls = new THREE.FirstPersonControls(camera);
 
 	var controls = new THREE.FlyControls( camera );
-        controls.movementSpeed = radius / 10;
+        controls.movementSpeed = radius / 1;
 //        controls.domElement = container;
         controls.domElement = document;
 //        controls.rollSpeed = Math.PI / 24; 
@@ -96,7 +97,7 @@ function start(){
 	tl.addEventListener("load", function(data){
 		pmat = new THREE.MeshBasicMaterial( { map: data.content });
 		plane = new THREE.Mesh( new THREE.PlaneGeometry(radius, radius, 128, 64 ), pmat);
-		plane.position.z += radius / 2;
+		plane.position.z += radius;
 		solarSystem.add(plane);
 	});
 	function updatePlane(p){

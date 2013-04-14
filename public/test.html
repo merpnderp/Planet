@@ -1,0 +1,48 @@
+
+
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+<div id="results"></div>
+<script>
+function log(test){
+    $('#results').append(test + "<br />");
+}
+
+function vector(){
+	this.x;
+	this.y;
+	this.z;
+}
+
+function toViewSpace(phi, theta){ 
+    var p = new vector();
+    p.x = Math.cos(phi) * Math.sin(theta);
+    p.y = Math.sin(phi) * Math.sin(theta);
+    p.z = Math.cos(theta);
+    return p;
+}
+
+function toWorldSpace(v, phi, theta){
+    var p = new vector();
+    p.x = Math.cos(theta) * v.x - Math.sin(theta) * v.z;
+    p.y = v.y;
+    p.z = -Math.sin(theta) * v.x + Math.cos(theta) * v.z;
+    return p;
+}
+
+function toAngles(v, theta){
+    var p = Math.atan(v.y/v.x);
+    var t = Math.acos(v.z) - theta;
+    return [p,t];
+}
+
+var phi = -Math.PI;
+var theta = Math.PI/2;
+log("Starting with: " + phi + " : " + theta);
+var p = toViewSpace(theta, phi);
+log(p);
+var w = toWorldSpace(p, theta, phi);
+log(w);
+var a = toAngles(w, theta);
+log(a);
+</script>

@@ -228,7 +228,7 @@ void main() {
 
 	//First we need to find the proected point of the plane onto the sphere.
 	//We'll do this as two separate rotations, once for phi and once for theata, since phi will be twice the rotation of theta (as it covers twice the distance).
-	float xRotationAmount = pos.x * 2.0 / rx * scaledPI;
+	float xRotationAmount = pos.x / rx * scaledPI * 2.0;
 	float yRotationAmount = pos.y / ry * scaledPI;
 
 	vec3 fAxis = normalize( cross( front, vec3( pos.x, 0, 0 ) ) );

@@ -250,10 +250,12 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 				clipMaps[i].material.uniforms.meshRotation.value = rotate ;
 				//clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] ); 
 				if(i === 0){
-					clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] ); 
+					clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture( rotate, scaledPI[i] ); 
 					var text = textureProvider.getTexture( rotate, scaledPI[i] ); 
 					var pmat = new THREE.MeshBasicMaterial( { map: text } );
-					updatePlane(new THREE.Mesh( new THREE.PlaneGeometry(radius/2, radius/2, 128, 64 ), pmat));
+					var p = new THREE.Mesh( new THREE.PlaneGeometry(radius/2, radius/2, 128, 64 ), pmat);
+					p.position.z = radius;
+					updatePlane(p);
 				}
 				if(i+1 === clipMapCount || clipMaps[i+1].theta < minTheta ){
 					clipMaps[i].material.uniforms.last.value =  1;
