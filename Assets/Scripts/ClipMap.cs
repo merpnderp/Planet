@@ -15,5 +15,4 @@ public class ClipMap : MonoBehaviour {
 		scaledPI = _scaledPI;
 		radius = _radius;
 	}
-	
 }

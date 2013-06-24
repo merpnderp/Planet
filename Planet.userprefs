@@ -1,13 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/RingGeometry.cs">
+    <Files>
+      <File FileName="Assets/Scripts/Planet.cs" Line="28" Column="1" />
+      <File FileName="Assets/Scripts/RingGeometry.cs" Line="1" Column="1" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="Assets" expanded="True">
               <Node name="Scripts" expanded="True">
-                <Node name="Utils.cs" selected="True" />
+                <Node name="RingGeometry.cs" selected="True" />
               </Node>
             </Node>
           </Node>
