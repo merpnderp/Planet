@@ -6,22 +6,38 @@
 	</head>
 
 	<body>
-        <div style="padding-top: 73px; padding-left:90%; position:absolute" id="render"></div>
-        <div style="padding-left: 100px; position:absolute" id="max"></div>
-        <div style="padding-top: 90px; position:absolute" id="info"></div>
-		<div style="position:absolute; z-index: -1" id="container"></div>
-	</body>
+		<div style="padding-top: 73px; padding-left:90%; position:absolute" id="render"></div>
+			<div style="padding-left: 100px; position:absolute" id="max"></div>
+			<div style="padding-top: 90px; position:absolute" id="info"></div>
+			<div style="position:absolute; z-index: -1" id="container"></div>
+		</body>
 
-    <script src="jquery-1.9.1.min.js"></script>
+	<script data-main="main" src="require.js"></script>
+	<!--
+	<script>
+		requirejs.config({
+			shim: {
+				'jquery':{exports: 'jquery'},
+				'stats.min.js':{exports: 'Stats'},
+				'three.min.js':{exports: 'THREE'}
+			}
+		});
+		requirejs(['main'], function(m){m();});
+	</script>
+	-->
+
+<!--
+	<script src="jquery-1.9.1.min.js"></script>
 	<script src="three.min.js"></script>
 	<script src="stats.min.js"></script>
 	<script src="Utils.js"></script>
-    <script src="js/controls/FirstPersonControls.js"></script>
-    <script src="js/controls/TrackballControls.js"></script>
-    <script src="js/controls/FlyControls.js"></script>
+	<script src="js/controls/FirstPersonControls.js"></script>
+	<script src="js/controls/TrackballControls.js"></script>
+	<script src="js/controls/FlyControls.js"></script>
 	<script src="RingGeometry.js"></script>
 	<script src="TextureProvider.js"></script>
 	<script src="planet.js"></script>
 	<script type="text/javascript" src="main.js"></script>
+-->
 
 </html>

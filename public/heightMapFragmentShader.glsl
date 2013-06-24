@@ -1,4 +1,5 @@
 
+
 //
 // GLSL textureless classic 3D noise "cnoise",
 // with an RSL-style periodic variant "pnoise".
@@ -250,4 +251,4 @@ void main() {
 	//vec4 color = vec4( 255, 0, 0, 0 );
 
 	gl_FragColor = vec4( color.rgb, 1.0 );
-} 
+}

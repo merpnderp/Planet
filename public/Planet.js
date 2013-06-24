@@ -1,17 +1,15 @@
 'use strict'
 
-var so = so || {};
-
 var halfPI = Math.PI/2;
 var quarterPI = Math.PI/4;
 var tau = Math.PI * 2;
+var TextureProvider = require('./TextureProvider');
+var THREE = require('three');
+var $ = require('./jquery');
 
-so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth, renderer, updatePlane ) {
+exports = function( _camera, _radius, _position, _segments, _fov, _screenWidth, renderer, updatePlane ) {
 
 	var me = this;
-	
-	var fragmentShader;
-	var vertexShader;
 
 	renderer = renderer ? renderer : new THREE.WebGLRenderer();
 
@@ -20,7 +18,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	me.obj = new THREE.Object3D();
 	me.obj.position = _position || new THREE.Vector3();
 
-	//trying to solve clipping issue.
+//trying to solve clipping issue.
 //	var placeHolder = new THREE.Mesh( new THREE.SphereGeometry( radius * 1.3 ) );
 //	placeHolder.position.z -= radius;
 //	me.obj.add( placeHolder );
@@ -32,7 +30,7 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	var fov = _fov || 30;
 	fov = fov * .0174532925;//Convert to radians
 
-	var textureProvider = new so.TextureProvider( renderer, radius, 128, 64, 42 );
+	var textureProvider = new TextureProvider( renderer, radius, 128, 64, 42 );
 
 	var screenWidth = _screenWidth || 768;
 	//tan of fov/screenWidth is first half of pixel size on planet calc
@@ -52,23 +50,13 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	}
 
 	//Don't resond to update unless init has completed
-	var inited = false;
 
-
-	//load shaders before init
-	var fileGetter = new so.FileLoader();
-	fileGetter.getFiles(['fragmentShader.glsl', 'vertexShader.glsl', 'wireframeFragmentShader.glsl'], init);
-
+	var fs = require('fs');
+	var fragmentShader = fs.readFileSync('./fragmentShader.glsl');
+	var vertexShader = fs.readFileSync('./vertexShader.glsl');
 	
-	function init( files ) {
-
-		fragmentShader = files['fragmentShader.glsl'];
-//		fragmentShader = files['wireframeFragmentShader.glsl'];
-		vertexShader = files['vertexShader.glsl'];
-		inited = true;
-		initClipMaps();
-
-	}
+	
+	initClipMaps();
 	
 	var clipMapCount = findClipMapCount();
 	
@@ -90,8 +78,6 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 	me.update = function( ) {
 		logText = '';
 
-		if(! inited){ return; }
-		
 		delta += clock.getDelta();
 	
 		if(delta >= .1){
@@ -147,8 +133,8 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 				log('maxTheta',maxTheta);
 				log('clipMapCount', clipMapCount+1);
 				$('#info').html(logText);
-				delta = 0;
 			}
+			delta = 0;
 		}
 	}
 
@@ -365,20 +351,4 @@ so.Planet = function( _camera, _radius, _position, _segments, _fov, _screenWidth
 		logText += "<br />";
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
