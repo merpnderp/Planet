@@ -62,10 +62,9 @@ define(function (require) {
 
         var clipMapCount = findClipMapCount();
 
-        initClipMaps();
-
-
         var circleGeo = new THREE.RingGeometry(.000001, radius, segments, segments, 0, tau);
+
+        initClipMaps();
 
 
         /*
@@ -238,7 +237,7 @@ define(function (require) {
                         var text = textureProvider.getTexture(rotate, scaledPI[i]);
                         var pmat = new THREE.MeshBasicMaterial({ map: text });
                         var p = new THREE.Mesh(new THREE.PlaneGeometry(radius / 2, radius / 2, 128, 64), pmat);
-                        p.position.z = radius;
+                        p.position.z = radius * 2;
                         updatePlane(p);
                     }
                     if (i + 1 === clipMapCount || clipMaps[i + 1].theta < minTheta) {
