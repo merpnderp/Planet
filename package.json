@@ -1,0 +1,15 @@
+{
+    "name": "planet",
+    "version": "0.0.1",
+    "private": false,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "express": "*",
+        "ejs": "*",
+        "connect": "*",
+        "browserify": "*",
+        "brfs" : "*"
+    }
+}

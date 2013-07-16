@@ -1,181 +1,193 @@
 requirejs.config({
-	shim: {
-//		'jquery':{exports: 'Jquery'},
-		'stats.min': {exports: 'Stats'},
-		'three.min': {exports: 'THREE'},
-		'js/controls/FlyControls': {exports: 'FlyControls'}
-	}
+    baseUrl: '/',
+    shim: {
+        'lib/jquery': {
+            exports: '$'
+        },
+        'lib/flycontrols': {
+            deps: ['lib/three'],
+            exports: 'FlyControls'
+        },
+        'lib/stats': {
+            exports: 'Stats'
+        },
+        'lib/three': {
+            exports: 'THREE'
+        }
+    }
 });
 
-requirejs(['Planet', 'jquery', 'stats.min', 'three.min', 'js/controls/FlyControls'],
-function(Planet, $, Stats, THREE, FlyControls){
-alert(FlyControls);	
-	//	var radius = 200,
-	var radius = 6353000,
-	//	var radius = 10000,
-		fov = 30,
-		stats = new Stats();
 
-	stats.setMode( 0 );
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.left = '5px';
-	stats.domElement.style.top = '5px';
-	stats.domElement.style.width = '90px';
-	document.body.appendChild( stats.domElement );
+requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'],
+    function ($, Stats, THREE, Planet) {
+        "use strict";
 
-	container = document.getElementById( "container" );
+        //	var radius = 200,
+        var radius = 6353000,
+        //	var radius = 10000,
+            fov = 30,
+            stats = new Stats();
 
-	var scene = new THREE.Scene();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '5px';
+        stats.domElement.style.top = '5px';
+        stats.domElement.style.width = '90px';
+        document.body.appendChild(stats.domElement);
 
-	var camera = new THREE.PerspectiveCamera( 
-		fov, 
-		window.innerWidth / window.innerHeight, 
-		.01, 
-		1000000000);
+        container = document.getElementById("container");
 
-	//   camera.position.x = radius;
-	//  camera.position.y = radius;
-	camera.position.z = radius * 3;
-	//   camera.position.x = radius * 2.5;
+        var scene = new THREE.Scene();
 
-	//    var controls = new THREE.FirstPersonControls(camera);
+        var camera = new THREE.PerspectiveCamera(
+            fov,
+            window.innerWidth / window.innerHeight,
+            .01,
+            1000000000);
 
-	var controls = new FlyControls( camera );
-	controls.movementSpeed = radius / 1;
-	//        controls.domElement = container;
-	controls.domElement = document;
-	//        controls.rollSpeed = Math.PI / 24; 
-	controls.rollSpeed = Math.PI / 3; 
-	controls.autoForward = false;
-	controls.dragToLook = false; 
-		
-	scene.add( camera );
+        //   camera.position.x = radius;
+        //  camera.position.y = radius;
+        camera.position.z = radius * 3;
+        //   camera.position.x = radius * 2.5;
 
-	//	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
+        //    var controls = new THREE.FirstPersonControls(camera);
 
-	var renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth-9, window.innerHeight-9);
-	renderer.domElement.style.position = "absolute";
-	renderer.domElement.style.top = 0 + "px";
-	renderer.domElement.style.left = "0px";
-	container.appendChild( renderer.domElement );
-	/*
-	var controls = new THREE.TrackballControls(camera);
-			controls.rotateSpeed = 1.0;
-			controls.zoomSpeed = 1.2;
-			controls.panSpeed = 0.8;
+        var controls = new THREE.FlyControls(camera);
+        controls.movementSpeed = radius / 1;
+        //        controls.domElement = container;
+        controls.domElement = document;
+        //        controls.rollSpeed = Math.PI / 24;
+        controls.rollSpeed = Math.PI / 3;
+        controls.autoForward = false;
+        controls.dragToLook = false;
 
-			controls.noZoom = false;
-			controls.noPan = false;
+        scene.add(camera);
 
-			controls.staticMoving = true;
-			controls.dynamicDampingFactor = 0.3;
+        //	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
 
-			controls.keys = [ 65, 83, 68 ];
-	*/ 
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth - 9, window.innerHeight - 9);
+        renderer.domElement.style.position = "absolute";
+        renderer.domElement.style.top = 0 + "px";
+        renderer.domElement.style.left = "0px";
+        container.appendChild(renderer.domElement);
+        /*
+         var controls = new THREE.TrackballControls(camera);
+         controls.rotateSpeed = 1.0;
+         controls.zoomSpeed = 1.2;
+         controls.panSpeed = 0.8;
 
-	var thetas = 20, phis = 20, 
-	wf = true, 
-	step = 1, count = 0;
-	var mod = Math.random();
-	var start = 0;
-	var end = step;
-	var colors = [0xFF0000, 0x0000FF, 0x00FF00];
-	for(var i = 0; i <= 3; i++){
-			var oradius = end + i * step;
-			var iradius = start + i * step;
-			var cgeo = new THREE.RingGeometry(iradius, oradius, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
-	count += cgeo.vertices.length
-			var c = new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial( { color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wf } )); 
-	//        scene.add(c);
-	}
-	//$('#info').append(count);
-	//$('#info').append('<br/>hi');
-	var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ); 
-	directionalLight.position.set( 2, 2, 10 ); 
-	scene.add( directionalLight );
+         controls.noZoom = false;
+         controls.noPan = false;
 
-	var solarSystem = new THREE.Object3D();
+         controls.staticMoving = true;
+         controls.dynamicDampingFactor = 0.3;
 
-	var pmat = new THREE.MeshBasicMaterial( );
-	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius, radius, 128, 64 ), pmat);
-	var tl = new THREE.TextureLoader();
-	tl.addEventListener("load", function(data){
-		pmat = new THREE.MeshBasicMaterial( { map: data.content });
-		plane = new THREE.Mesh( new THREE.PlaneGeometry(radius, radius, 128, 64 ), pmat);
-		plane.position.z += radius;
-		solarSystem.add(plane);
-	});
-	function updatePlane(p){
-		solarSystem.remove(plane);
-		plane = p;
-		solarSystem.add(plane);
-		plane.needsUpdate = true;
-	}
-	tl.load("explosion.png");
-	var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer, updatePlane);
+         controls.keys = [ 65, 83, 68 ];
+         */
 
-	camera.lookAt( planet.obj.position );
+        var thetas = 20, phis = 20,
+            wf = true,
+            step = 1, count = 0;
+        var start = 0;
+        var colors = [0xFF0000, 0x0000FF, 0x00FF00];
+        for (var i = 0; i <= 3; i++) {
+            var oradius = step + i * step;
+            var iradius = start + i * step;
+            var cgeo = new THREE.RingGeometry(iradius, oradius, thetas, phis, 0, Math.PI * 2);//10, 5, Math.PI, Math.PI);
+            count += cgeo.vertices.length;
+            var c = new THREE.Mesh(cgeo, new THREE.MeshPhongMaterial({ color: colors[ i % 3], specular: 0xffaa00, shininess: 5, wireframe: wf }));
+            //        scene.add(c);
+        }
+        //$('#info').append(count);
+        //$('#info').append('<br/>hi');
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(2, 2, 10);
+        scene.add(directionalLight);
 
-	solarSystem.add(planet.obj);
-	//	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius*2, radius*2, 128, 64 ));
+        var solarSystem = new THREE.Object3D();
 
-	var axis = new THREE.AxisHelper( radius * 100 );
-	axis.position = planet.obj.position;
-	solarSystem.add(axis);
-	var pipe = radius / 50;
-	var Y = new THREE.Mesh( new THREE.CylinderGeometry (pipe, pipe, radius * 100) );
-	var X = new THREE.Mesh( new THREE.CylinderGeometry (pipe, pipe, radius * 100) );
-	var Z = new THREE.Mesh( new THREE.CylinderGeometry (pipe, pipe, radius * 100) );
-	X.rotation.z += Math.PI/2;
-	Z.rotation.x += Math.PI/2;
-	Y.position.z -= radius;
-	X.position.z -= radius;
-	Z.position.z -= radius;
-	solarSystem.add(Y);
-	solarSystem.add(X);
-	solarSystem.add(Z);
-	scene.add(solarSystem);
-	var clock = new THREE.Clock();
-	var delta, logLimiter = 0;
+        var pmat = new THREE.MeshBasicMaterial();
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
+        var tl = new THREE.TextureLoader();
+        tl.addEventListener("load", function (data) {
+            pmat = new THREE.MeshBasicMaterial({ map: data.content });
+            plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
+            plane.position.z += radius;
+            solarSystem.add(plane);
+        });
+        function updatePlane(p) {
+            solarSystem.remove(plane);
+            plane = p;
+            solarSystem.add(plane);
+            plane.needsUpdate = true;
+        }
 
-	function render(){
-		delta = clock.getDelta();
-		controls.update( delta );
-		logLimiter++;
-		if( logLimiter % 180 == 0 ) {
-			var r = 
-				"programs: " + renderer.info.memory.programs + 
-				"<br />geometries: " + renderer.info.memory.geometries + 
-				"<br />textures: " + renderer.info.memory.textures + 
-				"<br />calls: " + renderer.info.render.calls + 
-				"<br />vertices: " + renderer.info.render.vertices + 
-				"<br />faces: " + renderer.info.render.faces + 
-				"<br />points: " + renderer.info.render.points + 
-				"<br />camera x: " + camera.position.x + 
-				"<br />camera y: " + camera.position.y + 
-				"<br />camera z: " + camera.position.z + 
-				"<br />"; 
+        tl.load("explosion.png");
+        var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer, updatePlane);
 
-			$('#render').html(r);
-			logLimiter = 0;
-		} 
-				renderer.render( scene, camera );
-				requestAnimationFrame( render );
-				stats.update();
-		if(camera.position.length() > 100){
-			var t = new THREE.Vector3(0,0,0);
-			t.subVectors(camera.position, t);
-			solarSystem.position.sub(t);
-			camera.position.x = 0;
-			camera.position.y = 0;
-			camera.position.z = 0;
-		}
+        camera.lookAt(planet.obj.position);
 
-		planet.update();
+        solarSystem.add(planet.obj);
+        //	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius*2, radius*2, 128, 64 ));
 
-	}
+        var axis = new THREE.AxisHelper(radius * 100);
+        axis.position = planet.obj.position;
+        solarSystem.add(axis);
+        var pipe = radius / 50;
+        var Y = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
+        var X = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
+        var Z = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
+        X.rotation.z += Math.PI / 2;
+        Z.rotation.x += Math.PI / 2;
+        Y.position.z -= radius;
+        X.position.z -= radius;
+        Z.position.z -= radius;
+        solarSystem.add(Y);
+        solarSystem.add(X);
+        solarSystem.add(Z);
+        scene.add(solarSystem);
+        var clock = new THREE.Clock();
+        var delta, logLimiter = 0;
 
-	render();
+        function render() {
+            delta = clock.getDelta();
+            controls.update(delta);
+            logLimiter++;
+            if (logLimiter % 180 == 0) {
+                var r =
+                    "programs: " + renderer.info.memory.programs +
+                        "<br />geometries: " + renderer.info.memory.geometries +
+                        "<br />textures: " + renderer.info.memory.textures +
+                        "<br />calls: " + renderer.info.render.calls +
+                        "<br />vertices: " + renderer.info.render.vertices +
+                        "<br />faces: " + renderer.info.render.faces +
+                        "<br />points: " + renderer.info.render.points +
+                        "<br />camera x: " + camera.position.x +
+                        "<br />camera y: " + camera.position.y +
+                        "<br />camera z: " + camera.position.z +
+                        "<br />";
 
-});
+                $('#render').html(r);
+                logLimiter = 0;
+            }
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+            stats.update();
+            if (camera.position.length() > 100) {
+                var t = new THREE.Vector3(0, 0, 0);
+                t.subVectors(camera.position, t);
+                solarSystem.position.sub(t);
+                camera.position.x = 0;
+                camera.position.y = 0;
+                camera.position.z = 0;
+            }
+
+            planet.update();
+
+        }
+
+        render();
+
+    });
+
