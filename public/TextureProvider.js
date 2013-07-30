@@ -8,7 +8,7 @@ define(function (require, exports, module) {
 
         var quadTarget;
         var cameraOrtho, sceneRenderTarget = new THREE.Scene();
-        var pars = { format: THREE.RGBFormat };
+        //var pars = { format: THREE.RGBFormat };
 
         seed = seed ? seed : Math.floor(Math.random() * 10000000000 + 1);
 
@@ -20,7 +20,7 @@ define(function (require, exports, module) {
 
         sceneRenderTarget.add(cameraOrtho);
 
-        //var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat };
+        var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat };
 
 
         var material = new THREE.ShaderMaterial({
@@ -33,7 +33,7 @@ define(function (require, exports, module) {
                     type: "f",
                     value: 0
                 },
-                meshRotation: {
+                rotate: {
                     type: "v4",
                     value: new THREE.Vector4(0, 0, 0, 0),
                 },
@@ -57,19 +57,20 @@ define(function (require, exports, module) {
         var geo = new THREE.PlaneGeometry(rx, ry, rx, ry);
 
         quadTarget = new THREE.Mesh(geo, material);
-//	quadTarget.position.z = -500;
 
         sceneRenderTarget.add(quadTarget);
 
         var textureHash = {};
         var textureArray = [];
 
+
+
         this.getTexture = function (rotate, scaledPI) {
 
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            quadTarget.material.uniforms.meshRotation.value = rotate;
+            quadTarget.material.uniforms.rotate.value = rotate;
             quadTarget.material.uniforms.scaledPI.value = scaledPI;
             renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
 

@@ -33,11 +33,11 @@ void main() {
    // vec4 color = texture2D( tHeightmap, tPos );
 //        vec4 color = texture2D( tHeightmap, vec2(5,5) );
 
-	if(length(color.rgb) > 0.0){
+//	if(length(color.rgb) > 0.0){
 		gl_FragColor = vec4( color.rgb, 1.0 );
-	}else{
-		gl_FragColor = vec4( icolor, 1.0 );
-	}
+//	}else{
+//		gl_FragColor = vec4( icolor, 1.0 );
+//	}
 
  
 }

@@ -102,12 +102,12 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         //$('#info').append(count);
         //$('#info').append('<br/>hi');
         var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(2, 2, 10);
+        directionalLight.position.set(0, 0, 1);
         scene.add(directionalLight);
 
         var solarSystem = new THREE.Object3D();
 
-        var pmat = new THREE.MeshBasicMaterial();
+/*        var pmat = new THREE.MeshBasicMaterial();
         var plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
         var tl = new THREE.TextureLoader();
 
@@ -118,7 +118,8 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             plane.position.x += radius;
             solarSystem.add(plane);
         });
-
+*/
+        var plane;
         function updatePlane(p) {
             solarSystem.remove(plane);
             plane = p;
@@ -126,7 +127,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             plane.needsUpdate = true;
         }
 
-        tl.load("explosion.png");
+ //       tl.load("explosion.png");
 
         var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer, updatePlane);
 

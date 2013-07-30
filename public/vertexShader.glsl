@@ -43,7 +43,7 @@ void main() {
 	if( last == 1 ) {
 		pointRotation = ( length(newPosition) / radius ) * scaledPI ;
 	} else {
-	    //Push all points in the circle into the outer half of the ring.
+	    //Push all points in
 		pointRotation = ( length(newPosition) / radius ) * scaledPI / 2.0  + scaledPI / 2.0;
 	}
 
