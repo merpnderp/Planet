@@ -35,7 +35,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         stats.domElement.style.width = '90px';
         document.body.appendChild(stats.domElement);
 
-        container = document.getElementById("container");
+        var container = document.getElementById("container");
 
         var scene = new THREE.Scene();
 
@@ -110,12 +110,15 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         var pmat = new THREE.MeshBasicMaterial();
         var plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
         var tl = new THREE.TextureLoader();
+
         tl.addEventListener("load", function (data) {
             pmat = new THREE.MeshBasicMaterial({ map: data.content });
             plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
             plane.position.z += radius;
+            plane.position.x += radius;
             solarSystem.add(plane);
         });
+
         function updatePlane(p) {
             solarSystem.remove(plane);
             plane = p;
@@ -124,6 +127,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         }
 
         tl.load("explosion.png");
+
         var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer, updatePlane);
 
         camera.lookAt(planet.obj.position);

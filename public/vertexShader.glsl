@@ -41,9 +41,10 @@ void main() {
 
 	//Test if this clipmap is a ring or a circle (is it the bottom level)
 	if( last == 1 ) {
-		pointRotation = ( length(newPosition) / radius ) * ( scaledPI * 2.0 );
+		pointRotation = ( length(newPosition) / radius ) * scaledPI ;
 	} else {
-		pointRotation = ( length(newPosition) / radius ) * scaledPI + scaledPI;
+	    //Push all points in the circle into the outer half of the ring.
+		pointRotation = ( length(newPosition) / radius ) * scaledPI / 2.0  + scaledPI / 2.0;
 	}
 
 	//Find the normal for the front of the sphere and this point

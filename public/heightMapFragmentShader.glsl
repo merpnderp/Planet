@@ -13,6 +13,8 @@
 // Distributed under the MIT license. See LICENSE file.
 // https://github.com/ashima/webgl-noise
 //
+
+
 vec3 mod289(vec3 x)
 {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -220,17 +222,20 @@ uniform float radius;
 uniform float seed;
 uniform float rx;
 uniform float ry;
-
+uniform int last;
 
 void main() {
 
 	vec3 front = vec3(0,0,1);
 	vec3 up = vec3(0,1,0);
 
+    //We need to determinekj
+
+
 	//First we need to find the proected point of the plane onto the sphere.
 	//We'll do this as two separate rotations, once for phi and once for theata, since phi will be twice the rotation of theta (as it covers twice the distance).
-	float xRotationAmount = pos.x / rx * scaledPI * 2.0;
-	float yRotationAmount = pos.y / ry * scaledPI;
+	float xRotationAmount = (pos.x / rx) * scaledPI * 2.0;
+	float yRotationAmount = (pos.y / ry) * scaledPI;
 
 	vec3 fAxis = normalize( cross( front, vec3( pos.x, 0, 0 ) ) );
 
@@ -250,5 +255,7 @@ void main() {
 	vec4 color = vec4( clamp( displacement, 0.0, 255.0 ), 0, 0, 0 );
 	//vec4 color = vec4( 255, 0, 0, 0 );
 
-	gl_FragColor = vec4( color.rgb, 1.0 );
+    gl_FragColor = vec4( vec4(0,pos.x,pos.y,0).rgb, 1.0 );
+//	    gl_FragColor = vec4( color.rgb, 1.0 );
+
 }

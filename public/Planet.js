@@ -64,6 +64,7 @@ define(function (require) {
 
         var circleGeo = new THREE.RingGeometry(.000001, radius, segments, segments, 0, tau);
 
+
         initClipMaps();
 
 
@@ -229,24 +230,26 @@ define(function (require) {
                     }
                 }
                 if (clipMaps[i].visible) {
-                    log('level: ' + i, ' theta:' + clipMaps[i].theta);
+                    log('level: ' + i, ' theta:' + clipMaps[i].theta.toFixed(3) + " : scaledPI: " + clipMaps[i].material.uniforms.scaledPI.value.toFixed(3));
                     clipMaps[i].material.uniforms.meshRotation.value = rotate;
                     //clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] );
-                    if (i === 0) {
-                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(rotate, scaledPI[i]);
-                        var text = textureProvider.getTexture(rotate, scaledPI[i]);
-                        var pmat = new THREE.MeshBasicMaterial({ map: text });
-                        var p = new THREE.Mesh(new THREE.PlaneGeometry(radius / 2, radius / 2, 128, 64), pmat);
-                        p.position.z = radius * 2;
-                        updatePlane(p);
-                    }
                     if (i + 1 === clipMapCount || clipMaps[i + 1].theta < minTheta) {
                         clipMaps[i].material.uniforms.last.value = 1;
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
+                    if (i === 0) {
+                        var last = clipMaps[i].material.uniforms.last.value;
+                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(rotate, scaledPI[i], last);
+                    }
                 }
             }
+            var text = textureProvider.getTexture(rotate, scaledPI[i]);
+            var pmat = new THREE.MeshBasicMaterial({ map: text });
+            var p = new THREE.Mesh(new THREE.PlaneGeometry(radius / 4, radius / 4, 128, 64), pmat);
+            p.position.z = radius * 2;
+            p.position.x = radius/2.8;
+            updatePlane(p);
         }
 
 
@@ -258,7 +261,7 @@ define(function (require) {
             var scale;
             for (i = 0; i < clipMapCount; i++) {
 
-                scale = ( 1 / Math.pow(2, i + 1) );
+                scale = ( 1 / Math.pow(2, i) );
                 scaledPI[i] = Math.PI / 2 * scale;
                 clipMaps[i] = {};
 
@@ -266,7 +269,7 @@ define(function (require) {
                     uniforms: {
                         texture: { // texture in slot 0, loaded with ImageUtils
                             type: "t",
-                            value: undefined
+                            value: THREE.ImageUtils.loadTexture("explosion.png")
                         },
                         meshRotation: {
                             type: "v4",
