@@ -76,8 +76,8 @@ void main() {
 //	float xoffset = phi;
 //	float yoffset = theta;
 
-	float xoffset = position.x / radius;
-	float yoffset = position.y / radius;
+	float xoffset = newPosition.x / radius;
+	float yoffset = newPosition.y / radius;
 
 	color = texture2D(texture, vec2(xoffset, yoffset));
 

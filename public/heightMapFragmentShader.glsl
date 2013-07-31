@@ -145,11 +145,10 @@ uniform float radius;
 uniform float seed;
 uniform float rx;
 uniform float ry;
-uniform int last;
 
 void main() {
 
-	vec3 front = vec3(0,0,1);
+/*	vec3 front = vec3(0,0,1);
 	vec3 up = vec3(0,1,0);
 
 	//First we need to find the proected point of the plane onto the sphere.
@@ -161,15 +160,20 @@ void main() {
 
 	vec4 rotation = createQuaternionFromAxisAngle( fAxis, xRotationAmount );
 	
-	vec3 uAxis = normalize( cross( up, vec3( 0, pos.y, 0 ) ) );
-	
+	//vec3 uAxis = normalize( cross( up, vec3( 0, pos.y, 0 ) ) );
+	vec3 uAxis = normalize( cross( front, vec3( 0, pos.y, 0 ) ) );
+
 	rotation = qmul( rotation, createQuaternionFromAxisAngle( uAxis, yRotationAmount ) );
 	
 	vec3 tempPos = rotateVector( rotation, vec3( 0, 0, radius ) );	
 
 	tempPos = rotateVector( rotate, tempPos );
+*/
 
-    tempPos += seed;
+	vec3 tempPos = rotateVector( rotate, vec3(pos.x, pos.y, radius) );
+
+
+//    tempPos += seed;
     float n = surface( tempPos );
     gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
 
