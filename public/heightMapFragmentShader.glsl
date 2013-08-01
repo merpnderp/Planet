@@ -182,11 +182,37 @@ void main() {
 
 
 
+<<<<<<< HEAD
+=======
+/*	vec3 front = vec3(0,0,1);
+	vec3 up = vec3(0,1,0);
+>>>>>>> d22d68572d103f7e3dc8bb803c6f30f227ba54d8
 
 
 
+<<<<<<< HEAD
 
 
+=======
+	vec4 rotation = createQuaternionFromAxisAngle( fAxis, xRotationAmount );
+	
+	//vec3 uAxis = normalize( cross( up, vec3( 0, pos.y, 0 ) ) );
+	vec3 uAxis = normalize( cross( front, vec3( 0, pos.y, 0 ) ) );
+
+	rotation = qmul( rotation, createQuaternionFromAxisAngle( uAxis, yRotationAmount ) );
+	
+	vec3 tempPos = rotateVector( rotation, vec3( 0, 0, radius ) );	
+
+	tempPos = rotateVector( rotate, tempPos );
+*/
+
+	vec3 tempPos = rotateVector( rotate, vec3(pos.x, pos.y, radius) );
+
+
+//    tempPos += seed;
+    float n = surface( tempPos );
+    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+>>>>>>> d22d68572d103f7e3dc8bb803c6f30f227ba54d8
 
 
 

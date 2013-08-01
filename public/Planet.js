@@ -238,13 +238,18 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i == 0) {
-//                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock, i+1);
+                    if (i = 0) {
+                        //    clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(rotate, scaledPI[i]);
                     }
                 }
             }
-            var text = textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2);
-            updatePlane(text);
+            var text = textureProvider.getTexture(rotate, scaledPI[0]);
+            var pmat = new THREE.MeshBasicMaterial({ map: text });
+            var p = new THREE.Mesh(new THREE.PlaneGeometry(256, 256, 128, 64), pmat);
+            p.position.z = -800;
+            p.position.x = 400;
+            p.position.y = 20;
+            updatePlane(p);
         }
 
         var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});

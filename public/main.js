@@ -4,9 +4,9 @@ requirejs.config({
         'lib/jquery': {
             exports: '$'
         },
-        'lib/flycontrols': {
+        'lib/OrbitControls': {
             deps: ['lib/three'],
-            exports: 'FlyControls'
+            exports: 'OrbitControls'
         },
         'lib/stats': {
             exports: 'Stats'
@@ -18,7 +18,7 @@ requirejs.config({
 });
 
 
-requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'],
+requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControls'],
     function ($, Stats, THREE, Planet) {
         "use strict";
 
@@ -52,15 +52,17 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         //    var controls = new THREE.FirstPersonControls(camera);
 
-        var controls = new THREE.FlyControls(camera);
-        controls.movementSpeed = radius / 1;
+        var controls = new THREE.OrbitControls(camera);
+//        controls.addEventListener('change', render );
+//        controls.autoRotate = true;
+/*        controls.movementSpeed = radius / 1;
         //        controls.domElement = container;
         controls.domElement = document;
         //        controls.rollSpeed = Math.PI / 24;
         controls.rollSpeed = Math.PI / 3;
         controls.autoForward = false;
         controls.dragToLook = false;
-
+*/
         scene.add(camera);
 
         //	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
@@ -157,7 +159,6 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         function render() {
             delta = clock.getDelta();
-            controls.update(delta);
             logLimiter++;
             if (logLimiter % 180 == 0) {
                 var r =
@@ -177,7 +178,6 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
                 logLimiter = 0;
             }
             renderer.render(scene, camera);
-            requestAnimationFrame(render);
             stats.update();
             if (camera.position.length() > 100) {
                 var t = new THREE.Vector3(0, 0, 0);
@@ -187,11 +187,15 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
                 camera.position.y = 0;
                 camera.position.z = 0;
             }
-
             planet.update();
-
+            requestAnimationFrame(render);
         }
-
+        function animate(){
+            requestAnimationFrame(animate);
+            controls.center = solarSystem.position;
+            controls.update();
+        }
+        animate();
         render();
 
     });
