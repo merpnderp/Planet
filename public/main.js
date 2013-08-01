@@ -121,9 +121,9 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 */
         var plane;
         function updatePlane(p) {
-            solarSystem.remove(plane);
+            camera.remove(plane);
             plane = p;
-            solarSystem.add(plane);
+            camera.add(plane);
             plane.needsUpdate = true;
         }
 

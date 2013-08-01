@@ -137,49 +137,57 @@ vec4 qmul(vec4 a, vec4 b) {
 	return vec4(cross(a.xyz,b.xyz) + a.xyz*b.w + b.xyz*a.w, a.w*b.w - dot(a.xyz,b.xyz));
 }
 
-varying vec3 pos;
 varying vec3 norm;
-uniform float scaledPI;
-uniform vec4 rotate;
-uniform float radius;
+varying vec2 vposition;
 uniform float seed;
 uniform float rx;
 uniform float ry;
-uniform int last;
+uniform vec2 uscale;
+uniform vec2 uoffset;
 
 void main() {
+    //calculate offset then scale so that we're working with the same scale numbers
 
-	vec3 front = vec3(0,0,1);
-	vec3 up = vec3(0,1,0);
+    vec2 pos;
+    //the left of a plane is negative, move it to the right to start at 0
+    pos.x = ((vposition.x + rx / 2.0) + uoffset.x) * uscale.x;
+    pos.y = ((vposition.y + rx / 2.0) + uoffset.y) * uscale.y;
 
-	//First we need to find the proected point of the plane onto the sphere.
-	//We'll do this as two separate rotations, once for phi and once for theta, since phi will be twice the rotation of theta (as it covers twice the distance).
-	float xRotationAmount = (pos.x / rx) * scaledPI * 2.0;
-	float yRotationAmount = (pos.y / ry) * scaledPI;
+    pos.x = pos.x > rx ? pos.x - rx : pos.x;
+    pos.x = pos.x < 0.0 ? pos.x + rx : pos.x;
 
-	vec3 fAxis = normalize( cross( front, vec3( pos.x, 0, 0 ) ) );
 
-	vec4 rotation = createQuaternionFromAxisAngle( fAxis, xRotationAmount );
-	
-	vec3 uAxis = normalize( cross( up, vec3( 0, pos.y, 0 ) ) );
-	
-	rotation = qmul( rotation, createQuaternionFromAxisAngle( uAxis, yRotationAmount ) );
-	
-	vec3 tempPos = rotateVector( rotation, vec3( 0, 0, radius ) );	
-
-	tempPos = rotateVector( rotate, tempPos );
-
-    tempPos += seed;
-    float n = surface( tempPos );
+    float n = surface( vec3( pos.x, pos.y, seed ) );
     gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
 
-/*
-    tempPos.x = tempPos.x / radius;
-    tempPos.y = tempPos.y / radius;
-    tempPos.z = tempPos.z / radius;
-    gl_FragColor = vec4( tempPos, 1.0 );
-*/
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

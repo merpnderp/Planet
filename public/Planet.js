@@ -238,18 +238,34 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    var last = clipMaps[i].material.uniforms.last.value;
-                    clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(rotate, scaledPI[i]);
+                    if (i == 0) {
+//                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock, i+1);
+                    }
                 }
             }
-            var text = textureProvider.getTexture(rotate, scaledPI[0]);
-            var pmat = new THREE.MeshBasicMaterial({ map: text });
-            var p = new THREE.Mesh(new THREE.PlaneGeometry(radius / 4, radius / 4, 128, 64), pmat);
-            p.position.z = radius * 2;
-            p.position.x = radius / 2.8;
-            updatePlane(p);
+            var text = textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2);
+            updatePlane(text);
         }
 
+        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
+        plane.position.z = -400;
+        plane.position.x = 200;
+        plane.position.y = 70;
+        var plane2 = plane.clone();
+        plane2.material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2)});
+        plane2.position.y = 0;
+        camera.add(plane);
+        camera.add(plane2);
+
+        function updatePlane(text) {
+            //    camera.remove(plane);
+            //   plane = p;
+            //  camera.add(plane);
+            plane2.material.map = text;
+//            pmat.map = text;
+            plane2.needsUpdate = true;
+        }
 
         function initClipMaps() {
 

@@ -22,21 +22,10 @@ define(function (require, exports, module) {
 
         var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat };
 
+        var scale = .01;
 
         var material = new THREE.ShaderMaterial({
             uniforms: {
-                radius: {
-                    type: "f",
-                    value: radius
-                },
-                scaledPI: {
-                    type: "f",
-                    value: 0
-                },
-                rotate: {
-                    type: "v4",
-                    value: new THREE.Vector4(0, 0, 0, 0),
-                },
                 seed: {
                     type: "f",
                     value: seed
@@ -48,6 +37,14 @@ define(function (require, exports, module) {
                 ry: {
                     type: "f",
                     value: ry
+                },
+                uscale: {
+                    type: "v2",
+                    value: new THREE.Vector2()
+                },
+                uoffset: {
+                    type: "v2",
+                    value: new THREE.Vector2()
                 }
             },
             vertexShader: vertexShader,
@@ -64,14 +61,28 @@ define(function (require, exports, module) {
         var textureArray = [];
 
 
-
-        this.getTexture = function (rotate, scaledPI) {
-
+        var uscale = new THREE.Vector2();
+        var offset = new THREE.Vector2();
+        var tau = Math.PI * 2;
+        this.getTexture = function (scaledPI, phi, theta, ringNumber) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            quadTarget.material.uniforms.rotate.value = rotate;
-            quadTarget.material.uniforms.scaledPI.value = scaledPI;
+            phi += Math.PI - (scaledPI * 2);
+            if (phi < 0) {
+                phi = tau + phi;
+            }
+            offset.x = (phi / tau) * rx;
+            console.log('rx: ' + rx + ' ringNumber: ' + ringNumber + ' scaledPI: ' + scaledPI.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2));
+            offset.y = 0;
+
+            uscale.x = scale * (1 / ringNumber);
+
+            uscale.y = scale * (1 / ringNumber);
+
+            quadTarget.material.uniforms.uscale.value = uscale;
+            quadTarget.material.uniforms.uoffset.value = offset;
+
             renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
 
             return heightMap;
