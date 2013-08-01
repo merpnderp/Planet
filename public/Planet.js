@@ -9,7 +9,7 @@ define(function (require) {
     var $ = require('lib/jquery');
     var TextureProvider = require('./TextureProvider');
 
-    return function (_camera, _radius, _position, _segments, _fov, _screenWidth, renderer, updatePlane) {
+    return function (_camera, _radius, _position, _segments, _fov, _screenWidth, renderer) {
 
         var clipMaps = [], i;
         var colors = [0xFF0000, 0x0000FF, 0x00FF00];//red, blue, green
@@ -230,7 +230,7 @@ define(function (require) {
                     }
                 }
                 if (clipMaps[i].visible) {
-                    log('level: ' + i, ' theta:' + clipMaps[i].theta.toFixed(3) + " : scaledPI: " + clipMaps[i].material.uniforms.scaledPI.value.toFixed(3));
+                    //log('level: ' + i, ' theta:' + clipMaps[i].theta.toFixed(3) + " : scaledPI: " + clipMaps[i].material.uniforms.scaledPI.value.toFixed(3));
                     clipMaps[i].material.uniforms.meshRotation.value = rotate;
                     //clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] );
                     if (i + 1 === clipMapCount || clipMaps[i + 1].theta < minTheta) {
@@ -238,28 +238,22 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i = 0) {
+                    if (i === 0) {
                         //    clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(rotate, scaledPI[i]);
                     }
                 }
             }
-            var text = textureProvider.getTexture(rotate, scaledPI[0]);
-            var pmat = new THREE.MeshBasicMaterial({ map: text });
-            var p = new THREE.Mesh(new THREE.PlaneGeometry(256, 256, 128, 64), pmat);
-            p.position.z = -800;
-            p.position.x = 400;
-            p.position.y = 20;
-            updatePlane(p);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2));
         }
 
         var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
         var plane = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
-        plane.position.z = -400;
+        plane.position.z = -1000;
         plane.position.x = 200;
-        plane.position.y = 70;
+        plane.position.y = 170;
         var plane2 = plane.clone();
         plane2.material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2)});
-        plane2.position.y = 0;
+        plane2.position.y -= 70;
         camera.add(plane);
         camera.add(plane2);
 

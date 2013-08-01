@@ -4,9 +4,9 @@ requirejs.config({
         'lib/jquery': {
             exports: '$'
         },
-        'lib/OrbitControls': {
+        'lib/flycontrols': {
             deps: ['lib/three'],
-            exports: 'OrbitControls'
+            exports: 'FlyControls'
         },
         'lib/stats': {
             exports: 'Stats'
@@ -18,7 +18,7 @@ requirejs.config({
 });
 
 
-requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControls'],
+requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'],
     function ($, Stats, THREE, Planet) {
         "use strict";
 
@@ -52,17 +52,13 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControl
 
         //    var controls = new THREE.FirstPersonControls(camera);
 
-        var controls = new THREE.OrbitControls(camera);
-//        controls.addEventListener('change', render );
-//        controls.autoRotate = true;
-/*        controls.movementSpeed = radius / 1;
-        //        controls.domElement = container;
+        var controls = new THREE.FlyControls(camera);
+        controls.movementSpeed = radius / 1;
         controls.domElement = document;
-        //        controls.rollSpeed = Math.PI / 24;
         controls.rollSpeed = Math.PI / 3;
         controls.autoForward = false;
         controls.dragToLook = false;
-*/
+
         scene.add(camera);
 
         //	camera.lookAt(new THREE.Vector3(0,radius*3,radius));
@@ -73,20 +69,6 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControl
         renderer.domElement.style.top = 0 + "px";
         renderer.domElement.style.left = "0px";
         container.appendChild(renderer.domElement);
-        /*
-         var controls = new THREE.TrackballControls(camera);
-         controls.rotateSpeed = 1.0;
-         controls.zoomSpeed = 1.2;
-         controls.panSpeed = 0.8;
-
-         controls.noZoom = false;
-         controls.noPan = false;
-
-         controls.staticMoving = true;
-         controls.dynamicDampingFactor = 0.3;
-
-         controls.keys = [ 65, 83, 68 ];
-         */
 
         var thetas = 20, phis = 20,
             wf = true,
@@ -121,17 +103,10 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControl
             solarSystem.add(plane);
         });
 */
-        var plane;
-        function updatePlane(p) {
-            camera.remove(plane);
-            plane = p;
-            camera.add(plane);
-            plane.needsUpdate = true;
-        }
 
  //       tl.load("explosion.png");
 
-        var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer, updatePlane);
+        var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer);
 
         camera.lookAt(planet.obj.position);
 
@@ -159,6 +134,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControl
 
         function render() {
             delta = clock.getDelta();
+            controls.update(delta);
             logLimiter++;
             if (logLimiter % 180 == 0) {
                 var r =
@@ -178,6 +154,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControl
                 logLimiter = 0;
             }
             renderer.render(scene, camera);
+            requestAnimationFrame(render);
             stats.update();
             if (camera.position.length() > 100) {
                 var t = new THREE.Vector3(0, 0, 0);
@@ -187,15 +164,11 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/OrbitControl
                 camera.position.y = 0;
                 camera.position.z = 0;
             }
+
             planet.update();
-            requestAnimationFrame(render);
+
         }
-        function animate(){
-            requestAnimationFrame(animate);
-            controls.center = solarSystem.position;
-            controls.update();
-        }
-        animate();
+
         render();
 
     });
