@@ -150,8 +150,9 @@ void main() {
 
     vec2 pos;
     //the left of a plane is negative, move it to the right to start at 0
-    pos.x = ((vposition.x + rx / 2.0) + uoffset.x) * uscale.x;
-    pos.y = ((vposition.y + rx / 2.0) + uoffset.y) * uscale.y;
+    pos.x = ( (vposition.x + (rx / 2.0 )) * uscale.x ) + uoffset.x;
+//    pos.x = ( (vposition.x + (rx / 2.0 )) * uscale.x );
+    pos.y = ( (vposition.y + (ry / 2.0 )) * uscale.y ) + uoffset.y;
 
     pos.x = pos.x > rx ? pos.x - rx : pos.x;
     pos.x = pos.x < 0.0 ? pos.x + rx : pos.x;

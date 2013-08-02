@@ -34,7 +34,7 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-        var textureProvider = new TextureProvider(renderer, radius, 128, 64, 42);
+        var textureProvider = new TextureProvider(renderer, radius, 256, 128, 94);
 
         var screenWidth = _screenWidth || 768;
         //tan of fov/screenWidth is first half of pixel size on planet calc
@@ -243,27 +243,25 @@ define(function (require) {
                     }
                 }
             }
-            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2));
+            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2), 1);
+            updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1), 0);
         }
 
         var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
-        var plane = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
-        plane.position.z = -1000;
-        plane.position.x = 200;
-        plane.position.y = 170;
-        var plane2 = plane.clone();
-        plane2.material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2)});
-        plane2.position.y -= 70;
-        camera.add(plane);
-        camera.add(plane2);
+        var plane = [];
+        plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
+        plane[0].position.z = -1000;
+        plane[0].position.x = 200;
+        plane[0].position.y = 170;
+        plane[1] = plane[0].clone();
+        plane[1].material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2)});
+        plane[1].position.y -= 70;
+        camera.add(plane[0]);
+        camera.add(plane[1]);
 
-        function updatePlane(text) {
-            //    camera.remove(plane);
-            //   plane = p;
-            //  camera.add(plane);
-            plane2.material.map = text;
-//            pmat.map = text;
-            plane2.needsUpdate = true;
+        function updatePlane(text, i) {
+            plane[i].material.map = text;
+            plane[i].needsUpdate = true;
         }
 
         function initClipMaps() {

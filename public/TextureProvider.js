@@ -22,7 +22,7 @@ define(function (require, exports, module) {
 
         var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat };
 
-        var scale = .01;
+        var scale = .010;
 
         var material = new THREE.ShaderMaterial({
             uniforms: {
@@ -68,20 +68,26 @@ define(function (require, exports, module) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            phi += Math.PI - (scaledPI * 2);
+            phi = phi + Math.PI - (scaledPI * 2 );
             if (phi < 0) {
                 phi = tau + phi;
             }
-            offset.x = (phi / tau) * rx;
-            console.log('rx: ' + rx + ' ringNumber: ' + ringNumber + ' scaledPI: ' + scaledPI.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2));
-            offset.y = 0;
+            if (phi > tau) {
+                phi = phi - tau;
+            }
+            offset.x = (phi / tau) * (rx);
+
+            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
 
             uscale.x = scale * (1 / ringNumber);
 
             uscale.y = scale * (1 / ringNumber);
 
+            console.log('rx: ' + rx + ' ringNumber: ' + ringNumber + ' scaledPI: ' + scaledPI.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) + " updated phi: " + phi.toFixed(2));
+
             quadTarget.material.uniforms.uscale.value = uscale;
             quadTarget.material.uniforms.uoffset.value = offset;
+
 
             renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
 
