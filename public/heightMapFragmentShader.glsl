@@ -154,7 +154,6 @@ void main() {
     //calculate offset then scale so that we're working with the same scale numbers
 
     vec2 pos = vec2( ( vposition.x + (rx/2.0) ) * scale , ( vposition.y + (ry/2.0) ) * scale );
-    //vec2 pos = vposition * scale;
 
     //the left of a plane is negative, move it to the right to start at 0
     //pos.x = ( (pos.x + (sx / 2.0 )) * uscale.x ) + uoffset.x;
@@ -162,12 +161,15 @@ void main() {
     pos.x = pos.x * uscale.x + uoffset.x;
     pos.y = pos.y * uscale.y + uoffset.y;
 
-//    pos.x = pos.x > sx ? pos.x - sx : pos.x;
-//    pos.x = pos.x < 0.0 ? pos.x + sx : pos.x;
+    pos.x = pos.x > sx ? pos.x - sx : pos.x;
+    pos.x = pos.x < 0.0 ? pos.x + sx : pos.x;
 
     n = surface( vec3( pos.x, pos.y, seed ) );
 
-    if(pos.x < .00000001 && pos.y < 0.00000001){
+    float m = .01 ;
+
+    vec2 aposition = vec2( ( vposition.x + (rx/2.0) ) , ( vposition.y + (ry/2.0) ) );
+    if(aposition.x < .75 *rx + rx * m && aposition.x > .25 * rx - rx * m  && aposition.y < .25 * ry + ry * m && aposition.y > .25 * ry - ry * m){
         n = 1.0;
     }
 

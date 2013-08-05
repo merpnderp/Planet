@@ -88,7 +88,7 @@ define(function (require, exports, module) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-         /*   phi = phi + Math.PI - (scaledPI * 2 );
+            phi = phi + Math.PI - (scaledPI * 2 );
             if (phi < 0) {
                 phi = tau + phi;
             }
@@ -96,7 +96,7 @@ define(function (require, exports, module) {
                 phi = phi - tau;
             }
             valueOffset = (phi / tau) * (sx);
-*/
+
             sxPower = (sx / Math.pow(2, ringNumber));
 
             start = halfSX - sxPower;
@@ -105,6 +105,8 @@ define(function (require, exports, module) {
             uscale.x = ( start - finish ) / ( 0 - sx );
 
             offset.x = start;// - ( 0 * uscale.x );
+            console.log(valueOffset);
+            offset.x += valueOffset;
 
 //            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
 
@@ -116,7 +118,7 @@ define(function (require, exports, module) {
             uscale.y = ( start - finish ) / ( 0 - sy );
             offset.y = start;// - ( 0 * uscale.y );
 
-            console.log('sx ' + sx + ' ringNumber: ' + ringNumber + ' scale.x: ' + uscale.x.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) );
+            console.log('sx ' + sx + ' ringNumber: ' + ringNumber + ' scale.x: ' + uscale.x.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) + " phiOffset " + valueOffset );
             console.log('sy ' + sy + ' ringNumber: ' + ringNumber + ' scale.y: ' + uscale.y.toFixed(2) + ' offset.y: ' + offset.y.toFixed(2) );
 
             quadTarget.material.uniforms.uscale.value = uscale;
