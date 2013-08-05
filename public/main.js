@@ -47,13 +47,13 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         //   camera.position.x = radius;
         //  camera.position.y = radius;
-        camera.position.z = radius * 3;
-        //   camera.position.x = radius * 2.5;
+        //camera.position.z = 2;
+        camera.position.z = radius * 1;
 
         //    var controls = new THREE.FirstPersonControls(camera);
 
         var controls = new THREE.FlyControls(camera);
-        controls.movementSpeed = radius / 1;
+        controls.movementSpeed = (radius );
         controls.domElement = document;
         controls.rollSpeed = Math.PI / 3;
         controls.autoForward = false;
@@ -136,7 +136,8 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             delta = clock.getDelta();
             controls.update(delta);
             logLimiter++;
-            if (logLimiter % 180 == 0) {
+            if (logLimiter % 30 == 0) {
+//                controls.movementSpeed = Math.abs( solarSystem.position.length) / 40;
                 var r =
                     "programs: " + renderer.info.memory.programs +
                         "<br />geometries: " + renderer.info.memory.geometries +

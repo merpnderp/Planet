@@ -142,22 +142,35 @@ varying vec2 vposition;
 uniform float seed;
 uniform float rx;
 uniform float ry;
+uniform float sx;
+uniform float sy;
+uniform float scale;
 uniform vec2 uscale;
 uniform vec2 uoffset;
+
+float n;
 
 void main() {
     //calculate offset then scale so that we're working with the same scale numbers
 
-    vec2 pos;
+    vec2 pos = vec2( ( vposition.x + (rx/2.0) ) * scale , ( vposition.y + (ry/2.0) ) * scale );
+    //vec2 pos = vposition * scale;
+
     //the left of a plane is negative, move it to the right to start at 0
-    pos.x = ( (vposition.x + (rx / 2.0 )) + uoffset.x ) * uscale.x;
-    pos.y = ( (vposition.y + (ry / 2.0 )) + uoffset.y ) * uscale.y;
+    //pos.x = ( (pos.x + (sx / 2.0 )) * uscale.x ) + uoffset.x;
+    //pos.y = ( (pos.y + (sy / 2.0 )) * uscale.y ) + uoffset.y;
+    pos.x = pos.x * uscale.x + uoffset.x;
+    pos.y = pos.y * uscale.y + uoffset.y;
 
-    pos.x = pos.x > rx ? pos.x - rx : pos.x;
-    pos.x = pos.x < 0.0 ? pos.x + rx : pos.x;
+//    pos.x = pos.x > sx ? pos.x - sx : pos.x;
+//    pos.x = pos.x < 0.0 ? pos.x + sx : pos.x;
 
+    n = surface( vec3( pos.x, pos.y, seed ) );
 
-    float n = surface( vec3( pos.x, pos.y, seed ) );
+    if(pos.x < .00000001 && pos.y < 0.00000001){
+        n = 1.0;
+    }
+
     gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
 
 }

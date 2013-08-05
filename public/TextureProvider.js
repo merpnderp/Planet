@@ -23,6 +23,8 @@ define(function (require, exports, module) {
         var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat };
 
         var scale = .010;
+        var sx = rx * scale;
+        var sy = ry * scale;
 
         var material = new THREE.ShaderMaterial({
             uniforms: {
@@ -37,6 +39,18 @@ define(function (require, exports, module) {
                 ry: {
                     type: "f",
                     value: ry
+                },
+                sx: {
+                    type: "f",
+                    value: sx
+                },
+                sy: {
+                    type: "f",
+                    value: sy
+                },
+                scale: {
+                    type: "f",
+                    value: scale
                 },
                 uscale: {
                     type: "v2",
@@ -64,30 +78,49 @@ define(function (require, exports, module) {
         var uscale = new THREE.Vector2();
         var offset = new THREE.Vector2();
         var tau = Math.PI * 2;
+        var valueOffset;
+        var halfSX = sx / 2;
+        var halfSY = sy / 2;
+        var start, finish, sxPower, syPower;
+
         this.getTexture = function (scaledPI, phi, theta, ringNumber) {
+//But anyway, you can conclude by yourself that n = (c - d) / (a - b), and m = c - a * n, so you know how to find both n and m.
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            phi = phi + Math.PI - (scaledPI * 2 );
+         /*   phi = phi + Math.PI - (scaledPI * 2 );
             if (phi < 0) {
                 phi = tau + phi;
             }
             if (phi > tau) {
                 phi = phi - tau;
             }
-            offset.x = (phi / tau) * (rx);
+            valueOffset = (phi / tau) * (sx);
+*/
+            sxPower = (sx / Math.pow(2, ringNumber));
 
-            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
+            start = halfSX - sxPower;
+            finish = halfSX + sxPower;
 
-            uscale.x = scale * (1 / ringNumber);
+            uscale.x = ( start - finish ) / ( 0 - sx );
 
-            uscale.y = scale * (1 / ringNumber);
+            offset.x = start;// - ( 0 * uscale.x );
 
-            console.log('rx: ' + rx + ' ringNumber: ' + ringNumber + ' scaledPI: ' + scaledPI.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) + " updated phi: " + phi.toFixed(2));
+//            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
+
+            syPower = (sy / Math.pow(2, ringNumber));
+
+            start = halfSY - syPower;
+            finish = halfSY + syPower;
+
+            uscale.y = ( start - finish ) / ( 0 - sy );
+            offset.y = start;// - ( 0 * uscale.y );
+
+            console.log('sx ' + sx + ' ringNumber: ' + ringNumber + ' scale.x: ' + uscale.x.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) );
+            console.log('sy ' + sy + ' ringNumber: ' + ringNumber + ' scale.y: ' + uscale.y.toFixed(2) + ' offset.y: ' + offset.y.toFixed(2) );
 
             quadTarget.material.uniforms.uscale.value = uscale;
             quadTarget.material.uniforms.uoffset.value = offset;
-
 
             renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
 

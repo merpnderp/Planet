@@ -34,7 +34,7 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-        var textureProvider = new TextureProvider(renderer, radius, 256, 128, 94);
+        var textureProvider = new TextureProvider(renderer, radius, 256, 128, 44);
 
         var screenWidth = _screenWidth || 768;
         //tan of fov/screenWidth is first half of pixel size on planet calc
@@ -77,7 +77,7 @@ define(function (require) {
         var clock = new THREE.Clock(), localCam, cameraDistance, delta = 0, theta, phi, maxTheta, minTheta;
         var heightLock = 2, thetaLock = 0, phiLock = 0;//These are the discrete values we're locking to for the cameras phi/theta to the planet
         var oldHeightLock = 0, oldThetaLock = 0, oldPhiLock = 0;
-
+        var tMesh;
         me.update = function () {
             logText = '';
 
@@ -85,7 +85,7 @@ define(function (require) {
 
             if (delta >= .1) {
 
-                var tMesh = me.obj.clone();
+                tMesh = me.obj.clone();
                 tMesh.position = tMesh.localToWorld(tMesh.position);
                 tMesh.position.z -= radius;
                 tMesh.updateMatrixWorld(false);
@@ -243,19 +243,23 @@ define(function (require) {
                     }
                 }
             }
-            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2), 1);
             updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1), 0);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2), 1);
         }
 
-        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
+//        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
+        var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
         plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
         plane[0].position.z = -1000;
         plane[0].position.x = 200;
         plane[0].position.y = 170;
-        plane[1] = plane[0].clone();
-        plane[1].material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2)});
-        plane[1].position.y -= 70;
+        plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
+        var pmat2 = new THREE.MeshBasicMaterial({map: pmat});
+        plane[1].material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1]) });
+        plane[1].position.z = -1000;
+        plane[1].position.x = 200;
+        plane[1].position.y = 90;
         camera.add(plane[0]);
         camera.add(plane[1]);
 
