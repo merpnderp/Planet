@@ -34,7 +34,7 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-        var textureProvider = new TextureProvider(renderer, radius, 256, 128, 44);
+        var textureProvider = new TextureProvider(renderer, radius, 256, 128, 42);
 
         var screenWidth = _screenWidth || 768;
         //tan of fov/screenWidth is first half of pixel size on planet calc
@@ -244,7 +244,7 @@ define(function (require) {
                 }
             }
             updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1), 0);
-            updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 2), 1);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2), 1);
         }
 
 //        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});

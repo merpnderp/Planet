@@ -11,6 +11,7 @@ define(function (require, exports, module) {
         //var pars = { format: THREE.RGBFormat };
 
         seed = seed ? seed : Math.floor(Math.random() * 10000000000 + 1);
+ //       seed /= 1073741824.0;
 
         rx = rx ? rx : 128;
         ry = ry ? ry : 64;
@@ -32,6 +33,23 @@ define(function (require, exports, module) {
                     type: "f",
                     value: seed
                 },
+                scale: {
+                    type: "f",
+                    value: scale
+                },
+                radius: {
+                    type: "f",
+                    value: radius
+                },
+                phi: {
+                    type: "f"
+                },
+                theta: {
+                    type: "f"
+                },
+                scaledPI: {
+                    type: "f"
+                },
                 rx: {
                     type: "f",
                     value: rx
@@ -39,7 +57,8 @@ define(function (require, exports, module) {
                 ry: {
                     type: "f",
                     value: ry
-                },
+                }
+                /*
                 sx: {
                     type: "f",
                     value: sx
@@ -47,10 +66,6 @@ define(function (require, exports, module) {
                 sy: {
                     type: "f",
                     value: sy
-                },
-                scale: {
-                    type: "f",
-                    value: scale
                 },
                 uscale: {
                     type: "v2",
@@ -60,6 +75,7 @@ define(function (require, exports, module) {
                     type: "v2",
                     value: new THREE.Vector2()
                 }
+                */
             },
             vertexShader: vertexShader,
             fragmentShader: fragmentShader
@@ -88,13 +104,21 @@ define(function (require, exports, module) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            phi = phi + Math.PI - (scaledPI * 2 );
+            phi = phi + Math.PI;// - (scaledPI * 2 );
             if (phi < 0) {
                 phi = tau + phi;
             }
             if (phi > tau) {
                 phi = phi - tau;
             }
+            console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
+            quadTarget.material.uniforms.phi.value = phi;
+            quadTarget.material.uniforms.theta.value = theta;
+            quadTarget.material.uniforms.scaledPI.value = scaledPI;
+
+
+
+/*
             valueOffset = (phi / tau) * (sx);
 
             sxPower = (sx / Math.pow(2, ringNumber));
@@ -123,7 +147,7 @@ define(function (require, exports, module) {
 
             quadTarget.material.uniforms.uscale.value = uscale;
             quadTarget.material.uniforms.uoffset.value = offset;
-
+*/
             renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
 
             return heightMap;

@@ -36,13 +36,13 @@ var scale = 0;
 var offset = 0;
 
 var ostart = num[0], ofinish = num[num.length-1];
-
+var pstart = 0, pfinish = Math.PI * 2;
 for(var s = 1; s <= 4; s++){
 	var out = "";
 
 	//we don't want to offset the original scaling 
-	start = (ofinish / 2) - (ofinish / Math.pow(2, s)); 
-	finish = (ofinish / 2) + (ofinish / Math.pow(2, s)); 
+	start = (pfinish / 2) - (pfinish / Math.pow(2, s)); 
+	finish = (pfinish / 2) + (pfinish / Math.pow(2, s)); 
 console.log(start + " : " + finish + " : " + ostart + " : " + ofinish);	
 	scale = ( start - finish) / ( ostart - ofinish );
 	offset = start - ( ostart * scale );
@@ -54,4 +54,6 @@ console.log(start + " : " + finish + " : " + ostart + " : " + ofinish);
 	out += " -- scale " + (scale.toFixed(dp));
 	out += " -- offset " +(offset.toFixed(dp));
   console.log(out);
-} 
+}
+
+ 
