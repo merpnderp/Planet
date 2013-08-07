@@ -58,7 +58,6 @@ void main() {
 	//Now rotate this point to face the camera
 	newPosition = rotateVector(meshRotation, newPosition );
 
-
 	vec3 newNormal = rotateVector(meshRotation, normal);
 
 	//Move point back to its relative position to the mesh
@@ -76,12 +75,12 @@ void main() {
 //	float xoffset = phi;
 //	float yoffset = theta;
 
-	float xoffset = newPosition.x / radius;
-	float yoffset = newPosition.y / radius;
+	float xoffset = ((position.x + radius) / (radius * 2.0) ) / 2.0 + .25;
+	float yoffset = (newPosition.y + radius) / (radius * 2.0);
 
 	color = texture2D(texture, vec2(xoffset, yoffset));
 
-	newPosition = newPosition + normal * color.r ;
+	newPosition = newPosition + newNormal * color.r ;
 	
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

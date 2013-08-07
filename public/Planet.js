@@ -239,13 +239,14 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i === 0) {
-                        //    clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(rotate, scaledPI[i]);
+                    if (i <= 20) {
+                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
                     }
                 }
             }
-            updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1), 0);
-            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock, 2), 1);
+            updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock), 0);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
+            updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
         }
 
 //        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
@@ -254,16 +255,21 @@ define(function (require) {
         plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
         plane[0].position.z = -1000;
         plane[0].position.x = 200;
-        plane[0].position.y = 170;
+        plane[0].position.y = 200;
         plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
-//        var pmat2 = new THREE.MeshBasicMaterial({map: pmat});
-        //plane[1].material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1]) });
         plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[1].position.z = -1000;
         plane[1].position.x = 200;
-        plane[1].position.y = 90;
+        plane[1].position.y = 200-64;
+        plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
+        plane[2].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
+        plane[2].position.z = -1000;
+        plane[2].position.x = 200;
+        plane[2].position.y = 200-64*2;
+        camera.add(plane[0]);
         camera.add(plane[0]);
         camera.add(plane[1]);
+        camera.add(plane[2]);
 
         function updatePlane(text, i) {
             plane[i].material.map = text;

@@ -11,7 +11,7 @@ define(function (require, exports, module) {
         //var pars = { format: THREE.RGBFormat };
 
         seed = seed ? seed : Math.floor(Math.random() * 10000000000 + 1);
- //       seed /= 1073741824.0;
+        //       seed /= 1073741824.0;
 
         rx = rx ? rx : 128;
         ry = ry ? ry : 64;
@@ -64,23 +64,23 @@ define(function (require, exports, module) {
                     value: 1
                 }
                 /*
-                sx: {
-                    type: "f",
-                    value: sx
-                },
-                sy: {
-                    type: "f",
-                    value: sy
-                },
-                uscale: {
-                    type: "v2",
-                    value: new THREE.Vector2()
-                },
-                uoffset: {
-                    type: "v2",
-                    value: new THREE.Vector2()
-                }
-                */
+                 sx: {
+                 type: "f",
+                 value: sx
+                 },
+                 sy: {
+                 type: "f",
+                 value: sy
+                 },
+                 uscale: {
+                 type: "v2",
+                 value: new THREE.Vector2()
+                 },
+                 uoffset: {
+                 type: "v2",
+                 value: new THREE.Vector2()
+                 }
+                 */
             },
             vertexShader: vertexShader,
             fragmentShader: fragmentShader
@@ -104,7 +104,7 @@ define(function (require, exports, module) {
         var halfSY = sy / 2;
         var start, finish, sxPower, syPower;
 
-        this.getTexture = function (scaledPI, phi, theta, ringNumber) {
+        this.getTexture = function (scaledPI, phi, theta) {
 //But anyway, you can conclude by yourself that n = (c - d) / (a - b), and m = c - a * n, so you know how to find both n and m.
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
@@ -117,36 +117,36 @@ define(function (require, exports, module) {
             quadTarget.material.uniforms.mScale.value = Math.cos(theta - Math.PI / 2); //Theta needs to be between 0-1.57, we don't care if positive or negative for scaling
 
 
-/*
-            valueOffset = (phi / tau) * (sx);
+            /*
+             valueOffset = (phi / tau) * (sx);
 
-            sxPower = (sx / Math.pow(2, ringNumber));
+             sxPower = (sx / Math.pow(2, ringNumber));
 
-            start = halfSX - sxPower;
-            finish = halfSX + sxPower;
+             start = halfSX - sxPower;
+             finish = halfSX + sxPower;
 
-            uscale.x = ( start - finish ) / ( 0 - sx );
+             uscale.x = ( start - finish ) / ( 0 - sx );
 
-            offset.x = start;// - ( 0 * uscale.x );
-            console.log(valueOffset);
-            offset.x += valueOffset;
+             offset.x = start;// - ( 0 * uscale.x );
+             console.log(valueOffset);
+             offset.x += valueOffset;
 
-//            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
+             //            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
 
-            syPower = (sy / Math.pow(2, ringNumber));
+             syPower = (sy / Math.pow(2, ringNumber));
 
-            start = halfSY - syPower;
-            finish = halfSY + syPower;
+             start = halfSY - syPower;
+             finish = halfSY + syPower;
 
-            uscale.y = ( start - finish ) / ( 0 - sy );
-            offset.y = start;// - ( 0 * uscale.y );
+             uscale.y = ( start - finish ) / ( 0 - sy );
+             offset.y = start;// - ( 0 * uscale.y );
 
-            console.log('sx ' + sx + ' ringNumber: ' + ringNumber + ' scale.x: ' + uscale.x.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) + " phiOffset " + valueOffset );
-            console.log('sy ' + sy + ' ringNumber: ' + ringNumber + ' scale.y: ' + uscale.y.toFixed(2) + ' offset.y: ' + offset.y.toFixed(2) );
+             console.log('sx ' + sx + ' ringNumber: ' + ringNumber + ' scale.x: ' + uscale.x.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) + " phiOffset " + valueOffset );
+             console.log('sy ' + sy + ' ringNumber: ' + ringNumber + ' scale.y: ' + uscale.y.toFixed(2) + ' offset.y: ' + offset.y.toFixed(2) );
 
-            quadTarget.material.uniforms.uscale.value = uscale;
-            quadTarget.material.uniforms.uoffset.value = offset;
-*/
+             quadTarget.material.uniforms.uscale.value = uscale;
+             quadTarget.material.uniforms.uoffset.value = offset;
+             */
             renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
 
             return heightMap;
