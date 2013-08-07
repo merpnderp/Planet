@@ -47,8 +47,8 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         //   camera.position.x = radius;
         //  camera.position.y = radius;
-        camera.position.z = 2;
-        //camera.position.z = radius * 1;
+        //camera.position.z = 2;
+        camera.position.z = radius * 2;
 
         //    var controls = new THREE.FirstPersonControls(camera);
 
