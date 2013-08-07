@@ -172,6 +172,7 @@ uniform float ry;
 uniform float phi;
 uniform float theta;
 uniform float radius;
+uniform float mScale;
 /*
 uniform float sx;
 uniform float sy;
@@ -182,11 +183,24 @@ const float PI = 3.1415926535897932384626433832795;
 
 void main() {
     //calculate offset then scale so that we're working with the same scale numbers
+    float xscaledPI = scaledPI;
+    float yscaledPI = scaledPI;
+    float utheta;
 
-    float utheta = theta - scaledPI < 0.0 ? scaledPI : theta;
-    utheta = theta + scaledPI > PI ? PI - scaledPI : utheta;
+    if( theta - scaledPI < 0.0 ){
+        utheta = scaledPI;
+        xscaledPI = PI / 2.0;
+    }else if( theta + scaledPI > PI ){
+        utheta = PI - scaledPI;
+        xscaledPI = PI / 2.0;
+    }else{
+        xscaledPI /= mScale;
+        xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
+        utheta = theta;
+    }
 
-    vec2 pos = vec2( (vposition.x / (rx/2.0)) * scaledPI * 4.0, ( -1.0 * vposition.y / (ry/2.0)) * scaledPI);
+    //xscaledPI is only a max of PI because it is also possibly negative
+    vec2 pos = vec2( (vposition.x / (rx/2.0)) * xscaledPI * 2.0, ( -1.0 * vposition.y / (ry/2.0)) * yscaledPI);
 
     pos.x += phi;
     pos.y += utheta;

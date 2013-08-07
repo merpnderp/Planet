@@ -83,7 +83,8 @@ define(function (require) {
 
             delta += clock.getDelta();
 
-            if (delta >= .1) {
+//            if (delta >= .1) {
+            if (true) {
 
                 tMesh = me.obj.clone();
                 tMesh.position = tMesh.localToWorld(tMesh.position);
@@ -257,7 +258,7 @@ define(function (require) {
         plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(128, 64, 128, 64), pmat);
 //        var pmat2 = new THREE.MeshBasicMaterial({map: pmat});
         //plane[1].material = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[1]) });
-        plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')} );
+        plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[1].position.z = -1000;
         plane[1].position.x = 200;
         plane[1].position.y = 90;

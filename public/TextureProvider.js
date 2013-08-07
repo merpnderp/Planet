@@ -57,6 +57,11 @@ define(function (require, exports, module) {
                 ry: {
                     type: "f",
                     value: ry
+                },
+                //mercator scaling of x axis / longitude
+                mScale: {
+                    type: "f",
+                    value: 1
                 }
                 /*
                 sx: {
@@ -104,18 +109,12 @@ define(function (require, exports, module) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            phi = phi + Math.PI;// - (scaledPI * 2 );
-            if (phi < 0) {
-                phi = tau + phi;
-            }
-            if (phi > tau) {
-                phi = phi - tau;
-            }
             console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
             quadTarget.material.uniforms.phi.value = phi;
             quadTarget.material.uniforms.theta.value = theta;
             quadTarget.material.uniforms.scaledPI.value = scaledPI;
 
+            quadTarget.material.uniforms.mScale.value = Math.cos(theta - Math.PI / 2); //Theta needs to be between 0-1.57, we don't care if positive or negative for scaling
 
 
 /*
