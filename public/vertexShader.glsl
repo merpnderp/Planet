@@ -29,7 +29,10 @@ uniform vec4 meshRotation;
 uniform int last;
 varying vec2 vUv;
 varying vec4 color;
-vec3 front = vec3(0,0,1);
+
+
+const float PI = 3.1415926535897932384626433832795;
+const vec3 front = vec3(0,0,-1);
 
 void main() {
  
@@ -41,10 +44,9 @@ void main() {
 
 	//Test if this clipmap is a ring or a circle (is it the bottom level)
 	if( last == 1 ) {
-		pointRotation = ( length(newPosition) / radius ) * scaledPI ;
+		pointRotation = length( newPosition ) * scaledPI ;
 	} else {
-	    //Push all points in
-		pointRotation = ( length(newPosition) / radius ) * scaledPI / 2.0  + scaledPI / 2.0;
+		pointRotation = length( newPosition ) * scaledPI / 2.0  + scaledPI / 2.0;
 	}
 
 	//Find the normal for the front of the sphere and this point
@@ -60,27 +62,16 @@ void main() {
 
 	vec3 newNormal = rotateVector(meshRotation, normal);
 
-	//Move point back to its relative position to the mesh
-	newPosition.z -= radius;
 
-//	float phi = atan( newPosition.z / newPosition.x ); 
-	//float theta = acos( newPosition.y );
-//	float theta = atan ( sqrt ( newPosition.y / ( newPosition.x * newPosition.x + newPosition.z + newPosition.z) ) );
+    float xoffset = ( atan( newPosition.z / newPosition.x )) / (PI * 2.0);   // + scaledPI) / (scaledPI * 2.0) ;
+    float yoffset = 1.0 - ( ( ( -1.0 * acos(newPosition.y) ) + PI / 2.0 ) / PI ) ;// / scaledPI ;
 
-//	phi += 3.14;
-//	phi = phi / 6.28;
-
-//	theta /= 3.14;
-
-//	float xoffset = phi;
-//	float yoffset = theta;
-
-	float xoffset = ((position.x + radius) / (radius * 2.0) ) / 2.0 + .25;
-	float yoffset = (newPosition.y + radius) / (radius * 2.0);
 
 	color = texture2D(texture, vec2(xoffset, yoffset));
 
-	newPosition = newPosition + newNormal * color.r ;
+	newPosition = newPosition;// + newNormal * color.r ;
 	
+	//Move point back to its relative position to the mesh
+	newPosition.z -= radius;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

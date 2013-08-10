@@ -28,7 +28,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             fov = 30,
             stats = new Stats();
 
-        stats.setMode(0);
+        stats.setMode(1);
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.left = '5px';
         stats.domElement.style.top = '5px';
@@ -48,7 +48,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         //   camera.position.x = radius;
         //  camera.position.y = radius;
         //camera.position.z = 2;
-        camera.position.z = radius * 2;
+        camera.position.z = radius * 4;
 
         //    var controls = new THREE.FirstPersonControls(camera);
 
@@ -106,7 +106,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
  //       tl.load("explosion.png");
 
-        var planet = new Planet(camera, radius, new THREE.Vector3(), 64, fov, window.innerWidth, renderer);
+        var planet = new Planet(camera, radius, new THREE.Vector3(), 256, fov, window.innerWidth, renderer);
 
         camera.lookAt(planet.obj.position);
 
@@ -115,7 +115,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         var axis = new THREE.AxisHelper(radius * 100);
         axis.position = planet.obj.position;
-        solarSystem.add(axis);
+ //       solarSystem.add(axis);
         var pipe = radius / 50;
         var Y = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
         var X = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
@@ -125,9 +125,9 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         Y.position.z -= radius;
         X.position.z -= radius;
         Z.position.z -= radius;
-        solarSystem.add(Y);
-        solarSystem.add(X);
-        solarSystem.add(Z);
+//        solarSystem.add(Y);
+//        solarSystem.add(X);
+//        solarSystem.add(Z);
         scene.add(solarSystem);
         var clock = new THREE.Clock();
         var delta, logLimiter = 0;

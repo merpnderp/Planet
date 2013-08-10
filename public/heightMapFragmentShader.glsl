@@ -206,34 +206,11 @@ void main() {
     pos.y += utheta;
 
     vec3 coords = vec3( sin(pos.x) * sin(pos.y), cos(pos.y), cos(pos.x) * sin(pos.y) );
-//    coords *= radius / 10000000.0;
+    coords *= radius / 10000000.0;
 
     float n = surface( vec4( coords, seed ) );
 
     gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
 
-/*
-    vec2 pos = vec2( ( vposition.x + (rx/2.0) ) * scale , ( vposition.y + (ry/2.0) ) * scale );
-
-    //the left of a plane is negative, move it to the right to start at 0
-    //pos.x = ( (pos.x + (sx / 2.0 )) * uscale.x ) + uoffset.x;
-    //pos.y = ( (pos.y + (sy / 2.0 )) * uscale.y ) + uoffset.y;
-    pos.x = pos.x * uscale.x + uoffset.x;
-    pos.y = pos.y * uscale.y + uoffset.y;
-
-    pos.x = pos.x > sx ? pos.x - sx : pos.x;
-    pos.x = pos.x < 0.0 ? pos.x + sx : pos.x;
-
-    n = surface( vec4( pos.x, pos.y, z, seed ) );
-
-    float m = .01 ;
-
-    vec2 aposition = vec2( ( vposition.x + (rx/2.0) ) , ( vposition.y + (ry/2.0) ) );
-    if(aposition.x < .75 *rx + rx * m && aposition.x > .25 * rx - rx * m  && aposition.y < .25 * ry + ry * m && aposition.y > .25 * ry - ry * m){
-        n = 1.0;
-    }
-
-    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
-*/
 }
 

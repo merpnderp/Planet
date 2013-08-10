@@ -11,7 +11,7 @@ define(function (require, exports, module) {
         //var pars = { format: THREE.RGBFormat };
 
         seed = seed ? seed : Math.floor(Math.random() * 10000000000 + 1);
-        //       seed /= 1073741824.0;
+        seed /= 1073741824.0;
 
         rx = rx ? rx : 128;
         ry = ry ? ry : 64;
@@ -109,7 +109,7 @@ define(function (require, exports, module) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
+            //console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
             quadTarget.material.uniforms.phi.value = phi;
             quadTarget.material.uniforms.theta.value = theta;
             quadTarget.material.uniforms.scaledPI.value = scaledPI;
