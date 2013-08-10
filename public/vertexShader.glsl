@@ -32,6 +32,7 @@ varying vec4 color;
 
 
 const float PI = 3.1415926535897932384626433832795;
+float halfPI = PI/2.0;
 const vec3 front = vec3(0,0,-1);
 
 void main() {
@@ -57,19 +58,37 @@ void main() {
 	//Create a brand new vertex at the prime meridian on the equator and rotate it to its correct position
 	newPosition = rotateVector( quat, vec3( 0, 0, radius ) );
 
+    vec3 pointPosition = normalize(vec3(newPosition));
+
 	//Now rotate this point to face the camera
 	newPosition = rotateVector(meshRotation, newPosition );
 
 	vec3 newNormal = rotateVector(meshRotation, normal);
 
+    vec3 normPosition = normalize(newPosition);
 
-    float xoffset = ( atan( newPosition.z / newPosition.x )) / (PI * 2.0);   // + scaledPI) / (scaledPI * 2.0) ;
-    float yoffset = 1.0 - ( ( ( -1.0 * acos(newPosition.y) ) + PI / 2.0 ) / PI ) ;// / scaledPI ;
+//    float xoffset = ( ( atan( normPosition.z / normPosition.x )) + PI / 2.0 ) / PI;   // + scaledPI) / (scaledPI * 2.0) ;
+//n = (c - d) / (a - b), and m = c - a * n,
+//a = -1.57 b = 1.57
+//c = .25 d = .75
+    float n = -.5 / ( -scaledPI - scaledPI ) ;
+    float m = .25 - (-scaledPI * n);
+    //float xoffset =  ( ( atan( pointPosition.x, pointPosition.z ) ) + scaledPI * 2.0) / (scaledPI * 4.0) ;
+    float xoffset =  ( atan( pointPosition.x, pointPosition.z ) ) * n + m;
 
+//n = (c - d) / (a - b), and m = c - a * n,
+//a = 0 b = 3.14
+//c = 0 d = 1
+    n = -1.0 / ( (halfPI - scaledPI) - (halfPI + scaledPI) );
+    m = 0.0 - ((halfPI - scaledPI) * n);
+    //float yoffset =  ( ( acos( -1.0 * pointPosition.y ) ) ) / ( scaledPI * 2.0 );
+    float yoffset =  ( ( acos( -1.0 * pointPosition.y ) ) ) * n + m;
 
 	color = texture2D(texture, vec2(xoffset, yoffset));
+//	color = vec4(xoffset,xoffset,xoffset,1);
+//	color = vec4(yoffset,yoffset,yoffset,1);
 
-	newPosition = newPosition;// + newNormal * color.r ;
+	newPosition = newPosition + newNormal * (1.0/color.r)*50000.0;
 	
 	//Move point back to its relative position to the mesh
 	newPosition.z -= radius;

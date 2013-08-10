@@ -28,7 +28,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             fov = 30,
             stats = new Stats();
 
-        stats.setMode(1);
+        stats.setMode(0);
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.left = '5px';
         stats.domElement.style.top = '5px';
@@ -48,14 +48,14 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         //   camera.position.x = radius;
         //  camera.position.y = radius;
         //camera.position.z = 2;
-        camera.position.z = radius * 4;
+        camera.position.z = radius * 3;
 
         //    var controls = new THREE.FirstPersonControls(camera);
 
         var controls = new THREE.FlyControls(camera);
-        controls.movementSpeed = (radius );
+        controls.movementSpeed = (radius  );
         controls.domElement = document;
-        controls.rollSpeed = Math.PI / 3;
+        controls.rollSpeed = Math.PI / 16;
         controls.autoForward = false;
         controls.dragToLook = false;
 
@@ -115,7 +115,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         var axis = new THREE.AxisHelper(radius * 100);
         axis.position = planet.obj.position;
- //       solarSystem.add(axis);
+        solarSystem.add(axis);
         var pipe = radius / 50;
         var Y = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
         var X = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
@@ -136,7 +136,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             delta = clock.getDelta();
             controls.update(delta);
             logLimiter++;
-            if (logLimiter % 30 == 0) {
+            if (logLimiter % 30 == 0 && false) {
 //                controls.movementSpeed = Math.abs( solarSystem.position.length) / 40;
                 var r =
                     "programs: " + renderer.info.memory.programs +
