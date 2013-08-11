@@ -109,7 +109,7 @@ define(function (require, exports, module) {
             var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
-            console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
+            //console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
             quadTarget.material.uniforms.phi.value = phi;
             quadTarget.material.uniforms.theta.value = theta;
             quadTarget.material.uniforms.scaledPI.value = scaledPI;

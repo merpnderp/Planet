@@ -64,7 +64,7 @@ define(function (require) {
 
         //var circleGeo = new THREE.RingGeometry(.0000001, radius, segments, segments, 0, tau);
         var circleGeo = new THREE.RingGeometry(.0000001, 1, segments, segments, 0, tau);
-
+				circleGeo.boundingSphere = radius * 1.1;
 
         initClipMaps();
 
@@ -137,7 +137,7 @@ define(function (require) {
                     log('minTheta', minTheta);
                     log('maxTheta', maxTheta);
                     log('clipMapCount', clipMapCount + 1);
-                    $('#info').html(logText);
+//                    $('#info').html(logText);
                 }
                 delta = 0;
             }
