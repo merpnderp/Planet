@@ -85,11 +85,10 @@ void main() {
     float yoffset =  ( ( acos( -1.0 * pointPosition.y ) ) ) * n + m;
 
 	color = texture2D(texture, vec2(xoffset, yoffset));
-//	color = vec4(xoffset,xoffset,xoffset,1);
-//	color = vec4(yoffset,yoffset,yoffset,1);
 
-	newPosition = newPosition + newNormal * (1.0/color.r)*50000.0;
-	
+
+	//newPosition = newPosition + newNormal * (1.0/color.r)*50000.0;
+
 	//Move point back to its relative position to the mesh
 	newPosition.z -= radius;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );

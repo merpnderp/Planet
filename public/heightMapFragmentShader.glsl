@@ -221,18 +221,22 @@ void main() {
 
     if( theta - scaledPI < 0.0 ){
         utheta = scaledPI;
-    //    xscaledPI = PI / 2.0;
     }else if( theta + scaledPI > PI ){
         utheta = PI - scaledPI;
-    //    xscaledPI = PI / 2.0;
     }else{
         utheta = theta;
     }
+    //utheta = 1.57 y = 64 scaledPI = .78
         xscaledPI /= cos( ( utheta + (scaledPI * ( -1.0 * vposition.y / (ry/2.0)) ) ) - PI / 2.0 )  ;
+    //xscaledPI /= cos( ( 1.57 + (.78 * ( -1.0 * 64 / (128/2.0) ) ) - PI / 2.0)
+    //xscaledPI = .78
         xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
+
+    //phi = 0 x = 128
 
     //xscaledPI is only a max of PI because it is also possibly negative
     vec2 pos = vec2( (vposition.x / (rx/2.0)) * xscaledPI * 2.0, ( -1.0 * vposition.y / (ry/2.0)) * yscaledPI);
+    //pos.x = ( ( 128 / (256/2) ) * .78 * 2
 
     pos.x += phi;
     pos.y += utheta;
@@ -242,7 +246,18 @@ void main() {
 
     float n = surface( vec4( coords, seed ) );
 
-    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+    if(
+        ( vposition.x <= rx * .253 && vposition.x >= rx * .25 && vposition.y <= ry * .25 && vposition.y >=  ry*-.25 ) ||
+        ( vposition.x <= rx * -.25 && vposition.x >= rx * -.252 && vposition.y <= ry * .25 && vposition.y >=  ry* -.25 )||
+        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y <= ry * .26 && vposition.y >=  ry*.25 ) ||
+        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y >= ry * -.26 && vposition.y <=  ry * -.25 )
+
+    ){
+        gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+    }else{
+        gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+    }
+
 /*
 */
 }
