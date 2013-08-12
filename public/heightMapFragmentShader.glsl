@@ -162,7 +162,6 @@ vec4 qmul(vec4 a, vec4 b) {
 	return vec4(cross(a.xyz,b.xyz) + a.xyz*b.w + b.xyz*a.w, a.w*b.w - dot(a.xyz,b.xyz));
 }
 
-varying vec3 norm;
 varying vec2 vposition;
 uniform float scale;
 uniform float seed;
@@ -174,6 +173,7 @@ uniform float theta;
 uniform float radius;
 uniform float mScale;
 /*
+varying vec3 norm;
 uniform float sx;
 uniform float sy;
 uniform vec2 uscale;
@@ -187,6 +187,8 @@ void main() {
     float yscaledPI = scaledPI;
     float utheta;
 
+
+/*
     if( theta - scaledPI < 0.0 ){
         utheta = scaledPI;
         xscaledPI = PI / 2.0;
@@ -211,6 +213,50 @@ void main() {
     float n = surface( vec4( coords, seed ) );
 
     gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+*/
 
+
+/*
+*/
+
+    if( theta - scaledPI < 0.0 ){
+        utheta = scaledPI;
+    //    xscaledPI = PI / 2.0;
+    }else if( theta + scaledPI > PI ){
+        utheta = PI - scaledPI;
+    //    xscaledPI = PI / 2.0;
+    }else{
+        utheta = theta;
+    }
+        xscaledPI /= cos( ( utheta + (scaledPI * ( -1.0 * vposition.y / (ry/2.0)) ) ) - PI / 2.0 )  ;
+        xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
+
+    //xscaledPI is only a max of PI because it is also possibly negative
+    vec2 pos = vec2( (vposition.x / (rx/2.0)) * xscaledPI * 2.0, ( -1.0 * vposition.y / (ry/2.0)) * yscaledPI);
+
+    pos.x += phi;
+    pos.y += utheta;
+
+    vec3 coords = vec3( sin(pos.x) * sin(pos.y), cos(pos.y), cos(pos.x) * sin(pos.y) );
+    coords *= radius / 10000000.0;
+
+    float n = surface( vec4( coords, seed ) );
+
+    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+/*
+*/
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

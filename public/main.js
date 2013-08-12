@@ -114,7 +114,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         //	var plane = new THREE.Mesh( new THREE.PlaneGeometry(radius*2, radius*2, 128, 64 ));
 
         var axis = new THREE.AxisHelper(radius * 100);
-        axis.position = planet.obj.position;
+//        axis.position = planet.obj.position;
         solarSystem.add(axis);
         var pipe = radius / 50;
         var Y = new THREE.Mesh(new THREE.CylinderGeometry(pipe, pipe, radius * 100));
