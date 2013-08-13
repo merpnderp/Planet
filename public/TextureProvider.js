@@ -86,10 +86,14 @@ define(function (require, exports, module) {
         var halfSY = sy / 2;
         var start, finish, sxPower, syPower;
 
+        var heightMaps = [];
+
         this.getTexture = function (scaledPI, phi, theta) {
 //But anyway, you can conclude by yourself that n = (c - d) / (a - b), and m = c - a * n, so you know how to find both n and m.
-            var heightMap = new THREE.WebGLRenderTarget(rx, ry, pars);
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
+
+            if (!heightMaps[scaledPI])
+                heightMaps[scaledPI] = new THREE.WebGLRenderTarget(rx, ry, pars);
 
             //console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
             quadTarget.material.uniforms.phi.value = phi;
@@ -129,9 +133,9 @@ define(function (require, exports, module) {
              quadTarget.material.uniforms.uscale.value = uscale;
              quadTarget.material.uniforms.uoffset.value = offset;
              */
-            renderer.render(sceneRenderTarget, cameraOrtho, heightMap, false);
+            renderer.render(sceneRenderTarget, cameraOrtho, heightMaps[scaledPI], false);
 
-            return heightMap;
+            return heightMaps[scaledPI];
 
         };
     }

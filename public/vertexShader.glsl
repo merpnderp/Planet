@@ -61,7 +61,7 @@ void main() {
     vec3 pointPosition = normalize(vec3(newPosition));
 
 	//Now rotate this point to face the camera
-	newPosition = rotateVector(meshRotation, newPosition );
+    newPosition = rotateVector(meshRotation, newPosition );
 
 	vec3 newNormal = rotateVector(meshRotation, normal);
 
@@ -71,18 +71,23 @@ void main() {
 //n = (c - d) / (a - b), and m = c - a * n,
 //a = -1.57 b = 1.57
 //c = .25 d = .75
-    float n = -.5 / ( -scaledPI - scaledPI ) ;
-    float m = .25 - (-scaledPI * n);
-    //float xoffset =  ( ( atan( pointPosition.x, pointPosition.z ) ) + scaledPI * 2.0) / (scaledPI * 4.0) ;
+
+    float p = atan(pointPosition.x, pointPosition.z);
+    float t = acos(-1.0 * pointPosition.y);
+    n = -1.0 / ( (halfPI - scaledPI) - (halfPI + scaledPI) );
+    m = 0.0 - ((halfPI - scaledPI) * n);
+    float yoffset =  t * n + m;
+
+    float xscaledPI = scaledPI / cos( utheta - PI / 2.0 );
+
+    //float n = -.5 / ( -scaledPI - scaledPI ) ;
+    float n = -.5 / ( -xscaledPI - xscaledPI ) ;
+    float m = .25 - (-xscaledPI * n);
     float xoffset =  ( atan( pointPosition.x, pointPosition.z ) ) * n + m;
 
 //n = (c - d) / (a - b), and m = c - a * n,
 //a = 0 b = 3.14
 //c = 0 d = 1
-    n = -1.0 / ( (halfPI - scaledPI) - (halfPI + scaledPI) );
-    m = 0.0 - ((halfPI - scaledPI) * n);
-    //float yoffset =  ( ( acos( -1.0 * pointPosition.y ) ) ) / ( scaledPI * 2.0 );
-    float yoffset =  ( ( acos( -1.0 * pointPosition.y ) ) ) * n + m;
 
 	color = texture2D(texture, vec2(xoffset, yoffset));
 
