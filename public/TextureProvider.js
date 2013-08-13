@@ -63,24 +63,6 @@ define(function (require, exports, module) {
                     type: "f",
                     value: 1
                 }
-                /*
-                 sx: {
-                 type: "f",
-                 value: sx
-                 },
-                 sy: {
-                 type: "f",
-                 value: sy
-                 },
-                 uscale: {
-                 type: "v2",
-                 value: new THREE.Vector2()
-                 },
-                 uoffset: {
-                 type: "v2",
-                 value: new THREE.Vector2()
-                 }
-                 */
             },
             vertexShader: vertexShader,
             fragmentShader: fragmentShader

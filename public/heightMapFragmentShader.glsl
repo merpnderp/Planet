@@ -226,31 +226,31 @@ void main() {
     }else{
         utheta = theta;
     }
-    //utheta = 1.57 y = 64 scaledPI = .78
-        xscaledPI /= cos( ( utheta + (scaledPI * ( -1.0 * vposition.y / (ry/2.0)) ) ) - PI / 2.0 )  ;
-    //xscaledPI /= cos( ( 1.57 + (.78 * ( -1.0 * 64 / (128/2.0) ) ) - PI / 2.0)
-    //xscaledPI = .78
-        xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
 
-    //phi = 0 x = 128
+    float ypercentScaledPI = scaledPI * ( vposition.y / ( ry / 2.0 ) );
+
+    xscaledPI /= cos( utheta + ypercentScaledPI - PI / 2.0 )  ;
+
+    xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
 
     //xscaledPI is only a max of PI because it is also possibly negative
-    vec2 pos = vec2( (vposition.x / (rx/2.0)) * xscaledPI * 2.0, ( -1.0 * vposition.y / (ry/2.0)) * yscaledPI);
-    //pos.x = ( ( 128 / (256/2) ) * .78 * 2
+    float p =  (vposition.x / (rx/2.0)) * xscaledPI * 2.0;
+    float t =  (-1.0 * vposition.y / (ry/2.0)) * yscaledPI;
 
-    pos.x += phi;
-    pos.y += utheta;
+    p += phi;
+    t += utheta;
 
-    vec3 coords = vec3( sin(pos.x) * sin(pos.y), cos(pos.y), cos(pos.x) * sin(pos.y) );
-    coords *= radius / 10000000.0;
+    vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
+
+//    coords *= radius;// / 10000000.0;
 
     float n = surface( vec4( coords, seed ) );
 
     if(
-        ( vposition.x <= rx * .253 && vposition.x >= rx * .25 && vposition.y <= ry * .25 && vposition.y >=  ry*-.25 ) ||
-        ( vposition.x <= rx * -.25 && vposition.x >= rx * -.252 && vposition.y <= ry * .25 && vposition.y >=  ry* -.25 )||
-        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y <= ry * .26 && vposition.y >=  ry*.25 ) ||
-        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y >= ry * -.26 && vposition.y <=  ry * -.25 )
+        ( vposition.x <= rx * .253 && vposition.x >= rx * .25 && vposition.y <= ry * .25 && vposition.y >=  ry*-.25 ) || // right line
+        ( vposition.x <= rx * -.25 && vposition.x >= rx * -.252 && vposition.y <= ry * .25 && vposition.y >=  ry* -.25 )|| // left line
+        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y <= ry * .26 && vposition.y >=  ry*.25 ) || // top line
+        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y >= ry * -.26 && vposition.y <=  ry * -.25 ) // bottom line
 
     ){
         gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );

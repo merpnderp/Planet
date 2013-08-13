@@ -64,7 +64,7 @@ define(function (require) {
 
         //var circleGeo = new THREE.RingGeometry(.0000001, radius, segments, segments, 0, tau);
         var circleGeo = new THREE.RingGeometry(.0000001, 1, segments, segments, 0, tau);
-				circleGeo.boundingSphere = radius * 1.1;
+        circleGeo.boundingSphere = radius * 1.1;
 
         initClipMaps();
 
@@ -240,7 +240,9 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
+                    if (i < 3) {
+                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
+                    }
                 }
             }
             updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock), 0);
@@ -251,21 +253,21 @@ define(function (require) {
 //        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
-        var px = 256 * 1.5, py = 128 * 1.5, start = 200;
-        plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 128, 64), pmat);
+        var px = 256 * 1.25, py = 128 * 1.25, start = 170;
+        plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[0].position.z = -1000;
         plane[0].position.x = 100;
         plane[0].position.y = start;
-        plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 128, 64), pmat);
+        plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[1].position.z = -1000;
         plane[1].position.x = 100;
-        plane[1].position.y = start-py;
-        plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 128, 64), pmat);
+        plane[1].position.y = start - py;
+        plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[2].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[2].position.z = -1000;
         plane[2].position.x = 100;
-        plane[2].position.y = start-py*2;
+        plane[2].position.y = start - py * 2;
         camera.add(plane[1]);
         camera.add(plane[2]);
         camera.add(plane[0]);
