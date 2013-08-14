@@ -130,14 +130,14 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 //        solarSystem.add(Z);
         scene.add(solarSystem);
         var clock = new THREE.Clock();
-        var delta, logLimiter = 0;
+        var delta, logLimiter = 0, t = new THREE.Vector3(0,0,0);
 
         function render() {
             delta = clock.getDelta();
             controls.update(delta);
             logLimiter++;
-            if (logLimiter % 30 == 0 && false) {
-//                controls.movementSpeed = Math.abs( solarSystem.position.length) / 40;
+            /*
+            if (logLimiter % 30 == 0) {
                 var r =
                     "programs: " + renderer.info.memory.programs +
                         "<br />geometries: " + renderer.info.memory.geometries +
@@ -154,11 +154,14 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
                 $('#render').html(r);
                 logLimiter = 0;
             }
+            */
             renderer.render(scene, camera);
             requestAnimationFrame(render);
             stats.update();
-            if (camera.position.length() > 100) {
-                var t = new THREE.Vector3(0, 0, 0);
+            if (camera.position.length > 100) {
+                t.x = 0;
+                t.y = 0;
+                t.z = 0;
                 t.subVectors(camera.position, t);
                 solarSystem.position.sub(t);
                 camera.position.x = 0;

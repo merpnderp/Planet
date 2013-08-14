@@ -78,11 +78,12 @@ define(function (require) {
         var clock = new THREE.Clock(), localCam, cameraDistance, delta = 0, theta, phi, maxTheta, minTheta;
         var heightLock = 2, thetaLock = 0, phiLock = 0;//These are the discrete values we're locking to for the cameras phi/theta to the planet
         var oldHeightLock = 0, oldThetaLock = 0, oldPhiLock = 0;
-        var tMesh;
+        var tMesh, pq = new THREE.Quaternion(), tq = new THREE.Quaternion();
+
         me.update = function () {
             logText = '';
 
-            delta += clock.getDelta();
+//            delta += clock.getDelta();
 
 //            if (delta >= .1) {
             if (true) {
@@ -110,8 +111,8 @@ define(function (require) {
                     oldPhiLock = phiLock;
                     oldThetaLock = thetaLock;
 
-                    var pq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phiLock);
-                    var tq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - thetaLock);
+                    pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phiLock);
+                    tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - thetaLock);
                     tq.multiply(pq);
                     updateClipMaps(tq);
                     /*
@@ -120,7 +121,6 @@ define(function (require) {
                      m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
                      var tr = m.decompose()[ 1 ].inverse();
                      updateClipMaps(heightLock, tr, phi, theta);
-                     */
                     log('height', cameraDistance);
                     log('heightLock', heightLock);
                     log('phiSteps', Math.PI * 2 / minTheta);
@@ -137,7 +137,8 @@ define(function (require) {
                     log('minTheta', minTheta);
                     log('maxTheta', maxTheta);
                     log('clipMapCount', clipMapCount + 1);
-//                    $('#info').html(logText);
+                    $('#info').html(logText);
+                     */
                 }
                 delta = 0;
             }
@@ -245,12 +246,13 @@ define(function (require) {
                     }
                 }
             }
+            /*
             updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock), 0);
             updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
             updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
+            */
         }
-
-//        var pmat = new THREE.MeshBasicMaterial({map: textureProvider.getTexture(scaledPI[0], phiLock, thetaLock, 1)});
+/*
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
         var px = 256 * 1.25, py = 128 * 1.25, start = 170;
@@ -274,9 +276,9 @@ define(function (require) {
 
         function updatePlane(text, i) {
             plane[i].material.map = text;
-            plane[i].needsUpdate = true;
+//            plane[i].needsUpdate = true;
         }
-
+*/
         function initClipMaps() {
 
             clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime

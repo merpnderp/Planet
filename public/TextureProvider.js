@@ -89,6 +89,8 @@ define(function (require, exports, module) {
         var heightMaps = [];
 
         this.getTexture = function (scaledPI, phi, theta) {
+
+
 //But anyway, you can conclude by yourself that n = (c - d) / (a - b), and m = c - a * n, so you know how to find both n and m.
 //		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
