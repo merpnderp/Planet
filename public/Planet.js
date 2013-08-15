@@ -75,10 +75,10 @@ define(function (require) {
          *
          */
 
-        var clock = new THREE.Clock(), localCam, cameraDistance, delta = 0, theta, phi, maxTheta, minTheta;
+        var clock = new THREE.Clock(), localCam = new THREE.Vector3(), cameraDistance, delta = 0, theta, phi, maxTheta, minTheta;
         var heightLock = 2, thetaLock = 0, phiLock = 0;//These are the discrete values we're locking to for the cameras phi/theta to the planet
         var oldHeightLock = 0, oldThetaLock = 0, oldPhiLock = 0;
-        var tMesh, pq = new THREE.Quaternion(), tq = new THREE.Quaternion();
+        var tMesh = new THREE.Object3D(), pq = new THREE.Quaternion(), tq = new THREE.Quaternion();
 
         me.update = function () {
             logText = '';
@@ -89,11 +89,15 @@ define(function (require) {
             if (true) {
 
                 tMesh = me.obj.clone();
+
                 tMesh.position = tMesh.localToWorld(tMesh.position);
                 tMesh.position.z -= radius;
                 tMesh.updateMatrixWorld(false);
 
-                localCam = camera.position.clone();
+                localCam.x = camera.position.x;
+                localCam.y = camera.position.y;
+                localCam.z = camera.position.z;
+
                 tMesh.worldToLocal(localCam);
                 cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
 
@@ -243,6 +247,8 @@ define(function (require) {
                     }
                     if (i < 3) {
                         clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
+                        clipMaps[i].material.uniforms.phi.value = phiLock;
+                        clipMaps[i].material.uniforms.theta.value = thetaLock;
                     }
                 }
             }
@@ -316,7 +322,16 @@ define(function (require) {
                         last: {
                             type: "i",
                             value: 0
+                        },
+                        phi: {
+                            type: "f",
+                            value: 0
+                        },
+                        theta: {
+                            type: "f",
+                            value: 0
                         }
+
                     },
 
                     vertexShader: vertexShader,

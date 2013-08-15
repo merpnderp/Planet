@@ -25,6 +25,8 @@ vec4 createQuaternionFromAxisAngle( vec3 axis, float angle ) {
 uniform sampler2D texture;
 uniform float scaledPI;
 uniform float radius;
+uniform float phi;
+uniform float theta;
 uniform vec4 meshRotation;
 uniform int last;
 varying vec2 vUv;
@@ -58,10 +60,12 @@ void main() {
 	//Create a brand new vertex at the prime meridian on the equator and rotate it to its correct position
 	newPosition = rotateVector( quat, vec3( 0, 0, radius ) );
 
-    vec3 pointPosition = normalize(vec3(newPosition));
+    vec3 circlePointPosition = normalize(vec3(newPosition));
 
 	//Now rotate this point to face the camera
     newPosition = rotateVector(meshRotation, newPosition );
+
+    vec3 pointPosition = normalize(vec3(newPosition));
 
 	vec3 newNormal = rotateVector(meshRotation, normal);
 
@@ -72,8 +76,7 @@ void main() {
 
     //Then find mercator offset and phi
     float mercatorMod = cos(t - PI / 2.0);
-    float p= atan(pointPosition.x, pointPosition.z);
-    p /= mercatorMod;////////////////////////Need to find this for actual theta not this point's theta
+    float p = atan(circlePointPosition.x, circlePointPosition.z);
 
     //Now scale theta inbetween scaledPI
     float n = (0.0 - 1.0 ) / (-scaledPI - scaledPI);
@@ -87,6 +90,8 @@ void main() {
     p = p * n + m;
 
 	color = texture2D(texture, vec2(p, t));
+	//color = vec4(p/(PI), t/PI, 0, 1);
+	//color = vec4(0, .5, 0, 1);
 
 //    float xoffset = ( ( atan( normPosition.z / normPosition.x )) + PI / 2.0 ) / PI;   // + scaledPI) / (scaledPI * 2.0) ;
 //n = (c - d) / (a - b), and m = c - a * n,
