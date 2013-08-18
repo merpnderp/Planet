@@ -164,12 +164,13 @@ vec4 qmul(vec4 a, vec4 b) {
 
 varying vec2 vposition;
 uniform float seed;
-uniform float scaledPI;
+uniform float left;
+uniform float right;
+uniform float top;
+uniform float bottom;
+uniform float phi;
 uniform float rx;
 uniform float ry;
-uniform float phi;
-uniform float theta;
-uniform float mTheta;
 uniform float radius;
 /*
 varying vec3 norm;
@@ -181,83 +182,29 @@ uniform vec2 uoffset;
 const float PI = 3.1415926535897932384626433832795;
 
 void main() {
-    //calculate offset then scale so that we're working with the same scale numbers
-/*
-    float xscaledPI = scaledPI;
-    float yscaledPI = scaledPI;
-    float theta;
+    //scaling formula
+    //n = (c - d) / (a - b), and m = c - a * n,
+    //a = -1.57 b = 1.57
+    //c = .25 d = .75
 
+    float x = vposition.x / rx;
+    float y = vposition.y / ry;
 
-    if( theta - scaledPI < 0.0 ){
-        theta = scaledPI;
-        xscaledPI = PI / 2.0;
-    }else if( theta + scaledPI > PI ){
-        utheta = PI - scaledPI;
-        xscaledPI = PI / 2.0;
-    }else{
-        xscaledPI /= mScale;
-        xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
-        utheta = theta;
-    }
+    float n = (left - right) / (-rx - rx);
+    float m = left - (-rx * n);
+    float p = x * n + m;
 
-    //xscaledPI is only a max of PI because it is also possibly negative
-    vec2 pos = vec2( (vposition.x / (rx/2.0)) * xscaledPI * 2.0, ( -1.0 * vposition.y / (ry/2.0)) * yscaledPI);
-
-    pos.x += phi;
-    pos.y += utheta;
-
-    vec3 coords = vec3( sin(pos.x) * sin(pos.y), cos(pos.y), cos(pos.x) * sin(pos.y) );
-    coords *= radius / 10000000.0;
-
-    float n = surface( vec4( coords, seed ) );
-
-    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
-*/
-
-
-/*
-*/
-    float xscaledPI = scaledPI * 2.0;
-    float yscaledPI = scaledPI;
-
-    //Theta is always scaledPI away from 0 or PI
-
-    float ypercentScaledPI = scaledPI * ( vposition.y / ( ry / 2.0 ) );
-
-    //circumference at latitude = cos( theta - ypercentScaledPI)
-
-    xscaledPI *=  abs(cos( mTheta - ypercentScaledPI ));
-
-//    xscaledPI = xscaledPI > PI ? PI : xscaledPI;
-
-    //xscaledPI is only a max of PI because it is also possibly negative
-    float p =  (vposition.x / (rx/2.0)) * xscaledPI;
-    float t =  -1.0 * ypercentScaledPI;
-
-    p += phi;
-    t += theta;
+    n = (bottom - top) / (-ry - ry);
+    m = bottom - (-ry * n);
+    float t = y * n + m;
 
     vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
 
-//    coords *= radius;// / 10000000.0;
+    coords *= radius / 100000.0;
 
-    float n = surface( vec4( coords, seed ) );
+    float nv = surface( vec4( coords, seed ) );
 
-/*    if(
-        ( vposition.x <= rx * .253 && vposition.x >= rx * .25 && vposition.y <= ry * .25 && vposition.y >=  ry*-.25 ) || // right line
-        ( vposition.x <= rx * -.25 && vposition.x >= rx * -.252 && vposition.y <= ry * .25 && vposition.y >=  ry* -.25 )|| // left line
-        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y <= ry * .26 && vposition.y >=  ry*.25 ) || // top line
-        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y >= ry * -.26 && vposition.y <=  ry * -.25 ) || // bottom line
-        ( vposition.y <= .5 && vposition.y >= -.5)
-
-    ){
-        gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
-    }else{
-        gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
-    }
-    */
-
-    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+    gl_FragColor = vec4( vec3( nv, nv, nv ), 1.0 );
 
 }
 

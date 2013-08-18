@@ -37,26 +37,28 @@ define(function (require, exports, module) {
                     type: "f",
                     value: radius
                 },
+                top: {
+                    type: "f"
+                },
+                bottom: {
+                    type: "f"
+                },
+                left: {
+                    type: "f"
+                },
+                right: {
+                    type: "f"
+                },
                 phi: {
-                    type: "f"
-                },
-                theta: {
-                    type: "f"
-                },
-                //The theta scaled with 0 at equator and 1.57, 1.57 at the poles
-                mTheta: {
-                    type: "f"
-                },
-                scaledPI: {
                     type: "f"
                 },
                 rx: {
                     type: "f",
-                    value: rx
+                    value: rx / 2
                 },
                 ry: {
                     type: "f",
-                    value: ry
+                    value: ry / 2
                 }
             },
             vertexShader: vertexShader,
@@ -82,7 +84,7 @@ define(function (require, exports, module) {
         var halfSY = sy / 2;
         var start, finish, sxPower, syPower;
 
-        var heightMaps = [];
+        var heightMaps = [], left, right, top, bottom;
 
         this.getTexture = function (scaledPI, phi, theta) {
 
@@ -93,66 +95,40 @@ define(function (require, exports, module) {
             if (!heightMaps[scaledPI])
                 heightMaps[scaledPI] = new THREE.WebGLRenderTarget(rx, ry, pars);
 
-            //console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
-            quadTarget.material.uniforms.phi.value = phi;
-
-            /*
-            if( theta - scaledPI < 0.0 ){
-                theta = scaledPI;
-            }else if( theta + scaledPI > Math.PI ){
-                theta = Math.PI - scaledPI;
-            }
-            */
-
-            var mTheta;
-            if(theta - scaledPI <= 0){
-                theta = scaledPI;
-            }else if(theta + scaledPI >= Math.PI){
-                theta = Math.PI - scaledPI;
-            }
-            if(theta <= halfPI){
-                mTheta = halfPI - theta;
+            if (theta - scaledPI < 0) {
+                left = phi - Math.PI;
+                right = phi + Math.PI;
+                top = 0;
+                bottom = theta + scaledPI;
+            } else if (theta + scaledPI > Math.PI) {
+                left = phi - Math.PI;
+                right  = phi + Math.PI;
+                top = theta - scaledPI;
+                bottom = Math.PI;
+            } else if (theta < Math.PI / 2) {
+                left = phi - (scaledPI / (1 - Math.cos(theta - scaledPI)));
+                right = phi + (scaledPI / (1 - Math.cos(theta - scaledPI)));
+                top = theta - scaledPI;
+                bottom = theta + scaledPI;
+            } else if (theta > Math.PI / 2) {
+                left = phi - (scaledPI / (1 - Math.cos(theta + scaledPI)));
+                right = phi + (scaledPI / (1 - Math.cos(theta + scaledPI)));
+                top = theta - scaledPI;
+                bottom = theta + scaledPI;
             }else{
-                mTheta = theta - halfPI;
+                left = phi - scaledPI;
+                right = phi + scaledPI;
+                top = theta - scaledPI;
+                bottom = theta + scaledPI;
             }
 
-            quadTarget.material.uniforms.mTheta.value = mTheta;
-            quadTarget.material.uniforms.theta.value = theta;
-            quadTarget.material.uniforms.scaledPI.value = scaledPI;
 
-//            quadTarget.material.uniforms.mScale.value = Math.cos(theta - Math.PI / 2); //Theta needs to be between 0-1.57, we don't care if positive or negative for scaling
+            quadTarget.material.uniforms.left.value = left;
+            quadTarget.material.uniforms.phi.value = phi;
+            quadTarget.material.uniforms.right.value = right;
+            quadTarget.material.uniforms.top.value = bottom;
+            quadTarget.material.uniforms.bottom.value = top;
 
-
-            /*
-             valueOffset = (phi / tau) * (sx);
-
-             sxPower = (sx / Math.pow(2, ringNumber));
-
-             start = halfSX - sxPower;
-             finish = halfSX + sxPower;
-
-             uscale.x = ( start - finish ) / ( 0 - sx );
-
-             offset.x = start;// - ( 0 * uscale.x );
-             console.log(valueOffset);
-             offset.x += valueOffset;
-
-             //            theta = theta - (Math.PI / 2) + (scaledPI * (Math.pow(2, ringNumber)));
-
-             syPower = (sy / Math.pow(2, ringNumber));
-
-             start = halfSY - syPower;
-             finish = halfSY + syPower;
-
-             uscale.y = ( start - finish ) / ( 0 - sy );
-             offset.y = start;// - ( 0 * uscale.y );
-
-             console.log('sx ' + sx + ' ringNumber: ' + ringNumber + ' scale.x: ' + uscale.x.toFixed(2) + ' offset.x: ' + offset.x.toFixed(2) + " phiOffset " + valueOffset );
-             console.log('sy ' + sy + ' ringNumber: ' + ringNumber + ' scale.y: ' + uscale.y.toFixed(2) + ' offset.y: ' + offset.y.toFixed(2) );
-
-             quadTarget.material.uniforms.uscale.value = uscale;
-             quadTarget.material.uniforms.uoffset.value = offset;
-             */
             renderer.render(sceneRenderTarget, cameraOrtho, heightMaps[scaledPI], false);
 
             return heightMaps[scaledPI];

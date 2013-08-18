@@ -253,7 +253,7 @@ var viewableClipmaps = 0;
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i < 6) {
+                    if (i < 1) {
                         viewableClipmaps++;
                         clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
                         clipMaps[i].material.uniforms.phi.value = phiLock;
@@ -267,8 +267,8 @@ var viewableClipmaps = 0;
                 }
             }
             updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock), 0);
-//            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
-//            updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
+            updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
             /*
             */
         }
@@ -280,7 +280,6 @@ var viewableClipmaps = 0;
         plane[0].position.x = xo;
         plane[0].position.y = start;
         camera.add(plane[0]);
-        /*
         plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[1].position.z = -1000;
@@ -293,7 +292,6 @@ var viewableClipmaps = 0;
         plane[2].position.x = xo;
         plane[2].position.y = start - py * 2;
         camera.add(plane[2]);
-        */
         function updatePlane(text, i) {
             plane[i].material.map = text;
         }
