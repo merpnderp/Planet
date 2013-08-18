@@ -79,17 +79,25 @@ define(function (require) {
         var heightLock = 2, thetaLock = 0, phiLock = 0;//These are the discrete values we're locking to for the cameras phi/theta to the planet
         var oldHeightLock = 0, oldThetaLock = 0, oldPhiLock = 0;
         var tMesh = new THREE.Object3D(), pq = new THREE.Quaternion(), tq = new THREE.Quaternion();
-
+var viewableClipmaps = 0;
         me.update = function () {
             logText = '';
-
 //            delta += clock.getDelta();
 
 //            if (delta >= .1) {
             if (true) {
 
                 tMesh = me.obj.clone();
-
+/*
+                tMesh.position.copy(me.obj.position);
+                tMesh.rotation.copy(me.obj.rotation);
+                tMesh.quaternion.copy(me.obj.quaternion);
+                tMesh.parent = me.obj.parent;
+                tMesh.rotation.order = me.obj.rotation.order;
+                tMesh.scale.copy(me.obj.scale);
+                tMesh.matrix.copy(me.obj.matrix);
+                tMesh.matrixWorld.copy(me.obj.matrixWorld);
+*/
                 tMesh.position = tMesh.localToWorld(tMesh.position);
                 tMesh.position.z -= radius;
                 tMesh.updateMatrixWorld(false);
@@ -119,12 +127,11 @@ define(function (require) {
                     tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - thetaLock);
                     tq.multiply(pq);
                     updateClipMaps(tq);
-                    /*
-                     var m = new THREE.Matrix4();
-                     var p = new THREE.Vector3();
-                     m.lookAt(localCam, p, new THREE.Vector3(0,1,0) );
-                     var tr = m.decompose()[ 1 ].inverse();
-                     updateClipMaps(heightLock, tr, phi, theta);
+//                    var m = new THREE.Matrix4();
+//                    var p = new THREE.Vector3();
+//                    m.lookAt(localCam, p, new THREE.Vector3(0, 1, 0));
+//                    var tr = m.decompose()[ 1 ].inverse();
+//                    updateClipMaps(heightLock, tr, phi, theta);
                     log('height', cameraDistance);
                     log('heightLock', heightLock);
                     log('phiSteps', Math.PI * 2 / minTheta);
@@ -141,8 +148,8 @@ define(function (require) {
                     log('minTheta', minTheta);
                     log('maxTheta', maxTheta);
                     log('clipMapCount', clipMapCount + 1);
+                    log('clipMap in View', viewableClipmaps);
                     $('#info').html(logText);
-                     */
                 }
                 delta = 0;
             }
@@ -223,20 +230,21 @@ define(function (require) {
         function updateClipMaps(rotate) {
             //min theta planet pixel size / radius i minimum theta
             //max theta
+            viewableClipmaps = 0;
             for (var i = 0; i < clipMapCount; i++) {
-                if (clipMaps[i].visible === false) {
+                if (clipMaps[i].mesh.visible === false) {
                     if (clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta) {
-                        me.obj.add(clipMaps[i].mesh);
-                        clipMaps[i].visible = true;
+//                        me.obj.add(clipMaps[i].mesh);
+                        clipMaps[i].mesh.visible = true;
                     }
                 } else {
                     if (clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta) {
-                        me.obj.remove(clipMaps[i].mesh);
-                        clipMaps[i].visible = false;
+//                        me.obj.remove(clipMaps[i].mesh);
+                        clipMaps[i].mesh.visible = false;
                         continue;
                     }
                 }
-                if (clipMaps[i].visible) {
+                if (clipMaps[i].mesh.visible) {
                     //log('level: ' + i, ' theta:' + clipMaps[i].theta.toFixed(3) + " : scaledPI: " + clipMaps[i].material.uniforms.scaledPI.value.toFixed(3));
                     clipMaps[i].material.uniforms.meshRotation.value = rotate;
                     //clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] );
@@ -245,46 +253,51 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i < 3) {
+                    if (i < 6) {
+                        viewableClipmaps++;
                         clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
                         clipMaps[i].material.uniforms.phi.value = phiLock;
                         clipMaps[i].material.uniforms.theta.value = thetaLock;
+                        if(theta <= halfPI){
+                            clipMaps[i].material.uniforms.mTheta.value = halfPI - thetaLock;
+                        }else{
+                            clipMaps[i].material.uniforms.mTheta.value = thetaLock - halfPI;
+                        }
                     }
                 }
             }
-            /*
             updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock), 0);
-            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
-            updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
+//            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
+//            updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
+            /*
             */
         }
-/*
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
-        var px = 256 * 1.25, py = 128 * 1.25, start = 170;
+        var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
         plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[0].position.z = -1000;
-        plane[0].position.x = 100;
+        plane[0].position.x = xo;
         plane[0].position.y = start;
+        camera.add(plane[0]);
+        /*
         plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[1].position.z = -1000;
-        plane[1].position.x = 100;
+        plane[1].position.x = xo;
         plane[1].position.y = start - py;
+        camera.add(plane[1]);
         plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
         plane[2].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[2].position.z = -1000;
-        plane[2].position.x = 100;
+        plane[2].position.x = xo;
         plane[2].position.y = start - py * 2;
-        camera.add(plane[1]);
         camera.add(plane[2]);
-        camera.add(plane[0]);
-
+        */
         function updatePlane(text, i) {
             plane[i].material.map = text;
-//            plane[i].needsUpdate = true;
         }
-*/
+
         function initClipMaps() {
 
             clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime
@@ -330,8 +343,10 @@ define(function (require) {
                         theta: {
                             type: "f",
                             value: 0
+                        },
+                        mTheta:{
+                            type: "f"
                         }
-
                     },
 
                     vertexShader: vertexShader,
@@ -341,9 +356,10 @@ define(function (require) {
 
                 clipMaps[i].theta = t;
                 clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
-                clipMaps[i].visible = false;
+                clipMaps[i].mesh.visible = false;
 
                 t /= 2;//Each successive clipMap covers half as much theta
+                me.obj.add(clipMaps[i].mesh);
             }
         }
 

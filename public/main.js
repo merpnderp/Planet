@@ -91,20 +91,20 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         var solarSystem = new THREE.Object3D();
 
-/*        var pmat = new THREE.MeshBasicMaterial();
-        var plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
-        var tl = new THREE.TextureLoader();
+        /*        var pmat = new THREE.MeshBasicMaterial();
+         var plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
+         var tl = new THREE.TextureLoader();
 
-        tl.addEventListener("load", function (data) {
-            pmat = new THREE.MeshBasicMaterial({ map: data.content });
-            plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
-            plane.position.z += radius;
-            plane.position.x += radius;
-            solarSystem.add(plane);
-        });
-*/
+         tl.addEventListener("load", function (data) {
+         pmat = new THREE.MeshBasicMaterial({ map: data.content });
+         plane = new THREE.Mesh(new THREE.PlaneGeometry(radius, radius, 128, 64), pmat);
+         plane.position.z += radius;
+         plane.position.x += radius;
+         solarSystem.add(plane);
+         });
+         */
 
- //       tl.load("explosion.png");
+        //       tl.load("explosion.png");
 
         var planet = new Planet(camera, radius, new THREE.Vector3(), 256, fov, window.innerWidth, renderer);
 
@@ -130,47 +130,49 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 //        solarSystem.add(Z);
         scene.add(solarSystem);
         var clock = new THREE.Clock();
-        var delta, logLimiter = 0, t = new THREE.Vector3(0,0,0);
+        var delta, limiter = 0, t = new THREE.Vector3(0, 0, 0);
 
         function render() {
             delta = clock.getDelta();
+//            limiter += delta;
             controls.update(delta);
-            logLimiter++;
             /*
-            if (logLimiter % 30 == 0) {
-                var r =
-                    "programs: " + renderer.info.memory.programs +
-                        "<br />geometries: " + renderer.info.memory.geometries +
-                        "<br />textures: " + renderer.info.memory.textures +
-                        "<br />calls: " + renderer.info.render.calls +
-                        "<br />vertices: " + renderer.info.render.vertices +
-                        "<br />faces: " + renderer.info.render.faces +
-                        "<br />points: " + renderer.info.render.points +
-                        "<br />camera x: " + camera.position.x +
-                        "<br />camera y: " + camera.position.y +
-                        "<br />camera z: " + camera.position.z +
-                        "<br />";
+             if (logLimiter % 30 == 0) {
+             var r =
+             "programs: " + renderer.info.memory.programs +
+             "<br />geometries: " + renderer.info.memory.geometries +
+             "<br />textures: " + renderer.info.memory.textures +
+             "<br />calls: " + renderer.info.render.calls +
+             "<br />vertices: " + renderer.info.render.vertices +
+             "<br />faces: " + renderer.info.render.faces +
+             "<br />points: " + renderer.info.render.points +
+             "<br />camera x: " + camera.position.x +
+             "<br />camera y: " + camera.position.y +
+             "<br />camera z: " + camera.position.z +
+             "<br />";
 
-                $('#render').html(r);
-                logLimiter = 0;
-            }
-            */
+             $('#render').html(r);
+             logLimiter = 0;
+             }
+             */
             renderer.render(scene, camera);
             requestAnimationFrame(render);
             stats.update();
-            if (camera.position.length > 100) {
-                t.x = 0;
-                t.y = 0;
-                t.z = 0;
-                t.subVectors(camera.position, t);
-                solarSystem.position.sub(t);
-                camera.position.x = 0;
-                camera.position.y = 0;
-                camera.position.z = 0;
+            //           if (camera.position.length > 10000) {
+            t.x = 0;
+            t.y = 0;
+            t.z = 0;
+            t.subVectors(camera.position, t);
+            solarSystem.position.sub(t);
+            camera.position.x = 0;
+            camera.position.y = 0;
+            camera.position.z = 0;
+            //          }
+
+            if (limiter < 20) {
+                planet.update();
+//                limiter++;
             }
-
-            planet.update();
-
         }
 
         render();

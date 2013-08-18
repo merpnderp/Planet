@@ -27,6 +27,7 @@ uniform float scaledPI;
 uniform float radius;
 uniform float phi;
 uniform float theta;
+uniform float mTheta;
 uniform vec4 meshRotation;
 uniform int last;
 varying vec2 vUv;
@@ -34,7 +35,7 @@ varying vec4 color;
 
 
 const float PI = 3.1415926535897932384626433832795;
-float halfPI = PI/2.0;
+const float halfPI = 1.5707963267948966;
 const vec3 front = vec3(0,0,-1);
 
 void main() {
@@ -58,40 +59,51 @@ void main() {
 	vec4 quat = createQuaternionFromAxisAngle( axis, pointRotation );
 
 	//Create a brand new vertex at the prime meridian on the equator and rotate it to its correct position
-	newPosition = rotateVector( quat, vec3( 0, 0, radius ) );
+	newPosition = rotateVector( quat, vec3( 0.0, 0.0, 1.0) );
 
-    vec3 circlePointPosition = normalize(vec3(newPosition));
+    vec3 circlePointPosition = vec3(newPosition.x, newPosition.y, newPosition.z);
 
 	//Now rotate this point to face the camera
     newPosition = rotateVector(meshRotation, newPosition );
 
-    vec3 pointPosition = normalize(vec3(newPosition));
+//	vec3 newNormal = rotateVector(meshRotation, normal);
 
-	vec3 newNormal = rotateVector(meshRotation, normal);
+//    vec3 normPosition = normalize(newPosition);
 
-    vec3 normPosition = normalize(newPosition);
+    //if scaledPI is 1.57
+    //n = 1/PI
+    //m = .5
 
     //First find theta for the pointPosition
-    float t = acos(pointPosition.y);
+    float t = acos(newPosition.y);
+    float n = (0.0 - 1.0 ) / (( theta + scaledPI ) - ( theta - scaledPI));
+    float m = 0.0 - (( theta + scaledPI) * n);
+    t = t * n + m;
+    //float t = acos(circlePointPosition.y);
+    //float n = (0.0 - 1.0 ) / (( halfPI + scaledPI ) - ( halfPI - scaledPI));
+    //float m = 0.0 - (( halfPI + scaledPI) * n);
+    //t = t * n + m;
 
     //Then find mercator offset and phi
-    float mercatorMod = cos(t - PI / 2.0);
+
+//    float mercatorMod = cos(t);
+//    float mercatorMod = 1.0 - abs(pointPosition.y);
+
     float p = atan(circlePointPosition.x, circlePointPosition.z);
 
-    //Now scale theta inbetween scaledPI
-    float n = (0.0 - 1.0 ) / (-scaledPI - scaledPI);
-    float m = scaledPI * n;
-    t = t * n + m;
-
-    //Now scale phi between scaledPI modified by mercatorMod
-    float mscaledPI = scaledPI / mercatorMod;
-    n = (0.0 - 1.0) / (-mscaledPI - mscaledPI);
-    m = mscaledPI * n;
+//    float mscaledPI = (scaledPI) / mercatorMod;
+    //n = (0.0 - 1.0) / (-mscaledPI - mscaledPI);
+    float mul = 1.0;
+    n = (0.0 - 1.0) / (-(scaledPI * mul) - (scaledPI * mul));
+    m = 0.0 - (-(scaledPI * mul) * n);
     p = p * n + m;
 
+
+    //color = vec4(circlePointPosition.x, pointPosition.y,circlePointPosition.z, 1.0);
+	//color = texture2D(texture, vec2(p, t));
 	color = texture2D(texture, vec2(p, t));
-	//color = vec4(p/(PI), t/PI, 0, 1);
-	//color = vec4(0, .5, 0, 1);
+
+
 
 //    float xoffset = ( ( atan( normPosition.z / normPosition.x )) + PI / 2.0 ) / PI;   // + scaledPI) / (scaledPI * 2.0) ;
 //n = (c - d) / (a - b), and m = c - a * n,
@@ -121,6 +133,7 @@ void main() {
 	//newPosition = newPosition + newNormal * (1.0/color.r)*50000.0;
 
 	//Move point back to its relative position to the mesh
+	newPosition *= radius;
 	newPosition.z -= radius;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

@@ -33,10 +33,6 @@ define(function (require, exports, module) {
                     type: "f",
                     value: seed
                 },
-                scale: {
-                    type: "f",
-                    value: scale
-                },
                 radius: {
                     type: "f",
                     value: radius
@@ -45,6 +41,10 @@ define(function (require, exports, module) {
                     type: "f"
                 },
                 theta: {
+                    type: "f"
+                },
+                //The theta scaled with 0 at equator and 1.57, 1.57 at the poles
+                mTheta: {
                     type: "f"
                 },
                 scaledPI: {
@@ -57,11 +57,6 @@ define(function (require, exports, module) {
                 ry: {
                     type: "f",
                     value: ry
-                },
-                //mercator scaling of x axis / longitude
-                mScale: {
-                    type: "f",
-                    value: 1
                 }
             },
             vertexShader: vertexShader,
@@ -81,6 +76,7 @@ define(function (require, exports, module) {
         var uscale = new THREE.Vector2();
         var offset = new THREE.Vector2();
         var tau = Math.PI * 2;
+        var halfPI = Math.PI / 2.0;
         var valueOffset;
         var halfSX = sx / 2;
         var halfSY = sy / 2;
@@ -99,10 +95,32 @@ define(function (require, exports, module) {
 
             //console.log("phi: " + phi + " theta: " + theta + " scaledPI: " + scaledPI)
             quadTarget.material.uniforms.phi.value = phi;
+
+            /*
+            if( theta - scaledPI < 0.0 ){
+                theta = scaledPI;
+            }else if( theta + scaledPI > Math.PI ){
+                theta = Math.PI - scaledPI;
+            }
+            */
+
+            var mTheta;
+            if(theta - scaledPI <= 0){
+                theta = scaledPI;
+            }else if(theta + scaledPI >= Math.PI){
+                theta = Math.PI - scaledPI;
+            }
+            if(theta <= halfPI){
+                mTheta = halfPI - theta;
+            }else{
+                mTheta = theta - halfPI;
+            }
+
+            quadTarget.material.uniforms.mTheta.value = mTheta;
             quadTarget.material.uniforms.theta.value = theta;
             quadTarget.material.uniforms.scaledPI.value = scaledPI;
 
-            quadTarget.material.uniforms.mScale.value = Math.cos(theta - Math.PI / 2); //Theta needs to be between 0-1.57, we don't care if positive or negative for scaling
+//            quadTarget.material.uniforms.mScale.value = Math.cos(theta - Math.PI / 2); //Theta needs to be between 0-1.57, we don't care if positive or negative for scaling
 
 
             /*

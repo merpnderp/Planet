@@ -163,15 +163,14 @@ vec4 qmul(vec4 a, vec4 b) {
 }
 
 varying vec2 vposition;
-uniform float scale;
 uniform float seed;
 uniform float scaledPI;
 uniform float rx;
 uniform float ry;
 uniform float phi;
 uniform float theta;
+uniform float mTheta;
 uniform float radius;
-uniform float mScale;
 /*
 varying vec3 norm;
 uniform float sx;
@@ -183,14 +182,14 @@ const float PI = 3.1415926535897932384626433832795;
 
 void main() {
     //calculate offset then scale so that we're working with the same scale numbers
+/*
     float xscaledPI = scaledPI;
     float yscaledPI = scaledPI;
-    float utheta;
+    float theta;
 
 
-/*
     if( theta - scaledPI < 0.0 ){
-        utheta = scaledPI;
+        theta = scaledPI;
         xscaledPI = PI / 2.0;
     }else if( theta + scaledPI > PI ){
         utheta = PI - scaledPI;
@@ -218,27 +217,25 @@ void main() {
 
 /*
 */
+    float xscaledPI = scaledPI * 2.0;
+    float yscaledPI = scaledPI;
 
-    if( theta - scaledPI < 0.0 ){
-        utheta = scaledPI;
-    }else if( theta + scaledPI > PI ){
-        utheta = PI - scaledPI;
-    }else{
-        utheta = theta;
-    }
+    //Theta is always scaledPI away from 0 or PI
 
     float ypercentScaledPI = scaledPI * ( vposition.y / ( ry / 2.0 ) );
 
-    xscaledPI /= cos( utheta + ypercentScaledPI - PI / 2.0 )  ;
+    //circumference at latitude = cos( theta - ypercentScaledPI)
 
-    xscaledPI = xscaledPI > PI / 2.0 ? PI / 2.0 : xscaledPI;
+    xscaledPI *=  abs(cos( mTheta - ypercentScaledPI ));
+
+//    xscaledPI = xscaledPI > PI ? PI : xscaledPI;
 
     //xscaledPI is only a max of PI because it is also possibly negative
-    float p =  (vposition.x / (rx/2.0)) * xscaledPI * 2.0;
-    float t =  (-1.0 * vposition.y / (ry/2.0)) * yscaledPI;
+    float p =  (vposition.x / (rx/2.0)) * xscaledPI;
+    float t =  -1.0 * ypercentScaledPI;
 
     p += phi;
-    t += utheta;
+    t += theta;
 
     vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
 
@@ -246,20 +243,22 @@ void main() {
 
     float n = surface( vec4( coords, seed ) );
 
-    if(
+/*    if(
         ( vposition.x <= rx * .253 && vposition.x >= rx * .25 && vposition.y <= ry * .25 && vposition.y >=  ry*-.25 ) || // right line
         ( vposition.x <= rx * -.25 && vposition.x >= rx * -.252 && vposition.y <= ry * .25 && vposition.y >=  ry* -.25 )|| // left line
         ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y <= ry * .26 && vposition.y >=  ry*.25 ) || // top line
-        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y >= ry * -.26 && vposition.y <=  ry * -.25 ) // bottom line
+        ( vposition.x <= rx * .25 && vposition.x >= rx * -.25 && vposition.y >= ry * -.26 && vposition.y <=  ry * -.25 ) || // bottom line
+        ( vposition.y <= .5 && vposition.y >= -.5)
 
     ){
         gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
     }else{
         gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
     }
+    */
 
-/*
-*/
+    gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
+
 }
 
 
