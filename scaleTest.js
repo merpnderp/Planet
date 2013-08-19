@@ -22,6 +22,20 @@ m = .19444 -- offset
 
 */
 
+// y = 128 goes form -64, 64
+// scaling from -PI, PI
+
+var n = (-Math.PI - Math.PI) / (-64 - 64);
+var m = -Math.PI - (-64 * n);
+
+for(var i = -64; i <= 64; i += 1){
+	console.log(i + " : " + (i * n + m));
+}
+
+
+
+
+/*
 var dp = 2;
 
 var num = [];
@@ -55,5 +69,4 @@ console.log(start + " : " + finish + " : " + ostart + " : " + ofinish);
 	out += " -- offset " +(offset.toFixed(dp));
   console.log(out);
 }
-
- 
+*/

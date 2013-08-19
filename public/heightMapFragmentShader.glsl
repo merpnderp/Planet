@@ -168,18 +168,13 @@ uniform float left;
 uniform float right;
 uniform float top;
 uniform float bottom;
-uniform float phi;
+uniform float xn;
+uniform float xm;
+uniform float yn;
+uniform float ym;
 uniform float rx;
 uniform float ry;
 uniform float radius;
-/*
-varying vec3 norm;
-uniform float sx;
-uniform float sy;
-uniform vec2 uscale;
-uniform vec2 uoffset;
-*/
-const float PI = 3.1415926535897932384626433832795;
 
 void main() {
     //scaling formula
@@ -187,20 +182,12 @@ void main() {
     //a = -1.57 b = 1.57
     //c = .25 d = .75
 
-    float x = vposition.x / rx;
-    float y = vposition.y / ry;
-
-    float n = (left - right) / (-rx - rx);
-    float m = left - (-rx * n);
-    float p = x * n + m;
-
-    n = (bottom - top) / (-ry - ry);
-    m = bottom - (-ry * n);
-    float t = y * n + m;
+    float p = vposition.x * xn + xm;
+    float t = vposition.y * yn + ym;
 
     vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
 
-    coords *= radius / 100000.0;
+//    coords *= radius / 100000.0;
 
     float nv = surface( vec4( coords, seed ) );
 

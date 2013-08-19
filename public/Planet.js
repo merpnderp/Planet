@@ -35,6 +35,7 @@ define(function (require) {
         fov = fov * .0174532925;//Convert to radians
 
         var textureProvider = new TextureProvider(renderer, radius, 256, 128, 42);
+//        var textureProvider = new TextureProvider(renderer, radius, 96, 48, 42);
 
         var screenWidth = _screenWidth || 768;
         //tan of fov/screenWidth is first half of pixel size on planet calc
@@ -79,80 +80,81 @@ define(function (require) {
         var heightLock = 2, thetaLock = 0, phiLock = 0;//These are the discrete values we're locking to for the cameras phi/theta to the planet
         var oldHeightLock = 0, oldThetaLock = 0, oldPhiLock = 0;
         var tMesh = new THREE.Object3D(), pq = new THREE.Quaternion(), tq = new THREE.Quaternion();
-var viewableClipmaps = 0;
+        var viewableClipmaps = 0;
         me.update = function () {
             logText = '';
 //            delta += clock.getDelta();
 
 //            if (delta >= .1) {
-            if (true) {
 
-                tMesh = me.obj.clone();
-/*
-                tMesh.position.copy(me.obj.position);
-                tMesh.rotation.copy(me.obj.rotation);
-                tMesh.quaternion.copy(me.obj.quaternion);
-                tMesh.parent = me.obj.parent;
-                tMesh.rotation.order = me.obj.rotation.order;
-                tMesh.scale.copy(me.obj.scale);
-                tMesh.matrix.copy(me.obj.matrix);
-                tMesh.matrixWorld.copy(me.obj.matrixWorld);
-*/
-                tMesh.position = tMesh.localToWorld(tMesh.position);
-                tMesh.position.z -= radius;
-                tMesh.updateMatrixWorld(false);
+//            tMesh = me.obj.clone();
+            tMesh.position.copy(me.obj.position);
+            tMesh.rotation.copy(me.obj.rotation);
+            tMesh.quaternion.copy(me.obj.quaternion);
+            tMesh.parent = me.obj.parent;
+            tMesh.rotation.order = me.obj.rotation.order;
+            tMesh.scale.copy(me.obj.scale);
+            tMesh.matrix.copy(me.obj.matrix);
+            tMesh.matrixWorld.copy(me.obj.matrixWorld);
+            tMesh.position = tMesh.localToWorld(tMesh.position);
+            tMesh.position.z -= radius;
+            tMesh.updateMatrixWorld(false);
 
-                localCam.x = camera.position.x;
-                localCam.y = camera.position.y;
-                localCam.z = camera.position.z;
+            localCam.x = camera.position.x;
+            localCam.y = camera.position.y;
+            localCam.z = camera.position.z;
 
-                tMesh.worldToLocal(localCam);
-                cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
+            tMesh.worldToLocal(localCam);
+            cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
 
-                getTheta(localCam.x, localCam.y, localCam.z);
-                getPhi(localCam.z);
+            getTheta(localCam.x, localCam.y, localCam.z);
+            getPhi(localCam.z);
 
-                getHeightLock(cameraDistance);
-                minTheta = getMinTheta(radius, heightLock);
-                maxTheta = getMaxTheta(radius, heightLock);
-                getPhiLock();
-                getThetaLock();
+            getHeightLock(cameraDistance);
+            minTheta = getMinTheta(radius, heightLock);
+            maxTheta = getMaxTheta(radius, heightLock);
+            getPhiLock();
+            getThetaLock();
+            /*
+             if (oldHeightLock != heightLock || oldPhiLock != phiLock || oldThetaLock != thetaLock) {
+             oldHeightLock = heightLock;
+             oldPhiLock = phiLock;
+             oldThetaLock = thetaLock;
+             */
+            if (oldHeightLock != cameraDistance || oldPhiLock != phi || oldThetaLock != theta) {
+                oldHeightLock = cameraDistance;
+                oldPhiLock = phi;
+                oldThetaLock = theta;
 
-                if (oldHeightLock != heightLock || oldPhiLock != phiLock || oldThetaLock != thetaLock) {
-                    oldHeightLock = heightLock;
-                    oldPhiLock = phiLock;
-                    oldThetaLock = thetaLock;
-
-                    pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phiLock);
-                    tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - thetaLock);
-                    tq.multiply(pq);
-                    updateClipMaps(tq);
+                pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phi);
+                tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - theta);
+                tq.multiply(pq);
+                updateClipMaps(tq, phi, theta);
 //                    var m = new THREE.Matrix4();
 //                    var p = new THREE.Vector3();
 //                    m.lookAt(localCam, p, new THREE.Vector3(0, 1, 0));
 //                    var tr = m.decompose()[ 1 ].inverse();
 //                    updateClipMaps(heightLock, tr, phi, theta);
-                    log('height', cameraDistance);
-                    log('heightLock', heightLock);
-                    log('phiSteps', Math.PI * 2 / minTheta);
-                    log('phiLock', phiLock);
-                    log("phi", phi);
-                    log('thetaSteps', Math.PI / minTheta);
-                    log('thetaLock', thetaLock);
-                    log("theta", theta);
-                    log("planetpos", me.obj.position);
-                    log("adjusted planetpos", tMesh.position);
-                    log('radius', radius);
-                    log("actualcam", camera.position);
-                    log("localcam", localCam);
-                    log('minTheta', minTheta);
-                    log('maxTheta', maxTheta);
-                    log('clipMapCount', clipMapCount + 1);
-                    log('clipMap in View', viewableClipmaps);
-                    $('#info').html(logText);
-                }
-                delta = 0;
+                log('height', cameraDistance);
+                log('heightLock', heightLock);
+                log('phiSteps', Math.PI * 2 / minTheta);
+                log('phiLock', phiLock);
+                log("phi", phi);
+                log('thetaSteps', Math.PI / minTheta);
+                log('thetaLock', thetaLock);
+                log("theta", theta);
+                log("planetpos", me.obj.position);
+                log("adjusted planetpos", tMesh.position);
+                log('radius', radius);
+                log("actualcam", camera.position);
+                log("localcam", localCam);
+                log('minTheta', minTheta);
+                log('maxTheta', maxTheta);
+                log('clipMapCount', clipMapCount + 1);
+                log('clipMap in View', viewableClipmaps);
+                $('#info').html(logText);
             }
+            delta = 0;
         };
 
         function getPhiLock() {
@@ -227,19 +229,17 @@ var viewableClipmaps = 0;
          *
          */
 
-        function updateClipMaps(rotate) {
+        function updateClipMaps(rotate, phi, theta) {
             //min theta planet pixel size / radius i minimum theta
             //max theta
             viewableClipmaps = 0;
             for (var i = 0; i < clipMapCount; i++) {
                 if (clipMaps[i].mesh.visible === false) {
                     if (clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta) {
-//                        me.obj.add(clipMaps[i].mesh);
                         clipMaps[i].mesh.visible = true;
                     }
                 } else {
                     if (clipMaps[i].theta < minTheta || clipMaps[i].theta > maxTheta) {
-//                        me.obj.remove(clipMaps[i].mesh);
                         clipMaps[i].mesh.visible = false;
                         continue;
                     }
@@ -253,25 +253,32 @@ var viewableClipmaps = 0;
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i < 1) {
+                    if (i < 7) {
                         viewableClipmaps++;
-                        clipMaps[i].material.uniforms.texture.value = textureProvider.getTexture(scaledPI[i], phiLock, thetaLock);
-                        clipMaps[i].material.uniforms.phi.value = phiLock;
-                        clipMaps[i].material.uniforms.theta.value = thetaLock;
-                        if(theta <= halfPI){
-                            clipMaps[i].material.uniforms.mTheta.value = halfPI - thetaLock;
-                        }else{
-                            clipMaps[i].material.uniforms.mTheta.value = thetaLock - halfPI;
-                        }
+                        var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
+                        clipMaps[i].material.uniforms.texture.value = tpResult[0];
+                        clipMaps[i].material.uniforms.phi.value = phi;
+                        clipMaps[i].material.uniforms.theta.value = theta;
+                        clipMaps[i].material.uniforms.left.value = tpResult[1]['left'];
+                        clipMaps[i].material.uniforms.right.value = tpResult[1]['right'];
+                        clipMaps[i].material.uniforms.top.value = tpResult[1]['top'];
+                        clipMaps[i].material.uniforms.bottom.value = tpResult[1]['bottom'];
+
+                        clipMaps[i].material.uniforms.xn.value = (0 - 1) / (tpResult[1]['left'] - tpResult[1]['right']);
+                        clipMaps[i].material.uniforms.xm.value = -tpResult[1]['left'] * clipMaps[i].material.uniforms.xn.value;
+                        clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult[1]['bottom'] - tpResult[1]['top']);
+                        clipMaps[i].material.uniforms.ym.value = -tpResult[1]['bottom'] * clipMaps[i].material.uniforms.yn.value;
+
                     }
                 }
             }
-            updatePlane(textureProvider.getTexture(scaledPI[0], phiLock, thetaLock), 0);
-            updatePlane(textureProvider.getTexture(scaledPI[1], phiLock, thetaLock), 1);
-            updatePlane(textureProvider.getTexture(scaledPI[2], phiLock, thetaLock), 2);
             /*
+            updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta)[0], 0);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta)[0], 1);
+            updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta)[0], 2);
             */
         }
+/*
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
         var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
@@ -295,7 +302,7 @@ var viewableClipmaps = 0;
         function updatePlane(text, i) {
             plane[i].material.map = text;
         }
-
+*/
         function initClipMaps() {
 
             clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime
@@ -342,9 +349,30 @@ var viewableClipmaps = 0;
                             type: "f",
                             value: 0
                         },
-                        mTheta:{
+                        left: {
                             type: "f"
-                        }
+                        },
+                        right: {
+                            type: "f"
+                        },
+                        top: {
+                            type: "f"
+                        },
+                        bottom: {
+                            type: "f"
+                        },
+                        xn: {
+                            type: "f"
+                        },
+                        xm: {
+                            type: "f"
+                        },
+                        yn: {
+                            type: "f"
+                        },
+                        ym: {
+                            type: "f"
+                        },
                     },
 
                     vertexShader: vertexShader,

@@ -52,6 +52,18 @@ define(function (require, exports, module) {
                 phi: {
                     type: "f"
                 },
+                xn: {
+                    type: "f"
+                },
+                xm: {
+                    type: "f"
+                },
+                yn: {
+                    type: "f"
+                },
+                ym: {
+                    type: "f"
+                },
                 rx: {
                     type: "f",
                     value: rx / 2
@@ -94,44 +106,47 @@ define(function (require, exports, module) {
 
             if (!heightMaps[scaledPI])
                 heightMaps[scaledPI] = new THREE.WebGLRenderTarget(rx, ry, pars);
+            var params = {};
 
-            if (theta - scaledPI < 0) {
+            if (theta - scaledPI <= 0) {
                 left = phi - Math.PI;
                 right = phi + Math.PI;
                 top = 0;
                 bottom = theta + scaledPI;
-            } else if (theta + scaledPI > Math.PI) {
+            } else if (theta + scaledPI >= Math.PI) {
                 left = phi - Math.PI;
                 right  = phi + Math.PI;
                 top = theta - scaledPI;
                 bottom = Math.PI;
-            } else if (theta < Math.PI / 2) {
-                left = phi - (scaledPI / (1 - Math.cos(theta - scaledPI)));
-                right = phi + (scaledPI / (1 - Math.cos(theta - scaledPI)));
+            } else if (theta <= Math.PI / 2) {
+                var mscaled = scaledPI / (1 - Math.cos(theta - scaledPI));
+                mscaled = mscaled > Math.PI ? Math.PI : mscaled;
+                left = phi - mscaled;
+                right = phi + mscaled;
                 top = theta - scaledPI;
                 bottom = theta + scaledPI;
-            } else if (theta > Math.PI / 2) {
-                left = phi - (scaledPI / (1 - Math.cos(theta + scaledPI)));
-                right = phi + (scaledPI / (1 - Math.cos(theta + scaledPI)));
-                top = theta - scaledPI;
-                bottom = theta + scaledPI;
-            }else{
-                left = phi - scaledPI;
-                right = phi + scaledPI;
+            } else if (theta >= Math.PI / 2) {
+                var mscaled = scaledPI / (1 + Math.cos(theta + scaledPI));
+                mscaled = mscaled > Math.PI ? Math.PI : mscaled;
+                left = phi - mscaled;
+                right = phi + mscaled;
                 top = theta - scaledPI;
                 bottom = theta + scaledPI;
             }
 
+            quadTarget.material.uniforms.xn.value = params['xn'] = (left - right) / (-rx/2 - rx/2);
+            quadTarget.material.uniforms.xm.value = params['xm'] = left - (-rx/2 * quadTarget.material.uniforms.xn.value );
+            quadTarget.material.uniforms.yn.value = params['yn'] = (bottom - top) / (-ry/2 - ry/2);
+            quadTarget.material.uniforms.ym.value = params['ym'] = bottom - (-ry/2 * quadTarget.material.uniforms.yn.value );
 
-            quadTarget.material.uniforms.left.value = left;
-            quadTarget.material.uniforms.phi.value = phi;
-            quadTarget.material.uniforms.right.value = right;
-            quadTarget.material.uniforms.top.value = bottom;
-            quadTarget.material.uniforms.bottom.value = top;
+            quadTarget.material.uniforms.left.value = params['left'] = left;
+            quadTarget.material.uniforms.right.value = params['right'] = right;
+            quadTarget.material.uniforms.top.value = params['top'] = top;
+            quadTarget.material.uniforms.bottom.value = params['bottom'] = bottom;
 
             renderer.render(sceneRenderTarget, cameraOrtho, heightMaps[scaledPI], false);
 
-            return heightMaps[scaledPI];
+            return [heightMaps[scaledPI], params];
 
         };
     }

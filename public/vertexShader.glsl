@@ -27,7 +27,14 @@ uniform float scaledPI;
 uniform float radius;
 uniform float phi;
 uniform float theta;
-uniform float mTheta;
+uniform float top;
+uniform float bottom;
+uniform float left;
+uniform float right;
+uniform float xn;
+uniform float xm;
+uniform float yn;
+uniform float ym;
 uniform vec4 meshRotation;
 uniform int last;
 varying vec2 vUv;
@@ -76,28 +83,11 @@ void main() {
 
     //First find theta for the pointPosition
     float t = acos(newPosition.y);
-    float n = (0.0 - 1.0 ) / (( theta + scaledPI ) - ( theta - scaledPI));
-    float m = 0.0 - (( theta + scaledPI) * n);
-    t = t * n + m;
-    //float t = acos(circlePointPosition.y);
-    //float n = (0.0 - 1.0 ) / (( halfPI + scaledPI ) - ( halfPI - scaledPI));
-    //float m = 0.0 - (( halfPI + scaledPI) * n);
-    //t = t * n + m;
+    t = t * yn + ym;
 
-    //Then find mercator offset and phi
+    float p = atan(newPosition.x, newPosition.z);
 
-//    float mercatorMod = cos(t);
-//    float mercatorMod = 1.0 - abs(pointPosition.y);
-
-    float p = atan(circlePointPosition.x, circlePointPosition.z);
-
-//    float mscaledPI = (scaledPI) / mercatorMod;
-    //n = (0.0 - 1.0) / (-mscaledPI - mscaledPI);
-    float mul = 1.0;
-    n = (0.0 - 1.0) / (-(scaledPI * mul) - (scaledPI * mul));
-    m = 0.0 - (-(scaledPI * mul) * n);
-    p = p * n + m;
-
+    p = p * xn + xm;
 
     //color = vec4(circlePointPosition.x, pointPosition.y,circlePointPosition.z, 1.0);
 	//color = texture2D(texture, vec2(p, t));

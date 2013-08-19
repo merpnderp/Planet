@@ -135,7 +135,6 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         function render() {
             delta = clock.getDelta();
 //            limiter += delta;
-            controls.update(delta);
             /*
              if (logLimiter % 30 == 0) {
              var r =
@@ -167,12 +166,9 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             camera.position.x = 0;
             camera.position.y = 0;
             camera.position.z = 0;
-            //          }
+            planet.update();
+            controls.update(delta);
 
-            if (limiter < 20) {
-                planet.update();
-//                limiter++;
-            }
         }
 
         render();
