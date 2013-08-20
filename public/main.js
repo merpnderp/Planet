@@ -106,7 +106,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         //       tl.load("explosion.png");
 
-        var planet = new Planet(camera, radius, new THREE.Vector3(), 256, fov, window.innerWidth, renderer);
+        var planet = new Planet(camera, radius, new THREE.Vector3(), 128, fov, window.innerWidth, renderer);
 
         camera.lookAt(planet.obj.position);
 
