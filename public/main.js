@@ -166,7 +166,10 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             camera.position.x = 0;
             camera.position.y = 0;
             camera.position.z = 0;
-            planet.update();
+            if (limiter < 10) {
+                planet.update();
+//                limiter++;
+            }
             controls.update(delta);
 
         }

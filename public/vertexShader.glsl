@@ -95,35 +95,9 @@ void main() {
 
 
 
-//    float xoffset = ( ( atan( normPosition.z / normPosition.x )) + PI / 2.0 ) / PI;   // + scaledPI) / (scaledPI * 2.0) ;
-//n = (c - d) / (a - b), and m = c - a * n,
-//a = -1.57 b = 1.57
-//c = .25 d = .75
-/*
-    float p = atan(pointPosition.x, pointPosition.z);
-    float t = acos(-1.0 * pointPosition.y);
-    n = -1.0 / ( (halfPI - scaledPI) - (halfPI + scaledPI) );
-    m = 0.0 - ((halfPI - scaledPI) * n);
-    float yoffset =  t * n + m;
-
-    float xscaledPI = scaledPI / cos( utheta - PI / 2.0 );
-
-    //float n = -.5 / ( -scaledPI - scaledPI ) ;
-    float n = -.5 / ( -xscaledPI - xscaledPI ) ;
-    float m = .25 - (-xscaledPI * n);
-    float xoffset =  ( atan( pointPosition.x, pointPosition.z ) ) * n + m;
-
-//n = (c - d) / (a - b), and m = c - a * n,
-//a = 0 b = 3.14
-//c = 0 d = 1
-
-	color = texture2D(texture, vec2(xoffset, yoffset));
-
-*/
-	//newPosition = newPosition + newNormal * (1.0/color.r)*50000.0;
-
 	//Move point back to its relative position to the mesh
 	newPosition *= radius;
+	newPosition = newPosition + 25000.0 * color.r;
 	newPosition.z -= radius;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }
