@@ -253,28 +253,29 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i < 25) {
+                    if (i < 7) {
                         viewableClipmaps++;
                         var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
-                        clipMaps[i].material.uniforms.texture.value = tpResult[0];
+                        clipMaps[i].material.uniforms.texture.value = tpResult.texture;
                         clipMaps[i].material.uniforms.phi.value = phi;
                         clipMaps[i].material.uniforms.theta.value = theta;
-                        clipMaps[i].material.uniforms.left.value = tpResult[1]['left'];
-                        clipMaps[i].material.uniforms.right.value = tpResult[1]['right'];
-                        clipMaps[i].material.uniforms.top.value = tpResult[1]['top'];
-                        clipMaps[i].material.uniforms.bottom.value = tpResult[1]['bottom'];
+                        clipMaps[i].material.uniforms.left.value = tpResult.params['left'];
+                        clipMaps[i].material.uniforms.right.value = tpResult.params['right'];
+                        clipMaps[i].material.uniforms.top.value = tpResult.params['top'];
+                        clipMaps[i].material.uniforms.bottom.value = tpResult.params['bottom'];
 
-                        clipMaps[i].material.uniforms.xn.value = (0 - 1) / (tpResult[1]['left'] - tpResult[1]['right']);
-                        clipMaps[i].material.uniforms.xm.value = -tpResult[1]['left'] * clipMaps[i].material.uniforms.xn.value;
-                        clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult[1]['bottom'] - tpResult[1]['top']);
-                        clipMaps[i].material.uniforms.ym.value = -tpResult[1]['bottom'] * clipMaps[i].material.uniforms.yn.value;
+                        clipMaps[i].material.uniforms.xn.value = (0 - 1) / (tpResult.params['left'] - tpResult.params['right']);
+                        clipMaps[i].material.uniforms.xm.value = -tpResult.params['left'] * clipMaps[i].material.uniforms.xn.value;
+                        clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult.params['bottom'] - tpResult.params['top']);
+                        clipMaps[i].material.uniforms.ym.value = -tpResult.params['bottom'] * clipMaps[i].material.uniforms.yn.value;
 
                     }
                 }
             }
-            updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta)[0], 0);
-            updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta)[0], 1);
-            updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta)[0], 2);
+
+            updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
+            updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
+            updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
         }
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];

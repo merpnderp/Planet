@@ -50,7 +50,7 @@ void main() {
 	vUv = uv;
 
 	vec3 newPosition = position;
-	
+
 	float pointRotation;
 
 	//Test if this clipmap is a ring or a circle (is it the bottom level)

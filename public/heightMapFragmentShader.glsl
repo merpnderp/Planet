@@ -177,20 +177,10 @@ uniform float ry;
 uniform float radius;
 
 void main() {
-    //scaling formula
-    //n = (c - d) / (a - b), and m = c - a * n,
-    //a = -1.57 b = 1.57
-    //c = .25 d = .75
-
     float p = vposition.x * xn + xm;
     float t = vposition.y * yn + ym;
-
     vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
-
-//    coords *= radius / 100000.0;
-
     float nv = surface( vec4( coords, seed ) );
-
     gl_FragColor = vec4( vec3( nv, nv, nv ), 1.0 );
 
 }
