@@ -233,6 +233,7 @@ define(function (require) {
             //min theta planet pixel size / radius i minimum theta
             //max theta
             viewableClipmaps = 0;
+ //           clipMapCount = 1;
             for (var i = 0; i < clipMapCount; i++) {
                 if (clipMaps[i].mesh.visible === false) {
                     if (clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta) {
@@ -272,11 +273,13 @@ define(function (require) {
                     }
                 }
             }
-
+/*
             updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
             updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
             updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
+            */
         }
+        /*
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
         var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
@@ -300,6 +303,7 @@ define(function (require) {
         function updatePlane(text, i) {
             plane[i].material.map = text;
         }
+        */
         function initClipMaps() {
 
             clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime

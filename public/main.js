@@ -132,28 +132,38 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
         var clock = new THREE.Clock();
         var delta, logLimiter = 0, limiter = 0, t = new THREE.Vector3(0, 0, 0);
 
+        var pause = false;
+
+        $(document).keyup(function (evt) {
+            if (evt.keyCode == 32) {
+                pause = !pause;
+            }
+        }).keydown(function (evt) {
+                if (evt.keyCode == 32) {
+//                        space = true;
+                }
+            });
+
         function render() {
             delta = clock.getDelta();
-/*
-            logLimiter++;
-            if (logLimiter % 30 == 0) {
-                var r =
-                    "programs: " + renderer.info.memory.programs +
-                        "<br />geometries: " + renderer.info.memory.geometries +
-                        "<br />textures: " + renderer.info.memory.textures +
-                        "<br />calls: " + renderer.info.render.calls +
-                        "<br />vertices: " + renderer.info.render.vertices +
-                        "<br />faces: " + renderer.info.render.faces +
-                        "<br />points: " + renderer.info.render.points +
-                        "<br />camera x: " + camera.position.x +
-                        "<br />camera y: " + camera.position.y +
-                        "<br />camera z: " + camera.position.z +
-                        "<br />";
+             logLimiter++;
+             if (logLimiter % 30 == 0) {
+             var r =
+             "programs: " + renderer.info.memory.programs +
+             "<br />geometries: " + renderer.info.memory.geometries +
+             "<br />textures: " + renderer.info.memory.textures +
+             "<br />calls: " + renderer.info.render.calls +
+             "<br />vertices: " + renderer.info.render.vertices +
+             "<br />faces: " + renderer.info.render.faces +
+             "<br />points: " + renderer.info.render.points +
+             "<br />camera x: " + camera.position.x +
+             "<br />camera y: " + camera.position.y +
+             "<br />camera z: " + camera.position.z +
+             "<br />";
 
-                $('#render').html(r);
-                logLimiter = 0;
-            }
-            */
+             $('#render').html(r);
+             logLimiter = 0;
+             }
             renderer.render(scene, camera);
             requestAnimationFrame(render);
             stats.update();
@@ -166,9 +176,8 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
             camera.position.x = 0;
             camera.position.y = 0;
             camera.position.z = 0;
-            if (limiter < 10) {
+            if (!pause) {
                 planet.update();
-                limiter++;
             }
             controls.update(delta);
 
@@ -176,5 +185,6 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         render();
 
-    });
+    })
+;
 

@@ -137,31 +137,6 @@ float surface( vec4 coord ) {
 }
 
 
-
-
-vec3 rotateVector( vec4 quat, vec3 vec ){
-		return vec + 2.0 * cross( cross( vec, quat.xyz ) + quat.w * vec, quat.xyz );
-}
-
-vec4 createQuaternionFromAxisAngle( vec3 axis, float angle ) { 
-		
-		vec4 quat;
-
-		float halfAngle = angle / 2.0;
-		float s = sin( halfAngle );
-		
-		quat.x = axis.x * s;
-		quat.y = axis.y * s;
-		quat.z = axis.z * s;
-		quat.w = cos( halfAngle );
-		
-		return quat;
-
-}
-vec4 qmul(vec4 a, vec4 b) {
-	return vec4(cross(a.xyz,b.xyz) + a.xyz*b.w + b.xyz*a.w, a.w*b.w - dot(a.xyz,b.xyz));
-}
-
 varying vec2 vposition;
 uniform float seed;
 uniform float left;
@@ -182,7 +157,6 @@ void main() {
     vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
     float nv = surface( vec4( coords, seed ) );
     gl_FragColor = vec4( vec3( nv, nv, nv ), 1.0 );
-
 }
 
 
