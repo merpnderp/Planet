@@ -1,24 +1,30 @@
 requirejs.config({
     baseUrl: '/',
+    paths: {
+        jquery: 'lib/jquery',
+        three: 'lib/three',
+        flycontrols: 'lib/flycontrols',
+        stats: 'lib/stats'
+    },
     shim: {
-        'lib/jquery': {
+        'jquery': {
             exports: '$'
         },
-        'lib/flycontrols': {
-            deps: ['lib/three'],
+        'flycontrols': {
+            deps: ['three'],
             exports: 'FlyControls'
         },
-        'lib/stats': {
+        'stats': {
             exports: 'Stats'
         },
-        'lib/three': {
+        'three': {
             exports: 'THREE'
         }
     }
 });
 
 
-requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'],
+requirejs(['jquery', 'stats', 'three', './Planet', 'flycontrols'],
     function ($, Stats, THREE, Planet) {
         "use strict";
 
@@ -106,7 +112,7 @@ requirejs(['lib/jquery', 'lib/stats', 'lib/three', './Planet', 'lib/flycontrols'
 
         //       tl.load("explosion.png");
 
-        var planet = new Planet(camera, radius, new THREE.Vector3(), 128, fov, window.innerWidth, renderer);
+        var planet = new Planet(camera, radius, new THREE.Vector3(), 256, fov, window.innerWidth, renderer);
 
         camera.lookAt(planet.obj.position);
 

@@ -5,9 +5,10 @@ var tau = Math.PI * 2;
 define(function (require) {
     'use strict';
 
-    var THREE = require('lib/three');
-    var $ = require('lib/jquery');
+    var THREE = require('three');
+    var $ = require('jquery');
     var TextureProvider = require('./TextureProvider');
+    var Debug = require('./debug');
 
     return function (_camera, _radius, _position, _segments, _fov, _screenWidth, renderer) {
 
@@ -34,8 +35,8 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
+//        var textureProvider = new TextureProvider(renderer, radius, 1024, 512, 42);
         var textureProvider = new TextureProvider(renderer, radius, 256, 128, 42);
-//        var textureProvider = new TextureProvider(renderer, radius, 96, 48, 42);
 
         var screenWidth = _screenWidth || 768;
         //tan of fov/screenWidth is first half of pixel size on planet calc
@@ -260,26 +261,21 @@ define(function (require) {
                         clipMaps[i].material.uniforms.texture.value = tpResult.texture;
                         clipMaps[i].material.uniforms.phi.value = phi;
                         clipMaps[i].material.uniforms.theta.value = theta;
-                        clipMaps[i].material.uniforms.left.value = tpResult.params['left'];
-                        clipMaps[i].material.uniforms.right.value = tpResult.params['right'];
                         clipMaps[i].material.uniforms.top.value = tpResult.params['top'];
                         clipMaps[i].material.uniforms.bottom.value = tpResult.params['bottom'];
 
-                        clipMaps[i].material.uniforms.xn.value = (0 - 1) / (tpResult.params['left'] - tpResult.params['right']);
-                        clipMaps[i].material.uniforms.xm.value = -tpResult.params['left'] * clipMaps[i].material.uniforms.xn.value;
                         clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult.params['bottom'] - tpResult.params['top']);
                         clipMaps[i].material.uniforms.ym.value = -tpResult.params['bottom'] * clipMaps[i].material.uniforms.yn.value;
 
                     }
                 }
             }
-/*
             updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
             updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
             updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
+            /*
             */
         }
-        /*
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
         var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
@@ -303,6 +299,7 @@ define(function (require) {
         function updatePlane(text, i) {
             plane[i].material.map = text;
         }
+        /*
         */
         function initClipMaps() {
 
@@ -360,12 +357,6 @@ define(function (require) {
                             type: "f"
                         },
                         bottom: {
-                            type: "f"
-                        },
-                        xn: {
-                            type: "f"
-                        },
-                        xm: {
                             type: "f"
                         },
                         yn: {

@@ -31,8 +31,6 @@ uniform float top;
 uniform float bottom;
 uniform float left;
 uniform float right;
-uniform float xn;
-uniform float xm;
 uniform float yn;
 uniform float ym;
 uniform vec4 meshRotation;
@@ -83,11 +81,19 @@ void main() {
 
     //First find theta for the pointPosition
     float t = acos(newPosition.y);
-    t = t * yn + ym;
 
     float p = atan(newPosition.x, newPosition.z);
 
+    float mscaled = scaledPI / (1.0 - abs(cos(t)));
+    mscaled = mscaled < PI ? mscaled : PI;
+
+    float left = phi - mscaled;
+    float right = phi + mscaled;
+    float xn = (0.0 - 1.0) / (left - right);
+    float xm = -left * xn;
     p = p * xn + xm;
+
+    t = t * yn + ym;
 
     //color = vec4(circlePointPosition.x, pointPosition.y,circlePointPosition.z, 1.0);
 	//color = texture2D(texture, vec2(p, t));
