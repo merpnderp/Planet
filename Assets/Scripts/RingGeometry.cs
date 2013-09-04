@@ -1,15 +1,13 @@
 /**
  * @author Kaleb Murphy
  */
-
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
-public class RingGeometry  {
-
-	
-	static public Mesh CreateRingGeometry (int innerRadius, int outerRadius, int thetaSegments, int phiSegments, int thetaStart, int thetaLength)
+public class RingGeometry
+{
+	static public Mesh CreateRingGeometry (int innerRadius, int outerRadius, int thetaSegments, 
+		int phiSegments, int thetaStart, int thetaLength)
 	{
 		Mesh mesh = new Mesh ();
 		

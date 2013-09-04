@@ -9,6 +9,8 @@ public class ClipMap : MonoBehaviour {
 	public bool visible = false;	
 	public float theta;
 	public Quaternion rotate;
+	public int zoomLevel;
+		
 	
 	public void Init (float _scaledPI, int _radius)
 	{
