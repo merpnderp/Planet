@@ -7,14 +7,13 @@ public class Planet : MonoBehaviour
 	static float halfPI = Mathf.PI / 2f;
 	static float quarterPI = Mathf.PI / 4f;
 	
-//	public Camera camera;
 	public int radius = 6353000;
 	public int segments = 64;
 	public int screenWidth = Screen.width;
 	public int minHeight = 2;
 	public float fov = 30f;
 	public float smallestTheta;
-	public ClipMap clipMapPrefab;
+	public GameObject clipMapPrefab;
 	public float ClipMapUpdateSpeed = .1f;
 	
 	private Camera playerCamera;
@@ -26,9 +25,14 @@ public class Planet : MonoBehaviour
 	private float delta = 0;
 	private float oldHeightLock = 0, oldPhiLock = 0, oldThetaLock = 0;
 	
+	private Mesh ringGeo;
+		
+	
 	// Use this for initialization
 	public void Init (Camera _camera, int _radius, Vector3 _position, int _segments, int _fov)
 	{
+		ringGeo	= RingGeometry.CreateRingGeometry(.000001f, 1f, segments, segments, 0f, Mathf.PI * 2f);
+		
 		playerCamera = GameObject.FindWithTag ("MainCamera").GetComponent<Camera>();
 		
 		fov = _fov == 0 ? _fov : fov;
@@ -129,12 +133,11 @@ public class Planet : MonoBehaviour
 		for (int i = 0; i < clipMapCount; i++) {
 			scale = (1 / Mathf.Pow (2, i + 1));
 			scaledPI [i] = Mathf.PI / 2 * scale;
-			clipMaps [i] = (ClipMap)Instantiate (clipMapPrefab);
+			clipMaps [i] = (ClipMapPrefab)Instantiate (clipMapPrefab);
 			clipMaps [i].Init (scaledPI [i], radius);
 			clipMaps [i].theta = t;
 			t /= 2f;
 		}
-		
 	}
 	
 	private void setClipMapCount ()

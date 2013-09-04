@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 public class RingGeometry
 {
-	static public Mesh CreateRingGeometry (int innerRadius, int outerRadius, int thetaSegments, 
-		int phiSegments, int thetaStart, int thetaLength)
+	static public Mesh CreateRingGeometry (float innerRadius, float outerRadius, int thetaSegments, 
+		int phiSegments, float thetaStart, float thetaLength)
 	{
 		Mesh mesh = new Mesh ();
 		
@@ -20,8 +20,11 @@ public class RingGeometry
 		
 		thetaSegments = thetaSegments == 0 ? Mathf.Max (3, thetaSegments) : 8;
 		phiSegments = phiSegments == 0 ? Mathf.Max (3, phiSegments) : 8;
+
+		float radius = innerRadius; 	
+		float radiusStep = ((outerRadius - innerRadius) / phiSegments);
 		
-		int i, o, radius = innerRadius, radiusStep = ((outerRadius - innerRadius) / phiSegments);
+		int i, o; 
 
 		List<Vector2> uvs = new List<Vector2> (); 
 		
