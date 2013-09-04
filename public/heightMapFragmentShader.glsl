@@ -150,30 +150,29 @@ uniform float radius;
 
 const float PI = 3.141592653589793238462643383;
 
-float left;
-float right;
-float mscaled;
-float xn;
-float xm;
-
 void main() {
+    float left;
+    float right;
+
     float t = vposition.y * yn + ym;
 
-    if(t <= 0.0 || t >= PI){
+/*    if(t <= 0.0 || t >= PI){
         left = phi - PI;
         right = phi + PI;
     }else{
-        mscaled = scaledPI / (1.0 - abs(cos(t)));
+    */
+        float mscaled = scaledPI / (1.0 - abs(cos(t)));
         mscaled = mscaled < PI ? mscaled : PI;
         left = phi - mscaled;
         right = phi + mscaled;
-    }
+    //}
 
-    xn = (left - right) / ((-rx / 2.0) - (rx / 2.0));
-    xm = left - ((-rx/2.0) * xn);
+    float xn = (left - right) / ((-rx / 2.0) - (rx / 2.0));
+    float xm = left - ((-rx/2.0) * xn);
     float p = vposition.x * xn + xm;
 
     vec3 coords = vec3( sin(p) * sin(t), cos(t), cos(p) * sin(t) );
+//    coords *= radius;
     float nv = surface( vec4( coords, seed ) );
 
     gl_FragColor = vec4( vec3( nv, nv, nv ), 1.0 );

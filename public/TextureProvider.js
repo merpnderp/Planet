@@ -1,5 +1,5 @@
-
 define(function (require, exports, module) {
+
     module.exports = TextureProvider = function (renderer, radius, rx, ry, seed) {
 
         var THREE = require('three');
@@ -33,15 +33,6 @@ define(function (require, exports, module) {
                 radius: {
                     type: "f",
                     value: radius
-                },
-                top: {
-                    type: "f"
-                },
-                bottom: {
-                    type: "f"
-                },
-                phi: {
-                    type: "f"
                 },
                 phi: {
                     type: "f"
@@ -80,19 +71,17 @@ define(function (require, exports, module) {
         var heightMaps = [], left, right, top, bottom;
 
         this.getTexture = function (scaledPI, phi, theta) {
-            return getUnaidedTexture(scaledPI, phi, theta);
-        };
-
-        var getUnaidedTexture = function (scaledPI, phi, theta) {
-
-
-//But anyway, you can conclude by yourself that n = (c - d) / (a - b), and m = c - a * n, so you know how to find both n and m.
-//		var normalMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 
             if (!heightMaps[scaledPI]) {
                 heightMaps[scaledPI] = {};
                 heightMaps[scaledPI].texture = new THREE.WebGLRenderTarget(rx, ry, pars);
             }
+
+            return getUnaidedTexture(scaledPI, phi, theta);
+        };
+
+        var getUnaidedTexture = function (scaledPI, phi, theta) {
+
 
             var params = {};
             if (theta - scaledPI <= 0) {
@@ -106,24 +95,29 @@ define(function (require, exports, module) {
                 bottom = theta + scaledPI;
             }
 
-            //quadTarget.material.uniforms.xn.value = params['xn'] = (left - right) / (-rx / 2 - rx / 2);
-            //quadTarget.material.uniforms.xm.value = params['xm'] = left - (-rx / 2 * quadTarget.material.uniforms.xn.value );
-
-            quadTarget.material.uniforms.phi.value = phi;
-            quadTarget.material.uniforms.theta.value = theta;
-            quadTarget.material.uniforms.scaledPI.value = scaledPI;
+            quadTarget.material.uniforms.phi.value = params['phi'] = phi;
+            quadTarget.material.uniforms.theta.value = params['theta'] = theta;
+            quadTarget.material.uniforms.scaledPI.value = params['scaledPI'] = scaledPI;
 
             quadTarget.material.uniforms.yn.value = params['yn'] = (bottom - top) / (-ry / 2 - ry / 2);
             quadTarget.material.uniforms.ym.value = params['ym'] = bottom - (-ry / 2 * quadTarget.material.uniforms.yn.value );
 
-            quadTarget.material.uniforms.top.value = params['top'] = top;
-            quadTarget.material.uniforms.bottom.value = params['bottom'] = bottom;
+            params['top'] = top;
+            params['bottom'] = bottom;
 
             renderer.render(sceneRenderTarget, cameraOrtho, heightMaps[scaledPI].texture, false);
 
             heightMaps[scaledPI].params = params;
 
             return heightMaps[scaledPI];
+
+        };
+
+        var getTextureFromParent = function (scaledPI, phi, theta, parentTexture) {
+
+        };
+
+        var getTextureFromParentAndSibling = function (scaledPI, phi, theta, parentHeightMap, siblingHeightMap) {
 
         };
     }

@@ -8,7 +8,6 @@ define(function (require) {
     var THREE = require('three');
     var $ = require('jquery');
     var TextureProvider = require('./TextureProvider');
-    var Debug = require('./debug');
 
     return function (_camera, _radius, _position, _segments, _fov, _screenWidth, renderer) {
 
@@ -23,10 +22,6 @@ define(function (require) {
         me.obj = new THREE.Object3D();
         me.obj.position = _position || new THREE.Vector3();
 
-//trying to solve clipping issue.
-//	var placeHolder = new THREE.Mesh( new THREE.SphereGeometry( radius * 1.3 ) );
-//	placeHolder.position.z -= radius;
-//	me.obj.add( placeHolder );
 
         var camera = _camera;
         var radius = _radius || 6353000;
@@ -35,10 +30,10 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-//        var textureProvider = new TextureProvider(renderer, radius, 1024, 512, 42);
-        var textureProvider = new TextureProvider(renderer, radius, 256, 128, 42);
+        var textureProvider = new TextureProvider(renderer, radius, 128, 56, 42);
 
         var screenWidth = _screenWidth || 768;
+
         //tan of fov/screenWidth is first half of pixel size on planet calc
         var vs = Math.tan(fov / screenWidth);
 
@@ -89,14 +84,14 @@ define(function (require) {
 //            if (delta >= .1) {
 
 //            tMesh = me.obj.clone();
+
+            tMesh.up.copy(me.obj.up);
             tMesh.position.copy(me.obj.position);
-            tMesh.rotation.copy(me.obj.rotation);
             tMesh.quaternion.copy(me.obj.quaternion);
-            tMesh.parent = me.obj.parent;
-            tMesh.rotation.order = me.obj.rotation.order;
             tMesh.scale.copy(me.obj.scale);
             tMesh.matrix.copy(me.obj.matrix);
             tMesh.matrixWorld.copy(me.obj.matrixWorld);
+
             tMesh.position = tMesh.localToWorld(tMesh.position);
             tMesh.position.z -= radius;
             tMesh.updateMatrixWorld(false);
@@ -234,7 +229,7 @@ define(function (require) {
             //min theta planet pixel size / radius i minimum theta
             //max theta
             viewableClipmaps = 0;
- //           clipMapCount = 1;
+            //           clipMapCount = 1;
             for (var i = 0; i < clipMapCount; i++) {
                 if (clipMaps[i].mesh.visible === false) {
                     if (clipMaps[i].theta < maxTheta && clipMaps[i].theta > minTheta) {
@@ -255,42 +250,42 @@ define(function (require) {
                     } else {
                         clipMaps[i].material.uniforms.last.value = 0;
                     }
-                    if (i < 7) {
-                        viewableClipmaps++;
-                        var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
-                        clipMaps[i].material.uniforms.texture.value = tpResult.texture;
-                        clipMaps[i].material.uniforms.phi.value = phi;
-                        clipMaps[i].material.uniforms.theta.value = theta;
-                        clipMaps[i].material.uniforms.top.value = tpResult.params['top'];
-                        clipMaps[i].material.uniforms.bottom.value = tpResult.params['bottom'];
+                    viewableClipmaps++;
+                    var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
+                    clipMaps[i].material.uniforms.texture.value = tpResult.texture;
+                    clipMaps[i].material.uniforms.phi.value = phi;
+                    clipMaps[i].material.uniforms.theta.value = theta;
+                    clipMaps[i].material.uniforms.top.value = tpResult.params['top'];
+                    clipMaps[i].material.uniforms.bottom.value = tpResult.params['bottom'];
 
-                        clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult.params['bottom'] - tpResult.params['top']);
-                        clipMaps[i].material.uniforms.ym.value = -tpResult.params['bottom'] * clipMaps[i].material.uniforms.yn.value;
+                    clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult.params['bottom'] - tpResult.params['top']);
+                    clipMaps[i].material.uniforms.ym.value = -tpResult.params['bottom'] * clipMaps[i].material.uniforms.yn.value;
 
-                    }
                 }
             }
+            /*
             updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
             updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
             updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
-            /*
-            */
+             */
         }
+
+        /*
         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         var plane = [];
         var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
-        plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
+        plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
         plane[0].position.z = -1000;
         plane[0].position.x = xo;
         plane[0].position.y = start;
         camera.add(plane[0]);
-        plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
+        plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
         plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[1].position.z = -1000;
         plane[1].position.x = xo;
         plane[1].position.y = start - py;
         camera.add(plane[1]);
-        plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, px, py), pmat);
+        plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
         plane[2].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
         plane[2].position.z = -1000;
         plane[2].position.x = xo;
@@ -299,8 +294,8 @@ define(function (require) {
         function updatePlane(text, i) {
             plane[i].material.map = text;
         }
-        /*
-        */
+
+         */
         function initClipMaps() {
 
             clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime

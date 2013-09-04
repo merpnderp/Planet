@@ -97,13 +97,18 @@ void main() {
 
     //color = vec4(circlePointPosition.x, pointPosition.y,circlePointPosition.z, 1.0);
 	//color = texture2D(texture, vec2(p, t));
-	color = texture2D(texture, vec2(p, t));
+	if(position.x < .01 && position.x > -.01 && position.y < .01 && position.y > -.01){
+    	color = vec4(0,0,0,1);
+	}
+	else{
+	    color = texture2D(texture, vec2(p, t));
+	}
 
 
 
 	//Move point back to its relative position to the mesh
 	newPosition *= radius;
-	newPosition = newPosition + 25000.0 * color.r;
+	newPosition = newPosition * (1.0 + color.r / 59.0);
 	newPosition.z -= radius;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }
