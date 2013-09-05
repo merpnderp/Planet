@@ -39,17 +39,6 @@ define(function (require) {
 
         var smallestTheta;
 
-        function findClipMapCount() {
-            smallestTheta = getMinTheta(radius, 2);//smallest theta is 2 units of height
-            var i = 0;
-            var theta = 100;
-            while (theta > smallestTheta) {
-                i++;
-                theta = (1 / Math.pow(2, i) ) * Math.PI;
-            }
-            var min = 21;
-            return i < min ? i : min;
-        }
 
         //Don't respond to update unless init has completed
 
@@ -59,9 +48,11 @@ define(function (require) {
 
         var clipMapCount = findClipMapCount();
 
-        //var circleGeo = new THREE.RingGeometry(.0000001, radius, segments, segments, 0, tau);
-        var circleGeo = new THREE.RingGeometry(.0000001, 1, segments, segments, 0, tau);
+        var circleGeo = new THREE.RingGeometry(.000001, 1, segments, segments, 0, tau);
+        var ringGeo = new THREE.RingGeometry(.5, 1, segments, segments, 0, tau);
+
         circleGeo.boundingSphere = radius * 1.1;
+        ringGeo.boundingSphere = radius * 1.1;
 
         initClipMaps();
 
@@ -242,16 +233,14 @@ define(function (require) {
                     }
                 }
                 if (clipMaps[i].mesh.visible) {
-                    //log('level: ' + i, ' theta:' + clipMaps[i].theta.toFixed(3) + " : scaledPI: " + clipMaps[i].material.uniforms.scaledPI.value.toFixed(3));
-                    clipMaps[i].material.uniforms.meshRotation.value = rotate;
-                    //clipMaps[i].material.uniforms.texture = textureProvider.getTexture( rotate, scaledPI[i] );
-                    if (i + 1 === clipMapCount || clipMaps[i + 1].theta < minTheta) {
-                        clipMaps[i].material.uniforms.last.value = 1;
-                    } else {
-                        clipMaps[i].material.uniforms.last.value = 0;
-                    }
-                    viewableClipmaps++;
                     var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
+                    if (i + 1 === clipMapCount || clipMaps[i + 1].theta < minTheta) {
+                        clipMaps[i].mesh.visible = false;
+                        clipMaps[clipMapCount].material.uniforms.scaledPI.value = scaledPI[i];
+                        i = clipMapCount;
+                    }
+                    clipMaps[i].material.uniforms.meshRotation.value = rotate;
+                    viewableClipmaps++;
                     clipMaps[i].material.uniforms.texture.value = tpResult.texture;
                     clipMaps[i].material.uniforms.phi.value = phi;
                     clipMaps[i].material.uniforms.theta.value = theta;
@@ -302,7 +291,7 @@ define(function (require) {
 
             var t = quarterPI;
             var scale;
-            for (i = 0; i < clipMapCount; i++) {
+            for (i = 0; i <= clipMapCount; i++) {
 
                 scale = ( 1 / Math.pow(2, i) );
                 scaledPI[i] = Math.PI / 2 * scale;
@@ -368,8 +357,13 @@ define(function (require) {
                 });
 
                 clipMaps[i].theta = t;
-                clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
-                clipMaps[i].mesh.visible = false;
+                if(i === clipMapCount){
+                    clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
+                    clipMaps[i].mesh.visible = true;
+                }else{
+                    clipMaps[i].mesh = new THREE.Mesh(ringGeo, clipMaps[i].material);
+                    clipMaps[i].mesh.visible = false;
+                }
 
                 t /= 2;//Each successive clipMap covers half as much theta
                 me.obj.add(clipMaps[i].mesh);
@@ -419,6 +413,18 @@ define(function (require) {
                 logText += s + ": " + t;
             }
             logText += "<br />";
+        }
+
+        function findClipMapCount() {
+            smallestTheta = getMinTheta(radius, 2);//smallest theta is 2 units of height
+            var i = 0;
+            var theta = 100;
+            while (theta > smallestTheta) {
+                i++;
+                theta = (1 / Math.pow(2, i) ) * Math.PI;
+            }
+            var min = 21;
+            return i < min ? i : min;
         }
     };
 });
