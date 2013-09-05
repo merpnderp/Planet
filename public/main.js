@@ -4,7 +4,8 @@ requirejs.config({
         jquery: 'lib/jquery',
         three: 'lib/three',
         flycontrols: 'lib/flycontrols',
-        stats: 'lib/stats'
+        stats: 'lib/stats',
+        text: 'lib/text'
     },
     shim: {
         'jquery': {

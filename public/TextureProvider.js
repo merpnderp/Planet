@@ -4,8 +4,8 @@ define(function (require, exports, module) {
 
         var THREE = require('three');
 
-        var vertexShader = require('text!heightMapVertexShader.glsl');
-        var fragmentShader = require('text!heightMapFragmentShader.glsl');
+        var vertexShader = require('text!shaders/heightMapVertexShader.glsl');
+        var fragmentShader = require('text!shaders/heightMapFragmentShader.glsl');
 
         var quadTarget;
         var cameraOrtho, sceneRenderTarget = new THREE.Scene();

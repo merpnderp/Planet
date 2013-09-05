@@ -42,8 +42,8 @@ define(function (require) {
 
         //Don't respond to update unless init has completed
 
-        var fragmentShader = require('text!fragmentShader.glsl');
-        var vertexShader = require('text!vertexShader.glsl');
+        var fragmentShader = require('text!shaders/fragmentShader.glsl');
+        var vertexShader = require('text!shaders/vertexShader.glsl');
 
 
         var clipMapCount = findClipMapCount();
