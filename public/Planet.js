@@ -30,7 +30,7 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-        var textureProvider = new TextureProvider(renderer, radius, 128, 56, 42);
+        var textureProvider = new TextureProvider(renderer, radius, 128, 64, 42);
 
         var screenWidth = _screenWidth || 768;
 
@@ -48,7 +48,7 @@ define(function (require) {
 
         var clipMapCount = findClipMapCount();
 
-        var circleGeo = new THREE.RingGeometry(.000001, 1, segments, segments, 0, tau);
+        var circleGeo = new THREE.RingGeometry(0, 1, segments*2, segments*2, 0, tau);
         var ringGeo = new THREE.RingGeometry(.5, 1, segments, segments, 0, tau);
 
         circleGeo.boundingSphere = radius * 1.1;
@@ -97,11 +97,15 @@ define(function (require) {
             getTheta(localCam.x, localCam.y, localCam.z);
             getPhi(localCam.z);
 
-            getHeightLock(cameraDistance);
-            minTheta = getMinTheta(radius, heightLock);
-            maxTheta = getMaxTheta(radius, heightLock);
-            getPhiLock();
-            getThetaLock();
+            /*
+             getHeightLock(cameraDistance);
+             minTheta = getMinTheta(radius, heightLock);
+             maxTheta = getMaxTheta(radius, heightLock);
+             */
+            minTheta = getMinTheta(radius, cameraDistance);
+            maxTheta = getMaxTheta(radius, cameraDistance);
+//            getPhiLock();
+//            getThetaLock();
             /*
              if (oldHeightLock != heightLock || oldPhiLock != phiLock || oldThetaLock != thetaLock) {
              oldHeightLock = heightLock;
@@ -112,7 +116,6 @@ define(function (require) {
                 oldHeightLock = cameraDistance;
                 oldPhiLock = phi;
                 oldThetaLock = theta;
-
                 pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phi);
                 tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - theta);
                 tq.multiply(pq);
@@ -253,36 +256,36 @@ define(function (require) {
                 }
             }
             /*
-            updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
-            updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
-            updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
+             updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
+             updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
+             updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
              */
         }
 
         /*
-        var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
-        var plane = [];
-        var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
-        plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
-        plane[0].position.z = -1000;
-        plane[0].position.x = xo;
-        plane[0].position.y = start;
-        camera.add(plane[0]);
-        plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
-        plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
-        plane[1].position.z = -1000;
-        plane[1].position.x = xo;
-        plane[1].position.y = start - py;
-        camera.add(plane[1]);
-        plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
-        plane[2].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
-        plane[2].position.z = -1000;
-        plane[2].position.x = xo;
-        plane[2].position.y = start - py * 2;
-        camera.add(plane[2]);
-        function updatePlane(text, i) {
-            plane[i].material.map = text;
-        }
+         var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
+         var plane = [];
+         var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
+         plane[0] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
+         plane[0].position.z = -1000;
+         plane[0].position.x = xo;
+         plane[0].position.y = start;
+         camera.add(plane[0]);
+         plane[1] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
+         plane[1].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
+         plane[1].position.z = -1000;
+         plane[1].position.x = xo;
+         plane[1].position.y = start - py;
+         camera.add(plane[1]);
+         plane[2] = new THREE.Mesh(new THREE.PlaneGeometry(px, py, 1, 1), pmat);
+         plane[2].material = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
+         plane[2].position.z = -1000;
+         plane[2].position.x = xo;
+         plane[2].position.y = start - py * 2;
+         camera.add(plane[2]);
+         function updatePlane(text, i) {
+         plane[i].material.map = text;
+         }
 
          */
         function initClipMaps() {
@@ -357,10 +360,10 @@ define(function (require) {
                 });
 
                 clipMaps[i].theta = t;
-                if(i === clipMapCount){
+                if (i === clipMapCount) {
                     clipMaps[i].mesh = new THREE.Mesh(circleGeo, clipMaps[i].material);
                     clipMaps[i].mesh.visible = true;
-                }else{
+                } else {
                     clipMaps[i].mesh = new THREE.Mesh(ringGeo, clipMaps[i].material);
                     clipMaps[i].mesh.visible = false;
                 }

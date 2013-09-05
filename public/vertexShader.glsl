@@ -77,7 +77,6 @@ void main() {
 
     //First find theta for the pointPosition
     float t = acos(newPosition.y);
-
     float p = atan(newPosition.x, newPosition.z);
 
     float mscaled = scaledPI / (1.0 - abs(cos(t)));
@@ -91,14 +90,7 @@ void main() {
 
     t = t * yn + ym;
 
-    //color = vec4(circlePointPosition.x, pointPosition.y,circlePointPosition.z, 1.0);
-	//color = texture2D(texture, vec2(p, t));
-	if(position.x < .01 && position.x > -.01 && position.y < .01 && position.y > -.01){
-    	color = vec4(0,0,0,1);
-	}
-	else{
-	    color = texture2D(texture, vec2(p, t));
-	}
+    color = texture2D(texture, vec2(p, t));
 
 
 

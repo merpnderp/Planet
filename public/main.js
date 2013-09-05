@@ -33,7 +33,7 @@ requirejs(['jquery', 'stats', 'three', './Planet', 'flycontrols'],
             mode = 0,
             z = radius * 3,
             //z = 20,
-            clipMapResolution = 64;
+            clipMapResolution = 128;
 
         var stats = new Stats();
         stats.setMode(mode);
