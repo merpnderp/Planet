@@ -161,7 +161,7 @@ void main() {
         right = phi + PI;
     }else{
     */
-        float mscaled = scaledPI / (1.0 - abs(cos(t)));
+        float mscaled = ( scaledPI / (1.0 - abs(cos(t))) ) / 2.0; // divide by 2 because phi goes twice as far as theta
         mscaled = mscaled < PI ? mscaled : PI;
         left = phi - mscaled;
         right = phi + mscaled;

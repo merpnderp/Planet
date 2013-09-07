@@ -30,7 +30,7 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-        var textureProvider = new TextureProvider(renderer, radius, 128, 64, 42);
+        var textureProvider = new TextureProvider(renderer, radius, 128, 56, 48);
 
         var screenWidth = _screenWidth || 768;
 
@@ -48,7 +48,7 @@ define(function (require) {
 
         var clipMapCount = findClipMapCount();
 
-        var circleGeo = new THREE.RingGeometry(0, 1, segments*2, segments*2, 0, tau);
+        var circleGeo = new THREE.RingGeometry(.000001, 1, segments * 2, segments * 2, 0, tau);
         var ringGeo = new THREE.RingGeometry(.5, 1, segments, segments, 0, tau);
 
         circleGeo.boundingSphere = radius * 1.1;
@@ -97,29 +97,29 @@ define(function (require) {
             getTheta(localCam.x, localCam.y, localCam.z);
             getPhi(localCam.z);
 
-            /*
-             getHeightLock(cameraDistance);
-             minTheta = getMinTheta(radius, heightLock);
-             maxTheta = getMaxTheta(radius, heightLock);
-             */
-            minTheta = getMinTheta(radius, cameraDistance);
-            maxTheta = getMaxTheta(radius, cameraDistance);
-//            getPhiLock();
-//            getThetaLock();
-            /*
-             if (oldHeightLock != heightLock || oldPhiLock != phiLock || oldThetaLock != thetaLock) {
-             oldHeightLock = heightLock;
-             oldPhiLock = phiLock;
-             oldThetaLock = thetaLock;
-             */
-            if (oldHeightLock != cameraDistance || oldPhiLock != phi || oldThetaLock != theta) {
-                oldHeightLock = cameraDistance;
-                oldPhiLock = phi;
-                oldThetaLock = theta;
-                pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phi);
-                tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - theta);
+            getHeightLock(cameraDistance);
+            minTheta = getMinTheta(radius, heightLock);
+            maxTheta = getMaxTheta(radius, heightLock);
+//            minTheta = getMinTheta(radius, cameraDistance);
+//            maxTheta = getMaxTheta(radius, cameraDistance);
+            getPhiLock();
+            getThetaLock();
+            if (oldHeightLock != heightLock || oldPhiLock != phiLock || oldThetaLock != thetaLock) {
+//            if(true){
+                oldHeightLock = heightLock;
+                oldPhiLock = phiLock;
+                oldThetaLock = thetaLock;
+                /*            if (oldHeightLock != cameraDistance || oldPhiLock != phi || oldThetaLock != theta) {
+                 oldHeightLock = cameraDistance;
+                 oldPhiLock = phi;
+                 oldThetaLock = theta;
+                 */
+//                pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phi);
+//                tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - theta);
+                pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -phiLock);
+                tq.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (Math.PI / 2 ) - thetaLock);
                 tq.multiply(pq);
-                updateClipMaps(tq, phi, theta);
+                updateClipMaps(tq, phiLock, thetaLock);
 //                    var m = new THREE.Matrix4();
 //                    var p = new THREE.Vector3();
 //                    m.lookAt(localCam, p, new THREE.Vector3(0, 1, 0));
@@ -255,14 +255,11 @@ define(function (require) {
 
                 }
             }
-            /*
              updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
              updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
              updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
-             */
         }
 
-        /*
          var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
          var plane = [];
          var px = 256 * 1, py = 128 * 1, start = 170, xo = 400;
@@ -287,7 +284,6 @@ define(function (require) {
          plane[i].material.map = text;
          }
 
-         */
         function initClipMaps() {
 
             clipMaps.length = 0;//empty array of any other clipMaps in case we've been re-init'd runtime
@@ -386,6 +382,7 @@ define(function (require) {
 
         function getMinTheta(radius, height) {
             var lt = ( (height * vs) / radius ) * segments;//multiply by segments because this is theta per triangle
+       //     var lt = 200.5 * height / radius;
             lt = lt < quarterPI ? lt : quarterPI;
             return lt < 0 ? smallestTheta : lt;
         }

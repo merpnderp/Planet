@@ -93,7 +93,6 @@ void main() {
     color = texture2D(texture, vec2(p, t));
 
 
-
 	//Move point back to its relative position to the mesh
 	newPosition *= radius;
 	newPosition = newPosition * (1.0 + color.r / 59.0);
