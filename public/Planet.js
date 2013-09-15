@@ -30,7 +30,7 @@ define(function (require) {
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
 
-        var textureProvider = new TextureProvider(renderer, radius, 128, 56, 48);
+        var textureProvider = new TextureProvider(renderer, radius, 96, 96, 48);
 
         var screenWidth = _screenWidth || 768;
 

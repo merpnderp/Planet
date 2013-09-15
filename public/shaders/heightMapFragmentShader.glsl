@@ -147,6 +147,7 @@ uniform float ym;
 uniform float rx;
 uniform float ry;
 uniform float radius;
+uniform float phiDiv;
 
 const float PI = 3.141592653589793238462643383;
 
@@ -161,7 +162,8 @@ void main() {
         right = phi + PI;
     }else{
     */
-        float mscaled = ( scaledPI / (1.0 - abs(cos(t))) ) / 2.0; // divide by 2 because phi goes twice as far as theta
+    float mscaled = scaledPI / 2.0;
+        mscaled = ( mscaled / (1.0 - abs(cos(t))) ) ; // divide by 2 because phi goes twice as far as theta
         mscaled = mscaled < PI ? mscaled : PI;
         left = phi - mscaled;
         right = phi + mscaled;

@@ -52,7 +52,11 @@ void main() {
 	float pointRotation;
 
 	//Test if this clipmap is a ring or a circle (is it the bottom level)
-    pointRotation = length( newPosition ) * scaledPI ;
+	if(pow(position.x,2.0) + pow(position.y, 2.0) > .99){
+        pointRotation = length( newPosition ) * scaledPI * 1.01 ;
+	}else{
+        pointRotation = length( newPosition ) * scaledPI ;
+	}
 
 	//Find the normal for the front of the sphere and this point
 	vec3 axis = normalize( cross( front, newPosition ) );

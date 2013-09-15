@@ -37,6 +37,9 @@ define(function (require, exports, module) {
                 phi: {
                     type: "f"
                 },
+                phiDiv: {
+                    type: "f"
+                },
                 theta: {
                     type: "f"
                 },
@@ -96,6 +99,11 @@ define(function (require, exports, module) {
             }
 
             quadTarget.material.uniforms.phi.value = params['phi'] = phi;
+            if(scaledPI > Math.PI / 2.1){
+                quadTarget.material.uniforms.phiDiv.value = 2;
+            }else{
+                quadTarget.material.uniforms.phiDiv.value = 2;
+            }
             quadTarget.material.uniforms.theta.value = params['theta'] = theta;
             quadTarget.material.uniforms.scaledPI.value = params['scaledPI'] = scaledPI;
 
