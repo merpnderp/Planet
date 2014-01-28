@@ -99,7 +99,7 @@ void main() {
 
 	//Move point back to its relative position to the mesh
 	newPosition *= radius;
-	newPosition = newPosition * (1.0 + color.r / 59.0);
+//	newPosition = newPosition * (1.0 + color.r / 59.0);
 	newPosition.z -= radius;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
 }

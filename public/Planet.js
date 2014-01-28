@@ -16,7 +16,6 @@ define(function (require) {
         var scaledPI = [];
 
         var me = this;
-
         renderer = renderer ? renderer : new THREE.WebGLRenderer();
 
         me.obj = new THREE.Object3D();
@@ -26,6 +25,7 @@ define(function (require) {
         var camera = _camera;
         var radius = _radius || 6353000;
         var segments = _segments || 64;
+				this.cameraDistance = radius;
 
         var fov = _fov || 30;
         fov = fov * .0174532925;//Convert to radians
@@ -92,7 +92,7 @@ define(function (require) {
             localCam.z = camera.position.z;
 
             tMesh.worldToLocal(localCam);
-            cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
+            this.cameraDistance = cameraDistance = camera.position.distanceTo(tMesh.position) - radius;
 
             getTheta(localCam.x, localCam.y, localCam.z);
             getPhi(localCam.z);
@@ -236,7 +236,7 @@ define(function (require) {
                     }
                 }
                 if (clipMaps[i].mesh.visible) {
-                    var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
+//                    var tpResult = textureProvider.getTexture(scaledPI[i], phi, theta);
                     if (i + 1 === clipMapCount || clipMaps[i + 1].theta < minTheta) {
                         clipMaps[i].mesh.visible = false;
                         clipMaps[clipMapCount].material.uniforms.scaledPI.value = scaledPI[i];
@@ -244,20 +244,20 @@ define(function (require) {
                     }
                     clipMaps[i].material.uniforms.meshRotation.value = rotate;
                     viewableClipmaps++;
-                    clipMaps[i].material.uniforms.texture.value = tpResult.texture;
+//                    clipMaps[i].material.uniforms.texture.value = tpResult.texture;
                     clipMaps[i].material.uniforms.phi.value = phi;
                     clipMaps[i].material.uniforms.theta.value = theta;
-                    clipMaps[i].material.uniforms.top.value = tpResult.params['top'];
-                    clipMaps[i].material.uniforms.bottom.value = tpResult.params['bottom'];
+//                    clipMaps[i].material.uniforms.top.value = tpResult.params['top'];
+//                    clipMaps[i].material.uniforms.bottom.value = tpResult.params['bottom'];
 
-                    clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult.params['bottom'] - tpResult.params['top']);
-                    clipMaps[i].material.uniforms.ym.value = -tpResult.params['bottom'] * clipMaps[i].material.uniforms.yn.value;
+//                    clipMaps[i].material.uniforms.yn.value = (0 - 1) / (tpResult.params['bottom'] - tpResult.params['top']);
+//                    clipMaps[i].material.uniforms.ym.value = -tpResult.params['bottom'] * clipMaps[i].material.uniforms.yn.value;
 
                 }
             }
-             updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
-             updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
-             updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
+//             updatePlane(textureProvider.getTexture(scaledPI[0], phi, theta).texture, 0);
+//             updatePlane(textureProvider.getTexture(scaledPI[1], phi, theta).texture, 1);
+//             updatePlane(textureProvider.getTexture(scaledPI[2], phi, theta).texture, 2);
         }
 
          var pmat = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('explosion.png')});
@@ -351,7 +351,8 @@ define(function (require) {
                     },
 
                     vertexShader: vertexShader,
-                    fragmentShader: fragmentShader
+                    fragmentShader: fragmentShader,
+										wireframe: true
 
                 });
 

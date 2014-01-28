@@ -59,7 +59,7 @@ requirejs(['jquery', 'stats', 'three', './Planet', 'flycontrols'],
         //    var controls = new THREE.FirstPersonControls(camera);
 
         var controls = new THREE.FlyControls(camera);
-        controls.movementSpeed = (radius  );
+        controls.movementSpeed = (radius);
         controls.domElement = document;
         controls.rollSpeed = Math.PI / 8;
         controls.autoForward = false;
@@ -124,6 +124,7 @@ requirejs(['jquery', 'stats', 'three', './Planet', 'flycontrols'],
             $('#render').html(r);
             logLimiter = 0;
             //           }
+        		controls.movementSpeed = (planet.cameraDistance);
             renderer.render(scene, camera);
             requestAnimationFrame(render);
             stats.update();
