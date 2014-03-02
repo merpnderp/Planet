@@ -24,7 +24,7 @@ define(function (require) {
 
         var camera = _camera;
         var radius = _radius || 6353000;
-        var segments = _segments || 64;
+        var segments = _segments || 32;
 				this.cameraDistance = radius;
 
         var fov = _fov || 30;
