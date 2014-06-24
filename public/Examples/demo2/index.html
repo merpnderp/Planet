@@ -305,11 +305,11 @@ float pnoise(vec3 P, vec3 rep)
 		} );	
 		// create a sphere and assign the material
 		meshl = new THREE.Mesh( 
-			new THREE.SphereGeometry( radius, 200,200, 0, Math.PI/2, 0, Math.PI/2 ), 
+			new THREE.SphereGeometry( radius, 300,300, 0, Math.PI/2, 0, Math.PI ), 
 			material 
 		);
 		meshr = new THREE.Mesh( 
-			new THREE.SphereGeometry( radius, 30,30, Math.PI/2, Math.PI/2, 0, Math.PI/2 ), 
+			new THREE.SphereGeometry( radius, 30,30, Math.PI/2, Math.PI/2, 0, Math.PI ), 
 			material 
 		);
 		scene.add( meshl );
